@@ -1,0 +1,4 @@
+module FleetSystemTestsPackageTests {
+    header "/Users/admin69/Desktop/GMS/fleetManagementSystem/Test/.build/arm64-apple-macosx/debug/FleetSystemTestsPackageTests.build/FleetSystemTestsPackageTests-Swift.h"
+    requires objc
+}

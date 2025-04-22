@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/admin69/Desktop/GMS/fleetManagementSystem/Test/.build/arm64-apple-macosx/debug/Test.build/master.swiftdeps"
+  },
+  "/Users/admin69/Desktop/GMS/fleetManagementSystem/Test/Sources/main.swift": {
+    "dependencies": "/Users/admin69/Desktop/GMS/fleetManagementSystem/Test/.build/arm64-apple-macosx/debug/Test.build/main.d",
+    "object": "/Users/admin69/Desktop/GMS/fleetManagementSystem/Test/.build/arm64-apple-macosx/debug/Test.build/main.swift.o",
+    "swiftmodule": "/Users/admin69/Desktop/GMS/fleetManagementSystem/Test/.build/arm64-apple-macosx/debug/Test.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/admin69/Desktop/GMS/fleetManagementSystem/Test/.build/arm64-apple-macosx/debug/Test.build/main.swiftdeps"
+  }
+}
