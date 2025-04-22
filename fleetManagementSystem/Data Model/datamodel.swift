@@ -22,3 +22,17 @@ struct EmergencyRequest: Codable {
     var timestamp: Date
     var inspectionId: String?
 }
+
+struct UserProfile: Codable {
+    var name: String?
+    var email: String?
+    var role: String?
+    var phone: String?
+
+    init(from data: [String: Any]) throws {
+        self.name = data["name"] as? String
+        self.email = data["email"] as? String
+        self.role = data["role"] as? String
+        self.phone = data["phone"] as? String
+    }
+}
