@@ -1,6 +1,6 @@
 
 import SwiftUI
-
+import FirebaseFirestore
     enum AuthScreen {
         case login
        
