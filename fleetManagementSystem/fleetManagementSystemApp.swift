@@ -24,7 +24,9 @@ struct fleetManagementSystemApp: App {
     
     var body: some Scene {
         WindowGroup {
-            AuthRootView()
+//            AuthRootView()
+            InspectionbeforeRide()
+//            MainTabView()
         }
     }
 }
