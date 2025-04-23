@@ -221,23 +221,6 @@ struct NavigationMapView: View {
             // Navigation UI overlay
             VStack(spacing: 0) {
                 // Status bar (would be managed by the system in a real app)
-                HStack {
-                    Text("9:41")
-                        .font(.system(size: 14, weight: .semibold))
-
-                    Spacer()
-
-                    HStack(spacing: 4) {
-                        Image(systemName: "cellularbars")
-                        Image(systemName: "wifi")
-                        Image(systemName: "battery.100")
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                .padding(.bottom, 8)
-                .background(Color(UIColor.systemGray6).opacity(0.8))
-
                 // Top buttons
                 ZStack {
                     VStack {
@@ -652,8 +635,3 @@ struct RoundedCornerShape: Shape {
 }
 
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}

@@ -26,6 +26,7 @@ struct fleetManagementSystemApp: App {
         WindowGroup {
 //            AuthRootView()
             InspectionbeforeRide()
+//            MainTabView()
         }
     }
 }
