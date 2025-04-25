@@ -20,12 +20,14 @@
 		359511872DB7562F00318EF3 /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = 359511862DB7562F00318EF3 /* FirebasePerformance */; };
 		359511892DB7562F00318EF3 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 359511882DB7562F00318EF3 /* FirebaseStorage */; };
 		3D6AC6892DB763AB00EE9A64 /* InspectionbeforeRide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6AC6882DB763AB00EE9A64 /* InspectionbeforeRide.swift */; };
+		49095A172DBA4D3F00EECBFB /* Firebase Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49095A162DBA4D3F00EECBFB /* Firebase Manager.swift */; };
 		497EB5122DB9EE4500702B4C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 497EB5112DB9EE4500702B4C /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		3D6AC6882DB763AB00EE9A64 /* InspectionbeforeRide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InspectionbeforeRide.swift; path = fleetManagementSystem/Ride/InspectionbeforeRide.swift; sourceTree = "<group>"; };
 		3D6D3AA62DB25FF200365240 /* fleetManagementSystem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = fleetManagementSystem.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		49095A162DBA4D3F00EECBFB /* Firebase Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Firebase Manager.swift"; sourceTree = "<group>"; };
 		497EB5112DB9EE4500702B4C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -61,6 +63,7 @@
 		3D6D3A9D2DB25FF200365240 = {
 			isa = PBXGroup;
 			children = (
+				49095A162DBA4D3F00EECBFB /* Firebase Manager.swift */,
 				497EB5112DB9EE4500702B4C /* GoogleService-Info.plist */,
 				3D6AC6882DB763AB00EE9A64 /* InspectionbeforeRide.swift */,
 				3D6D3AA82DB25FF200365240 /* fleetManagementSystem */,
@@ -165,6 +168,7 @@
 			isa = PBXSourcesBuildPhase;
 			files = (
 				3D6AC6892DB763AB00EE9A64 /* InspectionbeforeRide.swift in Sources */,
+				49095A172DBA4D3F00EECBFB /* Firebase Manager.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
