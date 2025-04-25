@@ -12,6 +12,9 @@ struct FleetVehicleListView: View {
     @State private var searchText = ""
     @State private var allVehicles: [Vehicle] = []
     @State private var selectedVehicle: Vehicle?
+    @State private var showAddVehicle = false
+    @State private var navigateToAddFleet = false
+
 
     let segments = ["HMV", "LMV"]
 
@@ -42,11 +45,18 @@ struct FleetVehicleListView: View {
                   searchBar
                   CustomSegmentedControl(selectedSegment: $selectedSegment, segments: segments)
                   vehicleList
+                  
+                  NavigationLink(destination: AddFleetVehicleView(), isActive: $navigateToAddFleet) {
+                      EmptyView()
+                  }
               }
+              
+              
+              
               .background(Color.white.ignoresSafeArea())
               .navigationBarTitle("Vehicles", displayMode: .inline)
               .navigationBarItems(trailing: Button(action: {
-                  // Future Add Vehicle button
+                  navigateToAddFleet = true
               }) {
                   Image(systemName: "plus.circle.fill")
                       .foregroundColor(.primary)
@@ -94,7 +104,8 @@ struct FleetVehicleListView: View {
         }
         .fullScreenCover(item: $selectedVehicle) { vehicle in
             NavigationStack {
-                VehicleDetailView()
+                // Pass the selected vehicle to VehicleDetailView
+                                VehicleDetailView(vehicle: vehicle)
                     .toolbar {
                         // Back button in top-left (navigationBarLeading)
                         ToolbarItem(placement: .navigationBarLeading) {

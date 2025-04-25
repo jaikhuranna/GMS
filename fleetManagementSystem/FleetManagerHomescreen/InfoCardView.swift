@@ -62,10 +62,12 @@ struct Vehicle: Identifiable {
     var engineNo: String
     var licenseRenewalDate: Date
     var carImage: String // Optional: for static images from Assets
-
-    enum VehicleType {
+    
+    enum VehicleType: String, CaseIterable, Identifiable {
         case HMV
         case LMV
+        
+        var id: String { rawValue }
     }
 }
 
