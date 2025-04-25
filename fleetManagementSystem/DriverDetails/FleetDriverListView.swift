@@ -10,39 +10,54 @@ import SwiftUI
 struct FleetDriverListView: View {
     @State private var selectedSegment = "HMV"
     @State private var searchText = ""
+    @State private var drivers: [Driver] = []
 
     let segments = ["HMV", "LMV"]
 
-    let hmvDrivers = [
-        Driver(driverName: "Angel Kenter", driverExperience: 4, driverImage: "driverImage"),
-        Driver(driverName: "Vikram Reddy", driverExperience: 5, driverImage: "driverImage"),
-        Driver(driverName: "Sonia Dsouza", driverExperience: 3, driverImage: "driverImage")
-    ]
-
-    let lmvDrivers = [
-        Driver(driverName: "Raj Mehra", driverExperience: 6, driverImage: "driverImage"),
-        Driver(driverName: "Sonia Dsouza", driverExperience: 3, driverImage: "driverImage"),
-        Driver(driverName: "Angel Kenter", driverExperience: 4, driverImage: "driverImage")
-    ]
+//    let hmvDrivers = [
+//        Driver(driverName: "Angel Kenter", driverExperience: 4, driverImage: "driverImage"),
+//        Driver(driverName: "Vikram Reddy", driverExperience: 5, driverImage: "driverImage"),
+//        Driver(driverName: "Sonia Dsouza", driverExperience: 3, driverImage: "driverImage")
+//    ]
+//
+//    let lmvDrivers = [
+//        Driver(driverName: "Raj Mehra", driverExperience: 6, driverImage: "driverImage"),
+//        Driver(driverName: "Sonia Dsouza", driverExperience: 3, driverImage: "driverImage"),
+//        Driver(driverName: "Angel Kenter", driverExperience: 4, driverImage: "driverImage")
+//    ]
 
     var filteredDrivers: [Driver] {
-        let drivers = selectedSegment == "HMV" ? hmvDrivers : lmvDrivers
-        return searchText.isEmpty ? drivers : drivers.filter { $0.driverName.lowercased().contains(searchText.lowercased()) }
-    }
-
+          let filtered = drivers.filter { driver in
+              selectedSegment == "HMV" ? driver.driverLicenseType == "HMV" : driver.driverLicenseType == "LMV"
+          }
+          return searchText.isEmpty ? filtered : filtered.filter { $0.driverName.lowercased().contains(searchText.lowercased()) }
+      }
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
                 searchBar
                 CustomSegmentedControl(selectedSegment: $selectedSegment, segments: segments)
                 driverList
+                
+//                NavigationLink(destination: AddDriverView(), isActive: $navigateToAddDriver)
+//                {
+//                    EmptyView()
+//                }
             }
             .background(Color.white.ignoresSafeArea())
             .navigationBarTitle("Drivers", displayMode: .inline)
-            .navigationBarItems(trailing: Button(action: {}) {
-                Image(systemName: "plus.circle.fill")
-                    .foregroundColor(.primary)
-            })
+//            .navigationBarItems(trailing: Button(action: {navigateToAddDriver = true}) {
+//                Image(systemName: "plus.circle.fill")
+//                    .foregroundColor(.primary)
+//            })
+            
+            .onAppear {
+                            // Fetch the drivers when the view appears
+                            FirebaseModules.shared.fetchDrivers { fetchedDrivers in
+                                self.drivers = fetchedDrivers
+                            }
+                        }
+            
         }
     }
 

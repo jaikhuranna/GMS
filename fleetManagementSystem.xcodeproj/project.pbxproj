@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		357596292DBB4FA800442223 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 357596282DBB4FA800442223 /* GoogleService-Info.plist */; };
 		359511732DB7562F00318EF3 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 359511722DB7562F00318EF3 /* FirebaseAnalytics */; };
 		359511752DB7562F00318EF3 /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 359511742DB7562F00318EF3 /* FirebaseAppCheck */; };
 		359511772DB7562F00318EF3 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 359511762DB7562F00318EF3 /* FirebaseAuth */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		357596282DBB4FA800442223 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		3D6AC6882DB763AB00EE9A64 /* InspectionbeforeRide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = InspectionbeforeRide.swift; path = fleetManagementSystem/Ride/InspectionbeforeRide.swift; sourceTree = "<group>"; };
 		3D6D3AA62DB25FF200365240 /* fleetManagementSystem.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = fleetManagementSystem.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -59,6 +61,7 @@
 		3D6D3A9D2DB25FF200365240 = {
 			isa = PBXGroup;
 			children = (
+				357596282DBB4FA800442223 /* GoogleService-Info.plist */,
 				3D6AC6882DB763AB00EE9A64 /* InspectionbeforeRide.swift */,
 				3D6D3AA82DB25FF200365240 /* fleetManagementSystem */,
 				3D6D3AA72DB25FF200365240 /* Products */,
@@ -152,6 +155,7 @@
 		3D6D3AA42DB25FF200365240 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				357596292DBB4FA800442223 /* GoogleService-Info.plist in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */

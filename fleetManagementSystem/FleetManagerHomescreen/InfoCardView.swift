@@ -34,7 +34,7 @@ struct PastTrip: Identifiable {
 
 struct PastMaintenance: Identifiable {
     let id = UUID()
-    let note: String  
+    let note: String
     let observerName: String
     let dateOfMaintenance: String
 }
@@ -52,10 +52,16 @@ struct VehicleDetail: Identifiable{
 }
 
 struct Vehicle: Identifiable {
-    let id = UUID()
-    let vehicleNo: String
-    let distanceTravelled: Int
-    let carImage: String
+    var id: String
+    var vehicleNo: String
+    var distanceTravelled: Int
+    var vehicleCategory: String
+    var vehicleType: String
+    var modelName: String
+    var averageMileage: Double
+    var engineNo: String
+    var licenseRenewalDate: Date
+    var carImage: String // Optional: for static images from Assets
 
     enum VehicleType {
         case HMV
@@ -64,10 +70,15 @@ struct Vehicle: Identifiable {
 }
 
 struct Driver: Identifiable {
-    let id = UUID()
-    let driverName: String
-    let driverExperience: Int
-    let driverImage: String
+    var id: String
+    var driverName: String
+    var driverImage: String
+    var driverExperience: Int
+    var driverAge: Int
+    var driverContactNo: String
+    var driverLicenseNo: String
+    var driverLicenseType: String
+
 
     enum DriverType {
         case HMV
@@ -109,7 +120,7 @@ struct InfoCardView: View {
                         .fill(Color.white)
                         .frame(width: 50, height: 50) // Increased size here
                     Image(systemName: card.icon)
-                        .font(.system(size: 20)) 
+                        .font(.system(size: 20))
                         .foregroundColor(Color(hex: "#396BAF"))
                 }
             }
