@@ -18,6 +18,7 @@ struct AddDriverView: View {
     @State private var validationErrors: [String: String] = [:]
     @FocusState private var focusedField: Field?
     @State private var showingLicenseTypePicker = false
+    @State private var navigateToSuccess = false
 
     enum Field {
         case name, age, experience, licenseNo, contactNo
@@ -136,7 +137,7 @@ struct AddDriverView: View {
         HStack(alignment: .top, spacing: 16) {
             Text(title)
                 .foregroundColor(Color(hex: "#396BAF"))
-                .font(.subheadline)
+                .font(.body)
                 .frame(width: 100, alignment: .leading)
             
             VStack(alignment: .leading, spacing: 4) {
@@ -159,7 +160,7 @@ struct AddDriverView: View {
         HStack(alignment: .center, spacing: 16) {
             Text("Licence Type")
                 .foregroundColor(Color(hex: "#396BAF"))
-                .font(.subheadline)
+                .font(.body)
                 .frame(width: 100, alignment: .leading)
             
             Button(action: {
@@ -224,14 +225,19 @@ struct AddDriverView: View {
     }
 
     private var addDriverButton: some View {
-        Button(action: validateAndSave) {
-            Text("Add Driver")
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color(hex: "#396BAF"))
-                .foregroundColor(.white)
-                .font(.headline)
-                .cornerRadius(12)
+        NavigationLink(
+            destination: DriverAddedSuccessView(driverName: driver.driverName),
+            isActive: $navigateToSuccess
+        ) {
+            Button(action: validateAndSave) {
+                Text("Add Driver")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(hex: "#396BAF"))
+                    .foregroundColor(.white)
+                    .font(.headline)
+                    .cornerRadius(12)
+            }
         }
         .padding(.horizontal)
         .padding(.top, 8)
@@ -257,7 +263,7 @@ struct AddDriverView: View {
         }
 
         if validationErrors.isEmpty {
-            showingSaveAlert = true
+            navigateToSuccess = true
         }
     }
 }

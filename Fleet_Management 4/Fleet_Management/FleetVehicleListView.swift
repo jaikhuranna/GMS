@@ -41,7 +41,7 @@ struct FleetVehicleListView: View {
                 CustomSegmentedControl(selectedSegment: $selectedSegment, segments: segments)
                 vehicleList
                 
-                NavigationLink(destination: AddDriverView(), isActive: $navigateToAddFleet) {
+                NavigationLink(destination: AddFleetVehicleView(), isActive: $navigateToAddFleet) {
                     EmptyView()
                 }
             }

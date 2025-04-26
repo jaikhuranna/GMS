@@ -17,21 +17,21 @@ struct AddFleetVehicleView: View {
         averageMileage: "",
         vehicleType: .LMV
     )
-    
+
     @State private var insuranceProofImage: UIImage?
     @State private var profileImage: UIImage?
     @State private var showingImagePicker = false
     @State private var showingVehicleTypePicker = false
-    @State private var showingSaveAlert = false
     @State private var validationErrors: [String: String] = [:]
     @FocusState private var focusedField: Field?
+    @State private var navigateToSuccess = false
 
     enum Field {
         case vehicleNo, modelName, engineNo, licenceRenewedDate, distanceTravelled, averageMileage
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
                     profileUploadSection
@@ -41,16 +41,15 @@ struct AddFleetVehicleView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 24)
+                .navigationDestination(isPresented: $navigateToSuccess) {
+                    VehicleAddedSuccessView(
+                        vehicleNumber: vehicle.vehicleNo,
+                        distanceTravelled: vehicle.distanceTravelled + " km"
+                    )
+                }
             }
             .sheet(isPresented: $showingImagePicker) {
                 ImagePicker(image: $insuranceProofImage)
-            }
-            .alert(isPresented: $showingSaveAlert) {
-                Alert(
-                    title: Text("Vehicle Added"),
-                    message: Text("\(vehicle.vehicleNo) has been added to the fleet."),
-                    dismissButton: .default(Text("OK"))
-                )
             }
         }
     }
@@ -123,7 +122,7 @@ struct AddFleetVehicleView: View {
         HStack(alignment: .top, spacing: 16) {
             Text(title)
                 .foregroundColor(Color(hex: "#396BAF"))
-                .font(.subheadline)
+                .font(.body)
                 .frame(width: 120, alignment: .leading)
 
             VStack(alignment: .leading, spacing: 4) {
@@ -146,7 +145,7 @@ struct AddFleetVehicleView: View {
         HStack(spacing: 16) {
             Text("Vehicle Type")
                 .foregroundColor(Color(hex: "#396BAF"))
-                .font(.subheadline)
+                .font(.body)
                 .frame(width: 120, alignment: .leading)
 
             Button(action: {
@@ -231,7 +230,7 @@ struct AddFleetVehicleView: View {
         if vehicle.averageMileage.isEmpty { validationErrors["Avg. Mileage"] = "Required" }
 
         if validationErrors.isEmpty {
-            showingSaveAlert = true
+            navigateToSuccess = true
         }
     }
 }
