@@ -108,6 +108,7 @@ struct VehicleDetailView: View {
                     .background(Color(hex: "396BAF"))
                     .cornerRadius(10)
                     .padding(.horizontal)
+                    
                 }
             }
 
@@ -130,7 +131,10 @@ struct VehicleDetailView: View {
                                                .background(Color(hex: "396BAF").opacity(0.1))
                                                .cornerRadius(10)
                                                .padding(.horizontal)
-                                           } else if selectedTab == 1 {
+                                           }
+                    
+                    
+                    else if selectedTab == 1 {
                         // Past Trips Tab
                         ForEach(pastTrips) { trip in
                             HStack(alignment: .center, spacing: 16) {
@@ -208,6 +212,18 @@ struct VehicleDetailView: View {
             .padding(.bottom, 10)
         }
         .background(Color(red: 231/255, green: 237/255, blue: 248/255).ignoresSafeArea())
+        
+        .onAppear {
+            FirebaseModules.fetchPastTrips(for: vehicle.vehicleNo) { trips in
+                self.pastTrips = trips
+            }
+            FirebaseModules.fetchPastMaintenances(for: vehicle.vehicleNo) { maintenances in
+                self.pastMaintenances = maintenances
+            }
+        }
+        
+        
+        
     }
     // Format date for display - This was missing!
        private func formatDateString(_ date: Date) -> String {
@@ -217,6 +233,7 @@ struct VehicleDetailView: View {
        }
 
 }
+
 
 
 

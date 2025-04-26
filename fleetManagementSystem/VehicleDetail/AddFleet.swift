@@ -286,6 +286,7 @@
 //}
 
 
+
 import SwiftUI
 
 struct AddFleetVehicleView: View {
@@ -302,18 +303,21 @@ struct AddFleetVehicleView: View {
     
     @State private var showingImagePickerForVehicle = false
     @State private var showingImagePickerForInsurance = false
-    @State private var showingSaveAlert = false
     @State private var validationErrors: [String: String] = [:]
     @State private var showingVehicleTypePicker = false
-
+    @State private var showSuccessView = false
     @FocusState private var focusedField: Field?
+    @State private var isSaving = false
+    @State private var showError = false
+    @State private var errorMessage = ""
+
     
     enum Field {
         case vehicleNo, modelName, engineNo, distanceTravelled, averageMileage
     }
-
+    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
                     profileUploadSection
@@ -330,17 +334,38 @@ struct AddFleetVehicleView: View {
             .sheet(isPresented: $showingImagePickerForInsurance) {
                 ImagePicker(selectedImage: $vehicle.insuranceProofImage)
             }
-            .alert(isPresented: $showingSaveAlert) {
-                Alert(
-                    title: Text("Vehicle Added"),
-                    message: Text("\(vehicle.vehicleNo) has been added to the fleet."),
-                    dismissButton: .default(Text("OK"))
+            .navigationDestination(isPresented: $showSuccessView) {
+                VehicleAddedSuccessView(
+                    vehicleNumber: vehicle.vehicleNo,
+                    distanceTravelled: String(format: "%.1f km", vehicle.distanceTravelled)
                 )
             }
-           
+            .overlay(
+                Group {
+                    if isSaving {
+                        ZStack {
+                            Color.black.opacity(0.4).ignoresSafeArea()
+                            
+                            VStack(spacing: 16) {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(1.5)
+                                
+                                Text("Saving Vehicle...")
+                                    .foregroundColor(.white)
+                                    .font(.headline)
+                            }
+                            .padding(20)
+                            .background(Color.black.opacity(0.7))
+                            .cornerRadius(12)
+                        }
+                    }
+                }
+            )
+
         }
     }
-
+    
     private var profileUploadSection: some View {
         ZStack(alignment: .bottomTrailing) {
             if let photo = vehicle.vehiclePhoto {
@@ -362,7 +387,7 @@ struct AddFleetVehicleView: View {
                             .foregroundColor(Color(hex: "#396BAF"))
                     )
             }
-
+            
             Button(action: { showingImagePickerForVehicle = true }) {
                 Circle()
                     .fill(Color.white)
@@ -377,7 +402,7 @@ struct AddFleetVehicleView: View {
         .padding(.top, 32)
         .padding(.bottom, 16)
     }
-
+    
     private var vehicleDetailsContainer: some View {
         VStack(spacing: 6) {
             Text("Vehicle Details")
@@ -385,12 +410,12 @@ struct AddFleetVehicleView: View {
                 .foregroundColor(Color(hex: "#396BAF"))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 2)
-
+            
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color.white)
                     .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-
+                
                 VStack(spacing: 16) {
                     inputRow(title: "Vehicle No.", text: $vehicle.vehicleNo, field: .vehicleNo)
                     Divider()
@@ -412,17 +437,17 @@ struct AddFleetVehicleView: View {
         }
         .padding(.horizontal)
     }
-
+    
     private func inputRow(title: String, text: Binding<String>, field: Field) -> some View {
         HStack(alignment: .top, spacing: 16) {
             Text(title)
                 .foregroundColor(Color(hex: "#396BAF"))
                 .frame(width: 120, alignment: .leading)
-
+            
             VStack(alignment: .leading, spacing: 4) {
                 TextField("Enter \(title.lowercased())", text: text)
                     .focused($focusedField, equals: field)
-
+                
                 if let error = validationErrors[title] {
                     Text(error)
                         .foregroundColor(.red)
@@ -432,21 +457,21 @@ struct AddFleetVehicleView: View {
         }
         .frame(height: 40)
     }
-
+    
     private func inputDoubleRow(title: String, value: Binding<Double>, field: Field) -> some View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-
+        
         return HStack(alignment: .top, spacing: 16) {
             Text(title)
                 .foregroundColor(Color(hex: "#396BAF"))
                 .frame(width: 120, alignment: .leading)
-
+            
             VStack(alignment: .leading, spacing: 4) {
                 TextField("Enter \(title.lowercased())", value: value, formatter: formatter)
                     .keyboardType(.decimalPad)
                     .focused($focusedField, equals: field)
-
+                
                 if let error = validationErrors[title] {
                     Text(error)
                         .foregroundColor(.red)
@@ -456,26 +481,26 @@ struct AddFleetVehicleView: View {
         }
         .frame(height: 40)
     }
-
+    
     private var datePickerRow: some View {
         HStack(spacing: 16) {
             Text("License Date")
                 .foregroundColor(Color(hex: "#396BAF"))
                 .frame(width: 120, alignment: .leading)
-
+            
             DatePicker("", selection: $vehicle.licenseRenewalDate, displayedComponents: .date)
                 .labelsHidden()
         }
         .frame(height: 40)
     }
-
+    
     private var vehicleCategoryPicker: some View {
         HStack(spacing: 16) {
             Text("Vehicle Category")
                 .foregroundColor(Color(hex: "#396BAF"))
                 .font(.subheadline)
                 .frame(width: 120, alignment: .leading)
-
+            
             Button(action: {
                 showingVehicleTypePicker = true
             }) {
@@ -504,22 +529,22 @@ struct AddFleetVehicleView: View {
         }
         .frame(height: 40)
     }
-
-
+    
+    
     private var insuranceUploadSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Insurance Proof")
                 .font(.headline)
                 .foregroundColor(Color(hex: "#396BAF"))
                 .padding(.leading, 4)
-
+            
             Button(action: { showingImagePickerForInsurance = true }) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.white)
                         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                         .frame(height: 150)
-
+                    
                     VStack(spacing: 12) {
                         if let img = vehicle.insuranceProofImage {
                             Image(uiImage: img)
@@ -539,41 +564,56 @@ struct AddFleetVehicleView: View {
         }
         .padding(.horizontal)
     }
-
+    
     private var addFleetButton: some View {
         Button(action: validateAndSave) {
-            Text("Add To Fleet")
+            Text(isSaving ? "Saving..." : "Add To Fleet")
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(hex: "#396BAF"))
+                .background(isSaving ? Color.gray : Color(hex: "#396BAF"))
                 .foregroundColor(.white)
                 .font(.headline)
                 .cornerRadius(12)
         }
+        .disabled(isSaving)
         .padding(.horizontal)
         .padding(.top, 8)
     }
 
     private func validateAndSave() {
         validationErrors.removeAll()
-
+        
         if vehicle.vehicleNo.isEmpty { validationErrors["Vehicle No."] = "Required" }
         if vehicle.modelName.isEmpty { validationErrors["Model Name"] = "Required" }
         if vehicle.engineNo.isEmpty { validationErrors["Engine No."] = "Required" }
         if vehicle.distanceTravelled == 0 { validationErrors["Distance Travelled"] = "Required" }
         if vehicle.averageMileage == 0 { validationErrors["Avg. Mileage"] = "Required" }
+        
+        guard validationErrors.isEmpty else { return }
 
-        if validationErrors.isEmpty {
-            showingSaveAlert = true
+        // Show saving state
+        isSaving = true
+        errorMessage = "" // Reset error message
+        showError = false
+        
+        // Upload data
+        Task {
+            do {
+                try await FirebaseModules.shared.addFleetVehicle(vehicle)
+                isSaving = false // Reset saving state
+                showSuccessView = true
+            } catch {
+                isSaving = false // Reset saving state
+                errorMessage = error.localizedDescription
+                showError = true
+            }
         }
     }
+
     
-}
-
-
-struct AddFleetVehicleView_Preview: PreviewProvider {
-    static var previews: some View {
-       AddFleetVehicleView()
+    struct AddFleetVehicleView_Preview: PreviewProvider {
+        static var previews: some View {
+            AddFleetVehicleView()
+        }
     }
 }
-

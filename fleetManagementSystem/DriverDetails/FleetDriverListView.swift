@@ -11,6 +11,7 @@ struct FleetDriverListView: View {
     @State private var selectedSegment = "HMV"
     @State private var searchText = ""
     @State private var drivers: [Driver] = []
+    @State private var navigateToAddDriver = false
 
     let segments = ["HMV", "LMV"]
 
@@ -39,17 +40,16 @@ struct FleetDriverListView: View {
                 CustomSegmentedControl(selectedSegment: $selectedSegment, segments: segments)
                 driverList
                 
-//                NavigationLink(destination: AddDriverView(), isActive: $navigateToAddDriver)
-//                {
-//                    EmptyView()
-//                }
+                NavigationLink(destination: AddDriverView(), isActive: $navigateToAddDriver) {
+                                  EmptyView() // This will perform navigation when the state is set to true
+                              }
             }
             .background(Color.white.ignoresSafeArea())
             .navigationBarTitle("Drivers", displayMode: .inline)
-//            .navigationBarItems(trailing: Button(action: {navigateToAddDriver = true}) {
-//                Image(systemName: "plus.circle.fill")
-//                    .foregroundColor(.primary)
-//            })
+            .navigationBarItems(trailing: Button(action: {navigateToAddDriver = true}) {
+                Image(systemName: "plus.circle.fill")
+                    .foregroundColor(Color(hex: "#396BAF"))
+            })
             
             .onAppear {
                             // Fetch the drivers when the view appears

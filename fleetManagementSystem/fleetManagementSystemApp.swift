@@ -13,7 +13,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
     FirebaseApp.configure()
-
+//      FirebaseManager.shared.pushSampleTripAndMaintenanceDataToFirebase()
+//      print("Attempting to push sample data...")
     return true
   }
 }

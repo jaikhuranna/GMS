@@ -10,13 +10,18 @@ import SwiftUI
 struct VehicleAddedSuccessView: View {
     @Environment(\.presentationMode) var presentationMode
 
-    var vehicleNumber: String = "MH 12 AB 1234" // Example Vehicle No
-    var distanceTravelled: String = "1520 km"    // Example Distance Travelled
+    var vehicleNumber: String
+    var distanceTravelled: String
+
+    init(vehicleNumber: String, distanceTravelled: String) {
+        self.vehicleNumber = vehicleNumber
+        self.distanceTravelled = distanceTravelled
+    }
 
     var body: some View {
         VStack(spacing: 24) {
             Spacer()
-            
+
             Text("Vehicle Added Successfully!")
                 .font(.title2)
                 .fontWeight(.bold)
@@ -28,14 +33,14 @@ struct VehicleAddedSuccessView: View {
                 Circle()
                     .fill(Color.blue.opacity(0.1))
                     .frame(width: 120, height: 120)
-                
+
                 Image(systemName: "car.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 60, height: 60)
                     .foregroundColor(Color(hex: "396BAF"))
             }
-            
+
             VStack(spacing: 0) {
                 infoRow(title: "Vehicle No.", value: vehicleNumber)
                 Divider()
@@ -65,7 +70,7 @@ struct VehicleAddedSuccessView: View {
         .background(Color(red: 237/255, green: 242/255, blue: 252/255))
         .navigationBarBackButtonHidden(true)
     }
-    
+
     private func infoRow(title: String, value: String) -> some View {
         HStack {
             Text(title)
@@ -83,7 +88,7 @@ struct VehicleAddedSuccessView: View {
 struct VehicleAddedSuccessView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            VehicleAddedSuccessView()
+            VehicleAddedSuccessView(vehicleNumber: "MH 12 AB 1234", distanceTravelled: "1520 km")
         }
     }
 }

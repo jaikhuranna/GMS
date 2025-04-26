@@ -37,6 +37,7 @@ struct PastMaintenance: Identifiable {
     let note: String
     let observerName: String
     let dateOfMaintenance: String
+    let vehicleNo: String
 }
 
 
