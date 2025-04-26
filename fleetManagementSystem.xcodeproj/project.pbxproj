@@ -31,22 +31,9 @@
 		497EB5112DB9EE4500702B4C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3D2201152DBC2AD700208ACE /* Exceptions for "fleetManagementSystem" folder in "fleetManagementSystem" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 3D6D3AA52DB25FF200365240 /* fleetManagementSystem */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3D6D3AA82DB25FF200365240 /* fleetManagementSystem */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				3D2201152DBC2AD700208ACE /* Exceptions for "fleetManagementSystem" folder in "fleetManagementSystem" target */,
-			);
 			path = fleetManagementSystem;
 			sourceTree = "<group>";
 		};
@@ -318,7 +305,6 @@
 				DEVELOPMENT_TEAM = VZ6G589YY2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = fleetManagementSystem/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Fleetums;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -349,7 +335,6 @@
 				DEVELOPMENT_TEAM = VZ6G589YY2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = fleetManagementSystem/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Fleetums;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
