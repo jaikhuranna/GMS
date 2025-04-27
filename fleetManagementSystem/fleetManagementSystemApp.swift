@@ -10,15 +10,13 @@ import FirebaseCore
 
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        FirebaseApp.configure()
-
-        // let dbService = FleetDriverDBService()
-        // dbService.uploadSampleFleetDrivers(sampleDrivers)
-
-        return true
-
-    }
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    FirebaseApp.configure()
+//      FirebaseManager.shared.pushSampleTripAndMaintenanceDataToFirebase()
+//      print("Attempting to push sample data...")
+    return true
+  }
 }
 
 @main
