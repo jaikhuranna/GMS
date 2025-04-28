@@ -1,43 +1,38 @@
 import SwiftUI
 
-
-struct AddDriverView: View {
-    @State private var driver = Driver(
-        id: UUID().uuidString,
-        driverName: "",
-        driverImage: "",
-        driverExperience: 0,
-        driverAge: 0,
-        driverContactNo: "",
-        driverLicenseNo: "",
-        driverLicenseType: "LMV"
-    )
-
+struct EditDriverView: View {
+    @Environment(\.dismiss) private var dismiss
     
+    let original: Driver
+    @State private var driver: Driver
     @State private var licenseProofImage: UIImage?
     @State private var profileImage: UIImage?
     @State private var showingImagePicker = false
     @State private var imagePickerType: ImagePickerType = .profile
-    @State private var showingSaveAlert = false
     @State private var validationErrors: [String: String] = [:]
     @FocusState private var focusedField: Field?
     @State private var showingLicenseTypePicker = false
-    @State private var showSuccessView = false
+    @State private var showSuccess = false
     @State private var firestoreError: String?
     @State private var isSaving = false
-     
-
-
-
+    
+    let onSave: () -> Void
+    
     enum ImagePickerType {
         case profile
         case license
     }
-
+    
     enum Field {
         case name, age, experience, licenseNo, contactNo
     }
-
+    
+    init(driver: Driver, onSave: @escaping () -> Void) {
+        self.original = driver
+        self._driver = State(initialValue: driver)
+        self.onSave = onSave
+    }
+    
     var body: some View {
         ZStack {
             NavigationStack {
@@ -46,7 +41,7 @@ struct AddDriverView: View {
                         profileUploadSection
                         driverDetailsContainer
                         licenseUploadSection
-                        addDriverButton
+                        saveChangesButton
                     }
                     .padding(.bottom, 24)
                     .padding(.horizontal, 16)
@@ -54,13 +49,16 @@ struct AddDriverView: View {
                 .sheet(isPresented: $showingImagePicker) {
                     ImagePicker(selectedImage: imagePickerType == .profile ? $profileImage : $licenseProofImage)
                 }
-                .navigationDestination(isPresented: $showSuccessView) {
-                    DriverAddedSuccessView(
-                        driverName: driver.driverName,
-                        driverExperience: "\(driver.driverExperience) years"
-                    )
+                .alert("Success", isPresented: $showSuccess) {
+                    Button("OK") {
+                        onSave()
+                        dismiss()
+                    }
+                } message: {
+                    Text("Your changes have been saved.")
                 }
             }
+            
             if isSaving {
                 Color.black.opacity(0.4)
                     .ignoresSafeArea()
@@ -71,8 +69,9 @@ struct AddDriverView: View {
                     .cornerRadius(12)
             }
         }
+        .navigationTitle("Edit Driver")
     }
-
+    
     private var profileUploadSection: some View {
         ZStack(alignment: .bottomTrailing) {
             Circle()
@@ -87,11 +86,22 @@ struct AddDriverView: View {
                                 .frame(width: 120, height: 120)
                                 .clipShape(Circle())
                         } else {
-                            Image(systemName: "camera.viewfinder")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 40, height: 40)
-                                .foregroundColor(Color(hex: "#396BAF"))
+                            AsyncImage(url: URL(string: original.driverImage)) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 120, height: 120)
+                                        .clipShape(Circle())
+                                default:
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 40, height: 40)
+                                        .foregroundColor(Color(hex: "#396BAF"))
+                                }
+                            }
                         }
                     }
                 )
@@ -114,7 +124,7 @@ struct AddDriverView: View {
         .padding(.top, 32)
         .padding(.bottom, 16)
     }
-
+    
     private var driverDetailsContainer: some View {
         VStack(spacing: 6) {
             Text("Driver Details")
@@ -123,7 +133,7 @@ struct AddDriverView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 2)
                 .fontWeight(.bold)
-
+            
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color.white)
@@ -167,7 +177,7 @@ struct AddDriverView: View {
         }
         .padding(.horizontal)
     }
-
+    
     private func inputRow(title: String, text: Binding<String>, field: Field, keyboard: UIKeyboardType = .default) -> some View {
         HStack(alignment: .top, spacing: 16) {
             Text(title)
@@ -190,7 +200,7 @@ struct AddDriverView: View {
         }
         .frame(height: 40)
     }
-
+    
     private var licenseTypeRow: some View {
         HStack(alignment: .center, spacing: 16) {
             Text("Licence Type")
@@ -229,7 +239,7 @@ struct AddDriverView: View {
         }
         .frame(minHeight: 40, alignment: .top)
     }
-
+    
     private var licenseUploadSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Licence Proof")
@@ -275,38 +285,35 @@ struct AddDriverView: View {
         }
         .padding(.horizontal)
     }
-
-    private var addDriverButton: some View {
-      Button(action: validateAndSave) {
-        if isSaving {
-          ProgressView()
-            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color(hex: "#396BAF"))
-            .cornerRadius(12)
-        } else {
-          Text("Add Driver")
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color(hex: "#396BAF"))
-            .foregroundColor(.white)
-            .font(.headline)
-            .cornerRadius(12)
+    
+    private var saveChangesButton: some View {
+        Button(action: validateAndSave) {
+            if isSaving {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(hex: "#396BAF"))
+                    .cornerRadius(12)
+            } else {
+                Text("Save Changes")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(hex: "#396BAF"))
+                    .foregroundColor(.white)
+                    .font(.headline)
+                    .cornerRadius(12)
+            }
         }
-      }
-      .disabled(isSaving)
-      .padding(.horizontal)
-      .padding(.top, 8)
+        .disabled(isSaving)
+        .padding(.horizontal)
+        .padding(.top, 8)
     }
-
-
+    
     private func validateAndSave() {
-        // 1) Clear out any old errors
         validationErrors.removeAll()
         firestoreError = nil
-
-        // 2) Your existing field checks…
+        
         if driver.driverName.trimmingCharacters(in: .whitespaces).isEmpty {
             validationErrors["Name"] = "Name is required."
         }
@@ -322,50 +329,24 @@ struct AddDriverView: View {
         if driver.driverExperience <= 0 {
             validationErrors["Experience"] = "Experience is required."
         }
-
-        // 3) Ensure we have images
-        if profileImage == nil {
-            validationErrors["ProfileImage"] = "Profile image is required."
-        }
-        if licenseProofImage == nil {
-            validationErrors["LicenseProof"] = "License proof is required."
-        }
-
-        // 4) If anything failed, bail out
+        
         guard validationErrors.isEmpty else {
             return
         }
-
-        // 5) Grab unwrapped images
-        let profile    = profileImage!
-        let licenseImg = licenseProofImage!
         
-        // 1) Show spinner
-          isSaving = true
-
-
-        // 6) Call your shared FirebaseModules helper
-        FirebaseModules.shared.addDriver(
+        isSaving = true
+        
+        FirebaseModules.shared.updateDriver(
             driver,
-            profileImage: profile,
-            licenseImage: licenseImg
+            profileImage: profileImage,
+            licenseImage: licenseProofImage
         ) { error in
-            
             isSaving = false
             if let err = error {
-                // Show the Firestore error below the button
                 self.firestoreError = err.localizedDescription
             } else {
-                // Success! show the success screen
-                self.showSuccessView = true
+                self.showSuccess = true
             }
         }
-    }
-
-}
-
-struct AddDriverView_Previews: PreviewProvider {
-    static var previews: some View {
-        AddDriverView()
     }
 }

@@ -12,55 +12,64 @@ struct FleetDriverListView: View {
     @State private var searchText = ""
     @State private var drivers: [Driver] = []
     @State private var navigateToAddDriver = false
-
+    @State private var editingDriver: Driver?
+    @State private var navigateToEdit = false
+    @State private var selectedDriver: Driver?
+    
+    
     let segments = ["HMV", "LMV"]
-
-//    let hmvDrivers = [
-//        Driver(driverName: "Angel Kenter", driverExperience: 4, driverImage: "driverImage"),
-//        Driver(driverName: "Vikram Reddy", driverExperience: 5, driverImage: "driverImage"),
-//        Driver(driverName: "Sonia Dsouza", driverExperience: 3, driverImage: "driverImage")
-//    ]
-//
-//    let lmvDrivers = [
-//        Driver(driverName: "Raj Mehra", driverExperience: 6, driverImage: "driverImage"),
-//        Driver(driverName: "Sonia Dsouza", driverExperience: 3, driverImage: "driverImage"),
-//        Driver(driverName: "Angel Kenter", driverExperience: 4, driverImage: "driverImage")
-//    ]
-
+    
+    
+    
     var filteredDrivers: [Driver] {
-          let filtered = drivers.filter { driver in
-              selectedSegment == "HMV" ? driver.driverLicenseType == "HMV" : driver.driverLicenseType == "LMV"
-          }
-          return searchText.isEmpty ? filtered : filtered.filter { $0.driverName.lowercased().contains(searchText.lowercased()) }
-      }
+        let filtered = drivers.filter { driver in
+            selectedSegment == "HMV" ? driver.driverLicenseType == "HMV" : driver.driverLicenseType == "LMV"
+        }
+        return searchText.isEmpty ? filtered : filtered.filter { $0.driverName.lowercased().contains(searchText.lowercased()) }
+    }
+    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 16) {
                 searchBar
                 CustomSegmentedControl(selectedSegment: $selectedSegment, segments: segments)
-                driverList
                 
-                NavigationLink(destination: AddDriverView(), isActive: $navigateToAddDriver) {
-                                  EmptyView() // This will perform navigation when the state is set to true
-                              }
-            }
-            .background(Color.white.ignoresSafeArea())
-            .navigationBarTitle("Drivers", displayMode: .inline)
-            .navigationBarItems(trailing: Button(action: {navigateToAddDriver = true}) {
-                Image(systemName: "plus.circle.fill")
-                    .foregroundColor(Color(hex: "#396BAF"))
-            })
-            
-            .onAppear {
-                            // Fetch the drivers when the view appears
-                            FirebaseModules.shared.fetchDrivers { fetchedDrivers in
-                                self.drivers = fetchedDrivers
+                ScrollView {
+                    VStack(spacing: 14) {
+                        if filteredDrivers.isEmpty {
+                            Text("No drivers found.").foregroundColor(.gray)
+                        } else {
+                            ForEach(filteredDrivers) { drv in
+                                driverRow(drv)
+                                
                             }
                         }
-            
+                    }
+                }
+            }
+            .navigationBarTitle("Drivers", displayMode: .inline)
+            .toolbar {
+                // ← Here is the Add button
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: AddDriverView()) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(Color(hex: "#396BAF"))
+                    }
+                }
+            }
+            .onAppear {
+                FirebaseModules.shared.fetchDrivers { self.drivers = $0 }
+            }
+            .sheet(item: $editingDriver) { drv in
+                EditDriverView(driver: drv) {
+                    // refresh list after save
+                    FirebaseModules.shared.fetchDrivers { self.drivers = $0 }
+                }
+            }
         }
     }
-
+    
     private var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -74,7 +83,7 @@ struct FleetDriverListView: View {
         .shadow(color: .gray.opacity(0.2), radius: 4, x: 0, y: 2)
         .padding(.horizontal)
     }
-
+    
     private var driverList: some View {
         ScrollView {
             VStack(spacing: 14) {
@@ -90,62 +99,100 @@ struct FleetDriverListView: View {
             }
         }
     }
-
+    
     private func driverRow(_ driver: Driver) -> some View {
-        HStack(spacing: 16) {
-                Image(driver.driverImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 50, height: 50)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
-                    .shadow(radius: 2)
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(driver.driverName)
-                    .font(.headline)
-                    .foregroundColor(Color(hex: "#396BAF"))
-                Text("Experience: \(driver.driverExperience) Years")
-                    .font(.subheadline)
-                    .foregroundColor(Color(hex: "#396BAF"))
+        NavigationLink(destination: DriverDetailView(driver: driver)) {
+            HStack(spacing: 16) {
+                AsyncImage(url: sanitizeStorageURL(driver.driverImage)) { phase in
+                    switch phase {
+                    case .success(let img):
+                        img.resizable().scaledToFill()
+                    default:
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable().foregroundColor(.gray)
+                    }
+                }
+                .frame(width: 50, height: 50)
+                .clipShape(Circle())
+                .shadow(radius: 2)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(driver.driverName)
+                        .font(.headline)
+                        .foregroundColor(Color(hex: "#396BAF"))
+                    Text("Experience: \(driver.driverExperience) yrs")
+                        .font(.subheadline)
+                        .foregroundColor(Color(hex: "#396BAF"))
+                }
+                
+                Spacer()
+                
+                Button {
+                    editingDriver = driver
+                } label: {
+                    Image(systemName: "pencil.circle.fill")
+                        .font(.system(size: 24))
+                        .foregroundColor(Color(hex: "#396BAF"))
+                }
+                // make sure tapping the pencil doesn’t trigger the row link:
+                .buttonStyle(BorderlessButtonStyle())
             }
-            Spacer()
+            .padding()
+            .background(Color(red: 237/255, green: 242/255, blue: 252/255))
+            .cornerRadius(12)
+            .padding(.horizontal)
         }
-        .padding()
-        .background(Color(red: 237/255, green: 242/255, blue: 252/255))
-        .cornerRadius(16)
-        .padding(.horizontal)
+        .buttonStyle(PlainButtonStyle())
     }
 }
+    
+    /// Turn that bad “.firebasestorage.app” into “.appspot.com”, and drop the “:443” port
+    private func sanitizeStorageURL(_ raw: String) -> URL? {
+        guard var comps = URLComponents(string: raw) else { return nil }
+        // remove explicit port
+        comps.port = nil
+        // correct the host
+        if let host = comps.host,
+           host.hasSuffix(".firebasestorage.app") {
+            comps.host = host
+              .replacingOccurrences(of: ".firebasestorage.app",
+                                    with: ".appspot.com")
+        }
+        return comps.url
+    }
 
-struct CustomSegmentedControl: View {
-    @Binding var selectedSegment: String
-    let segments: [String]
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(segments, id: \.self) { segment in
-                Button(action: {
-                    selectedSegment = segment
-                }) {
-                    Text(segment)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 6)
-                        .background(selectedSegment == segment ? Color.white : Color(hex: "396BAF"))
-                        .foregroundColor(selectedSegment == segment ? Color(hex: "396BAF") : .white)
-                        .cornerRadius(8)
+    
+    struct CustomSegmentedControl: View {
+        @Binding var selectedSegment: String
+        let segments: [String]
+        
+        var body: some View {
+            HStack(spacing: 0) {
+                ForEach(segments, id: \.self) { segment in
+                    Button(action: {
+                        selectedSegment = segment
+                    }) {
+                        Text(segment)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
+                            .background(selectedSegment == segment ? Color.white : Color(hex: "396BAF"))
+                            .foregroundColor(selectedSegment == segment ? Color(hex: "396BAF") : .white)
+                            .cornerRadius(8)
+                    }
                 }
             }
+            .padding(4)
+            .background(Color(hex: "396BAF"))
+            .cornerRadius(10)
+            .padding(.horizontal)
         }
-        .padding(4)
-        .background(Color(hex: "396BAF"))
-        .cornerRadius(10)
-        .padding(.horizontal)
     }
-}
+    
+    
+    
+    struct FleetDriverListView_Previews: PreviewProvider {
+        static var previews: some View {
+           FleetDriverListView()
+        }
+    }
 
-struct FleetDriverListView_Previews: PreviewProvider {
-    static var previews: some View {
-        FleetDriverListView()
-    }
-}
