@@ -5,26 +5,95 @@
 //  Created by admin81 on 22/04/25.
 //
 import SwiftUI
+import SwiftUI
+import Firebase
+import FirebaseFirestore
+import Combine
 
+
+//struct DashboardView: View {
+//    @State private var selectedTab: Int = 0
+//    
+//    let infoCards = [
+//        InfoCard(number: "5", title: "Running Trips", icon: "person.line.dotted.person"),
+//        InfoCard(number: "5", title: "Cars In Maintenance", icon: "car.side.front.open"),
+//        InfoCard(number: "5", title: "Ideal Vehicles", icon: "car.2"),
+//        InfoCard(number: "5", title: "Ideal Drivers", icon: "person.3")
+//    ]
+//    
+//    let trips = [
+//        Trip(driverName: "John Doe", vehicleNo: "WB12 4567", tripDetail: "Kolkata to Delhi", driverImage: "person1"),
+//        Trip(driverName: "Jane Smith", vehicleNo: "MH04 2231", tripDetail: "Mumbai to Pune", driverImage: "person2"),
+//        Trip(driverName: "Trishita Yadav", vehicleNo: "MH04 2231", tripDetail: "Mysore to Chennai", driverImage: "person2")
+//    ]
+//    
+//    var body: some View {
+//        VStack(spacing: 22) {
+//            // Header
+//            ZStack(alignment: .top) {
+//                RoundedRectangle(cornerRadius: 30, style: .circular)
+//                    .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
+//                    .edgesIgnoringSafeArea(.top)
+//                
+//                HStack {
+//                    VStack(alignment: .leading, spacing: 4) {
+//                        Text("Welcome,")
+//                            .font(.title3)
+//                            .foregroundColor(.black)
+//                        Text("Manager")
+//                            .font(.title2)
+//                            .bold()
+//                            .foregroundColor(.black)
+//                    }
+//                    Spacer()
+//                    HStack(spacing: 20) {
+//                        Image(systemName: "bell.fill").font(.system(size: 26))
+//                        Image(systemName: "person.crop.circle").font(.system(size: 26))
+//                    }
+//                    .font(.title3)
+//                    .foregroundColor(.black)
+//                }
+//                .padding(.horizontal)
+//                .padding(.top, 20)
+//            }
+//            .frame(height: 100)
+//            .zIndex(1)
+//            
+//            ScrollView {
+//                VStack(alignment: .leading, spacing: 10) {
+//                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+//                        ForEach(infoCards) { card in
+//                            InfoCardView(card: card)
+//                        }
+//                    }
+//                    .padding(.horizontal)
+//                    
+//                    Text("On Going Trips")
+//                        .font(.title3)
+//                        .bold()
+//                        .padding(.horizontal)
+//                        .foregroundColor(Color.primary)
+//                    VStack(spacing: 12) {
+//                        ForEach(trips) { trip in
+//                            TripRowView(trip: trip)
+//                                .padding(.horizontal)
+//                        }
+//                    }
+//                    .padding(.bottom, 20)
+//                }
+//            }
+//        }
+//    }
+//}
+//
+//
 struct DashboardView: View {
-    @State private var selectedTab: Int = 0
-    
-    let infoCards = [
-        InfoCard(number: "5", title: "Running Trips", icon: "person.line.dotted.person"),
-        InfoCard(number: "5", title: "Cars In Maintenance", icon: "car.side.front.open"),
-        InfoCard(number: "5", title: "Ideal Vehicles", icon: "car.2"),
-        InfoCard(number: "5", title: "Ideal Drivers", icon: "person.3")
-    ]
-    
-    let trips = [
-        Trip(driverName: "John Doe", vehicleNo: "WB12 4567", tripDetail: "Kolkata to Delhi", driverImage: "person1"),
-        Trip(driverName: "Jane Smith", vehicleNo: "MH04 2231", tripDetail: "Mumbai to Pune", driverImage: "person2"),
-        Trip(driverName: "Trishita Yadav", vehicleNo: "MH04 2231", tripDetail: "Mysore to Chennai", driverImage: "person2")
-    ]
+    @StateObject private var dashboard = DashboardService()
     
     var body: some View {
+        
         VStack(spacing: 22) {
-            // Header
+            // MARK: – Header
             ZStack(alignment: .top) {
                 RoundedRectangle(cornerRadius: 30, style: .circular)
                     .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
@@ -45,7 +114,6 @@ struct DashboardView: View {
                         Image(systemName: "bell.fill").font(.system(size: 26))
                         Image(systemName: "person.crop.circle").font(.system(size: 26))
                     }
-                    .font(.title3)
                     .foregroundColor(.black)
                 }
                 .padding(.horizontal)
@@ -54,22 +122,42 @@ struct DashboardView: View {
             .frame(height: 100)
             .zIndex(1)
             
+            // MARK: – Cards + Trips List
             ScrollView {
-                VStack(alignment: .leading, spacing: 10) {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                        ForEach(infoCards) { card in
-                            InfoCardView(card: card)
-                        }
+                // 1) Info cards grid
+                VStack(alignment: .leading , spacing: 10){
+                    LazyVGrid(columns: [ GridItem(.flexible()), GridItem(.flexible()) ], spacing: 10) {
+                        InfoCardView(card: InfoCard(
+                            number: "\(dashboard.runningTripsCount)",
+                            title: "Running Trips",
+                            icon: "person.line.dotted.person"
+                        ))
+                        InfoCardView(card: InfoCard(
+                            number: "\(dashboard.carsInMaintenanceCount)",
+                            title: "Cars In Maintenance",
+                            icon: "car.side.front.open"
+                        ))
+                        InfoCardView(card: InfoCard(
+                            number: "\(dashboard.idleVehiclesCount)",
+                            title: "Idle Vehicles",
+                            icon: "car.2"
+                        ))
+                        InfoCardView(card: InfoCard(
+                            number: "\(dashboard.idleDriversCount)",
+                            title: "Idle Drivers",
+                            icon: "person.3"
+                        ))
                     }
                     .padding(.horizontal)
                     
+                    // 2) Ongoing trips header
                     Text("On Going Trips")
-                        .font(.title3)
-                        .bold()
+                        .font(.title3).bold()
                         .padding(.horizontal)
-                        .foregroundColor(Color.primary)
+                    
+                    // 3) Ongoing trips rows
                     VStack(spacing: 12) {
-                        ForEach(trips) { trip in
+                        ForEach(dashboard.ongoingTrips) { trip in
                             TripRowView(trip: trip)
                                 .padding(.horizontal)
                         }
@@ -77,8 +165,15 @@ struct DashboardView: View {
                     .padding(.bottom, 20)
                 }
             }
+            .onAppear {
+                dashboard.fetchAll()
+            }
         }
     }
 }
-
-
+// MARK: - Preview
+struct DashBoardView: PreviewProvider {
+    static var previews: some View {
+        DashboardView()
+    }
+}

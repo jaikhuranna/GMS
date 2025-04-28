@@ -36,10 +36,12 @@ class FirebaseModules {
                    let id = data["id"] as? String,
                    let licenseNo = data["licenseNo"] as? String,
                    let licenseType = data["licenseType"] as? String {
+                    let driverImage = data["driverImage"] as? String ?? ""
+                    print("Driver image URL for \(name): \(driverImage)")
                     let driver = Driver(
                         id: id,
                         driverName: name,
-                        driverImage: data["driverImage"] as? String ?? "",
+                        driverImage: driverImage,
                         driverExperience: experience,
                         driverAge: age,
                         driverContactNo: contactNo,
@@ -48,12 +50,59 @@ class FirebaseModules {
                     )
                     drivers.append(driver)
                 }
+                
             }
             completion(drivers)
         }
-        
     }
     
+    //MARK: - Firebase - Update Driver
+    func updateDriver(
+            _ driver: Driver,
+            profileImage: UIImage?,
+            licenseImage: UIImage?,
+            completion: @escaping (Error?) -> Void
+        ) {
+            let driverRef = db.collection("fleetDrivers").document(driver.id)
+
+            Task {
+                do {
+                    var data: [String: Any] = [
+                        "name":        driver.driverName,
+                        "age":         driver.driverAge,
+                        "experience":  driver.driverExperience,
+                        "contactNo":   driver.driverContactNo,
+                        "licenseNo":   driver.driverLicenseNo,
+                        "licenseType": driver.driverLicenseType
+                    ]
+
+                    // If user picked a new profile image, upload it
+                    if let img = profileImage,
+                       let imgData = img.jpegData(compressionQuality: 0.8) {
+                        let url = try await uploadImage(imgData,
+                            path: "drivers/\(driver.id)_profile.jpg"
+                        )
+                        data["driverImage"] = url
+                    }
+
+                    // If user picked a new license image, upload it
+                    if let lic = licenseImage,
+                       let licData = lic.jpegData(compressionQuality: 0.8) {
+                        let url = try await uploadImage(licData,
+                            path: "drivers/\(driver.id)_license.jpg"
+                        )
+                        data["licenseProofImage"] = url
+                    }
+
+                    // Merge update into Firestore
+                    try await driverRef.updateData(data)
+                    DispatchQueue.main.async { completion(nil) }
+                }
+                catch {
+                    DispatchQueue.main.async { completion(error) }
+                }
+            }
+        }
     
     //MARK: - Firebase - Fetch Vehicle List
     func fetchAllVehicles(completion: @escaping ([Vehicle]) -> Void) {
@@ -103,14 +152,53 @@ class FirebaseModules {
         }
     }
     
+    //MARK: - Firebase - Fetch Past Trips for vehicle
+//    static func fetchPastTrips(for vehicleNo: String, completion: @escaping ([PastTrip]) -> Void) {
+//        let db = Firestore.firestore()
+//        db.collection("pastTrips")
+//            .whereField("vehicleNo", isEqualTo: vehicleNo)
+//            .getDocuments { (snapshot, error) in
+//                if let error = error {
+//                    print("Error fetching past trips: \(error)")
+//                    completion([])
+//                    return
+//                }
+//                
+//                guard let documents = snapshot?.documents else {
+//                    completion([])
+//                    return
+//                }
+//                
+//                let trips = documents.compactMap { doc -> PastTrip? in
+//                    let data = doc.data()
+//                    guard let driverName = data["driverName"] as? String,
+//                          let vehicleNo = data["vehicleNo"] as? String,
+//                          let tripDetail = data["tripDetail"] as? String,
+//                          let driverImage = data["driverImage"] as? String,
+//                          let date = data["date"] as? String else {
+//                        return nil
+//                    }
+//                    return PastTrip(
+//                        driverName: driverName,
+//                        vehicleNo: vehicleNo,
+//                        tripDetail: tripDetail,
+//                        driverImage: driverImage,
+//                        date: date
+//                    )
+//                }
+//                
+//                completion(trips)
+//            }
+//    }
+    
     
     static func fetchPastTrips(for vehicleNo: String, completion: @escaping ([PastTrip]) -> Void) {
         let db = Firestore.firestore()
         db.collection("pastTrips")
             .whereField("vehicleNo", isEqualTo: vehicleNo)
-            .getDocuments { (snapshot, error) in
+            .getDocuments { snapshot, error in
                 if let error = error {
-                    print("Error fetching past trips: \(error)")
+                    print("Error fetching past trips: \(error.localizedDescription)")
                     completion([])
                     return
                 }
@@ -122,19 +210,28 @@ class FirebaseModules {
                 
                 let trips = documents.compactMap { doc -> PastTrip? in
                     let data = doc.data()
-                    guard let driverName = data["driverName"] as? String,
-                          let vehicleNo = data["vehicleNo"] as? String,
-                          let tripDetail = data["tripDetail"] as? String,
-                          let driverImage = data["driverImage"] as? String,
-                          let date = data["date"] as? String else {
+                    
+                    guard
+                        let driverName = data["driverName"] as? String,
+                        let tripDetail = data["tripDetail"] as? String,
+                        let timestamp = data["date"] as? Timestamp,
+                        let cost = data["cost"] as? Double,
+                        let mileage = data["mileage"] as? String,
+                        let distanceKm = data["distanceKm"] as? Double,
+                        let durationMinutes = data["durationMinutes"] as? Int
+                    else {
                         return nil
                     }
+                    
                     return PastTrip(
+                        id: doc.documentID,
                         driverName: driverName,
-                        vehicleNo: vehicleNo,
                         tripDetail: tripDetail,
-                        driverImage: driverImage,
-                        date: date
+                        date: timestamp.dateValue(),
+                        cost: cost,
+                        mileage: mileage,
+                        distanceKm: distanceKm,
+                        durationMinutes: durationMinutes
                     )
                 }
                 
@@ -142,6 +239,95 @@ class FirebaseModules {
             }
     }
     
+    // MARK: - Firebase - Fetch Past Trips for Driver
+//    func fetchPastTrips(forDriver driverName: String, completion: @escaping ([PastTrip]) -> Void) {
+//        let db = Firestore.firestore()
+//        db.collection("pastTrips")
+//            .whereField("driverName", isEqualTo: driverName)
+//            .getDocuments { (snapshot, error) in
+//                if let error = error {
+//                    print("Error fetching past trips for driver: \(error)")
+//                    completion([])
+//                    return
+//                }
+//                
+//                guard let documents = snapshot?.documents else {
+//                    completion([])
+//                    return
+//                }
+//                
+//                let trips = documents.compactMap { doc -> PastTrip? in
+//                    let data = doc.data()
+//                    guard let driverName = data["driverName"] as? String,
+//                          let vehicleNo = data["vehicleNo"] as? String,
+//                          let tripDetail = data["tripDetail"] as? String,
+//                          let driverImage = data["driverImage"] as? String,
+//                          let date = data["date"] as? String else {
+//                        return nil
+//                    }
+//                    print("Trip image URL for \(driverName): \(driverImage)")
+//                    return PastTrip(
+//                        driverName: driverName,
+//                        vehicleNo: vehicleNo,
+//                        tripDetail: tripDetail,
+//                        driverImage: driverImage,
+//                        date: date
+//                    )
+//                }
+//                
+//                completion(trips)
+//            }
+//    }
+    
+    
+    func fetchPastTrips(forDriver driverName: String, completion: @escaping ([PastTrip]) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("pastTrips")
+            .whereField("driverName", isEqualTo: driverName)
+            .getDocuments(completion: { (snapshot, error) in
+                if let error = error {
+                    print("Error fetching past trips for driver: \(error)")
+                    completion([])
+                    return
+                }
+                
+                guard let documents = snapshot?.documents else {
+                    completion([])
+                    return
+                }
+                
+                let trips = documents.compactMap { doc -> PastTrip? in
+                    let data = doc.data()
+                    
+                    guard
+                        let driverName = data["driverName"] as? String,
+                        let tripDetail = data["tripDetail"] as? String,
+                        let timestamp = data["date"] as? Timestamp,
+                        let cost = data["cost"] as? Double,
+                        let mileage = data["mileage"] as? String,
+                        let distanceKm = data["distanceKm"] as? Double,
+                        let durationMinutes = data["durationMinutes"] as? Int
+                    else {
+                        return nil
+                    }
+                    
+                    return PastTrip(
+                        id: doc.documentID,
+                        driverName: driverName,
+                        tripDetail: tripDetail,
+                        date: timestamp.dateValue(), // Converts Timestamp -> Date
+                        cost: cost,
+                        mileage: mileage,
+                        distanceKm: distanceKm,
+                        durationMinutes: durationMinutes
+                    )
+                }
+                
+                completion(trips)
+            })
+    }
+
+    //MARK: - Firebase - Fetch Past Maintenance
     static func fetchPastMaintenances(for vehicleNo: String, completion: @escaping ([PastMaintenance]) -> Void) {
         let db = Firestore.firestore()
         db.collection("pastMaintenances")
@@ -178,7 +364,7 @@ class FirebaseModules {
             }
     }
     
-    
+    //MARK: - Firebase - Add New Fleet
     func addFleetVehicle(_ vehicle: FleetVehicle) async throws {
         let vehicleRef = Firestore.firestore().collection("vehicles").document()
 
@@ -222,31 +408,58 @@ class FirebaseModules {
         return downloadURL.absoluteString
     }
 
+    
+    //MARK: - Firebase - Add New driver
+    func addDriver(
+           _ driver: Driver,
+           profileImage: UIImage,
+           licenseImage: UIImage?,
+           completion: @escaping (Error?) -> Void
+       ) {
+           let driverRef = db.collection("fleetDrivers").document(driver.id)
+
+           Task {
+               do {
+                   // 1) Build base fields
+                   var data: [String: Any] = [
+                       "id":            driver.id,
+                       "name":          driver.driverName,
+                       "age":           driver.driverAge,
+                       "experience":    driver.driverExperience,
+                       "contactNo":     driver.driverContactNo,
+                       "licenseNo":     driver.driverLicenseNo,
+                       "licenseType":   driver.driverLicenseType,
+                       "createdAt":     FieldValue.serverTimestamp()
+                   ]
+
+                   // 2) Upload profile image
+                   if let imgData = profileImage.jpegData(compressionQuality: 0.8) {
+                       let url = try await uploadImage(imgData,
+                           path: "drivers/\(driver.id)_profile.jpg"
+                       )
+                       data["driverImage"] = url
+                   }
+
+                   // 3) Upload license proof image (optional)
+                   if let license = licenseImage,
+                      let licData = license.jpegData(compressionQuality: 0.8) {
+                       let url = try await uploadImage(licData,
+                           path: "drivers/\(driver.id)_license.jpg"
+                       )
+                       data["licenseProofImage"] = url
+                   }
+
+                   // 4) Write to Firestore
+                   try await driverRef.setData(data)
+                   DispatchQueue.main.async { completion(nil) }
+
+               } catch {
+                   DispatchQueue.main.async { completion(error) }
+               }
+           }
+       }
 
     
 }
-//    // MARK: - Fetch Past Trips for Vehicle
-//        func fetchPastTrips(forVehicleId vehicleId: String, completion: @escaping (Result<[PastTrip], Error>) -> Void) {
-//            db.collection("pastTrips")
-//              .whereField("vehicleId", isEqualTo: vehicleId)
-//              .getDocuments { (querySnapshot, error) in
-//                  if let error = error {
-//                      print("Error fetching past trips for \(vehicleId): \(error.localizedDescription)") // Added vehicleId to print
-//                      completion(.failure(error))
-//                  } else {
-//                      var fetchedTrips: [PastTrip] = []
-//                      for document in querySnapshot!.documents {
-//                          do {
-//                              // Use document.data(as:) for Codable structs
-//                              let trip = try document.data(as: PastTrip.self)
-//                              fetchedTrips.append(trip)
-//                          } catch {
-//                              print("Error decoding past trip document \(document.documentID): \(error.localizedDescription)")
-//                          }
-//                      }
-//                      print("Fetched \(fetchedTrips.count) past trips for vehicleId: \(vehicleId)")
-//                      completion(.success(fetchedTrips))
-//                  }
-//              }
-//        }
+
 

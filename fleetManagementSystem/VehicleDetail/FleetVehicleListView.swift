@@ -32,6 +32,35 @@ struct FleetVehicleListView: View {
 //        Vehicle(vehicleNo: "KA 01 AB 1122", distanceTravelled: 40000, carImage: "car")
 //    ]
 
+    
+    struct CustomSegmentedControl: View {
+        @Binding var selectedSegment: String
+        let segments: [String]
+        
+        var body: some View {
+            HStack(spacing: 0) {
+                ForEach(segments, id: \.self) { segment in
+                    Button(action: {
+                        selectedSegment = segment
+                    }) {
+                        Text(segment)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
+                            .background(selectedSegment == segment ? Color.white : Color(hex: "396BAF"))
+                            .foregroundColor(selectedSegment == segment ? Color(hex: "396BAF") : .white)
+                            .cornerRadius(8)
+                    }
+                }
+            }
+            .padding(4)
+            .background(Color(hex: "396BAF"))
+            .cornerRadius(10)
+            .padding(.horizontal)
+        }
+    }
+
+    
+    
     var filteredVehicles: [Vehicle] {
            allVehicles.filter { vehicle in
                vehicle.vehicleCategory == selectedSegment &&
