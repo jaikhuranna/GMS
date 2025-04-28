@@ -365,7 +365,7 @@ struct HomeScreenRouter: View {
         case .driver:
             DriverHomeScreen(viewModel: viewModel)
         case .fleetManager:
-            DashboardView(viewModel: viewModel)
+            MainTabView(viewModel: viewModel)
         case .maintenance:
             MaintenanceHomeScreen(viewModel: viewModel)
         case .unknown:
