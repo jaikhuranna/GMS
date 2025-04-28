@@ -63,7 +63,7 @@ struct AuthRootView: View {
 struct LogoView: View {
     var body: some View {
         VStack(spacing: 8) {
-            Image(systemName: "car.fill") // Fallback if Logo isn't available
+            Image(uiImage: UIImage(named: "Logo")!) // Fallback if Logo isn't available
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 100, height: 100)
