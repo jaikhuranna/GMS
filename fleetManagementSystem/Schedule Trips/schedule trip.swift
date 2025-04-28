@@ -20,7 +20,8 @@ struct ScheduleTripView: View {
         center: CLLocationCoordinate2D(latitude: 12.2958, longitude: 76.6394),
         span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
     )
-    
+    @State private var startPoint = ""
+        @State private var endPoint = ""
     @State private var routeLocations: [RouteLocation] = []
 
     @State private var availableDrivers: [FleetDriver] = []
