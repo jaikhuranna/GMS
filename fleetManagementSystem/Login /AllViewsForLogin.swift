@@ -373,7 +373,8 @@ struct HomeScreenRouter: View {
         
         switch viewModel.userRole {
         case .driver:
-            DriverHomeScreen(viewModel: viewModel)
+//            DriverHomeScreen(viewModel: viewModel)
+            TripAssignedView()
         case .fleetManager:
             MainTabView()
         case .maintenance:

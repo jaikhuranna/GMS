@@ -10,102 +10,104 @@ struct TripAssignedView: View {
     @State private var isConfirmed = false
     
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Map(coordinateRegion: $region)
-            
-            VStack(spacing: 0) {
-                // Blue Top Card
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text("Trip Assigned")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white)
-                        Spacer()
-                        Button(action: {
-                            // Close action
-                        }) {
-                            Image(systemName: "xmark")
-                                .foregroundColor(.white)
-                                .padding(8)
-                                .background(Color.black.opacity(0.3))
-                                .clipShape(Circle())
-                        }
-                    }
-                    
-                    HStack(spacing: 0) {
-                        Image(systemName: "location.fill")
-                            .foregroundColor(.white.opacity(0.8))
-                            .font(.system(size: 14))
-                        Text("Tata ACE  < 3km")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                }
-                .padding(20)
-                .background(Color(red: 0.25, green: 0.44, blue: 0.7))
-                .cornerRadius(24, corners: [.topLeft, .topRight])
+        NavigationStack {   // <<<<< Add NavigationStack here
+            ZStack(alignment: .bottom) {
+                Map(coordinateRegion: $region)
+                    .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
-                    HStack {
-                        Spacer()
-                        Text("25 kms")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(.black)
-                    }
-                    
-                    VStack(spacing: 16) {
-                        // Pickup
-                        HStack(alignment: .top, spacing: 12) {
-                            Image(systemName: "arrow.up.circle.fill")
-                                .foregroundColor(.green)
-                                .font(.system(size: 20))
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Infosys Gate 2")
-                                    .font(.system(size: 18, weight: .semibold))
-                                Text("Meenakunte, Hebbal Industrial Area")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.gray)
+                    // Blue Top Card
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("Trip Assigned")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.white)
+                            Spacer()
+                            Button(action: {
+                                // Close action
+                            }) {
+                                Image(systemName: "xmark")
+                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .background(Color.black.opacity(0.3))
+                                    .clipShape(Circle())
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        // Drop
-                        HStack(alignment: .top, spacing: 12) {
-                            Image(systemName: "arrow.down.circle.fill")
-                                .foregroundColor(.red)
-                                .font(.system(size: 20))
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Mysuru Airport")
-                                    .font(.system(size: 18, weight: .semibold))
-                                Text("Mandakalli, Karnataka 571311")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.gray)
-                            }
+                        HStack(spacing: 0) {
+                            Image(systemName: "location.fill")
+                                .foregroundColor(.white.opacity(0.8))
+                                .font(.system(size: 14))
+                            Text("Tata ACE  < 3km")
+                                .font(.system(size: 14))
+                                .foregroundColor(.white.opacity(0.8))
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(20)
+                    .background(Color(red: 0.25, green: 0.44, blue: 0.7))
+                    .cornerRadius(24, corners: [.topLeft, .topRight])
                     
-                    // Slide Button
-                    SlideToConfirm(action: {
-                        isConfirmed = true
-                    })
-                    .padding(.horizontal)
+                    VStack(spacing: 0) {
+                        HStack {
+                            Spacer()
+                            Text("25 kms")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.black)
+                        }
+                        
+                        VStack(spacing: 16) {
+                            // Pickup
+                            HStack(alignment: .top, spacing: 12) {
+                                Image(systemName: "arrow.up.circle.fill")
+                                    .foregroundColor(.green)
+                                    .font(.system(size: 20))
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Infosys Gate 2")
+                                        .font(.system(size: 18, weight: .semibold))
+                                    Text("Meenakunte, Hebbal Industrial Area")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            // Drop
+                            HStack(alignment: .top, spacing: 12) {
+                                Image(systemName: "arrow.down.circle.fill")
+                                    .foregroundColor(.red)
+                                    .font(.system(size: 20))
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Mysuru Airport")
+                                        .font(.system(size: 18, weight: .semibold))
+                                    Text("Mandakalli, Karnataka 571311")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        
+                        // Slide Button
+                        SlideToConfirm {
+                            isConfirmed = true
+                        }
+                        .padding(.horizontal)
+                    }
+                    .padding(20)
+                    .background(Color.white)
+                    .cornerRadius(24, corners: [.topLeft, .topRight])
+                    .frame(height: 220)
                 }
-                .padding(20)
-                .background(Color.white)
-                .cornerRadius(24, corners: [.topLeft, .topRight])
-                .frame(height: 220)
-            }
-            .background(
+                
+                // NavigationLink OUTSIDE background
                 NavigationLink(destination: InspectionbeforeRide(), isActive: $isConfirmed) {
                     EmptyView()
                 }
-                .hidden()
-            )
+            }
+            .navigationBarHidden(true)
         }
-        .navigationBarHidden(true)
     }
 }
 
@@ -159,8 +161,6 @@ struct SlideToConfirm: View {
 
 struct TripAssignedView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            TripAssignedView()
-        }
+        TripAssignedView()
     }
 }
