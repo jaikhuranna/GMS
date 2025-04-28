@@ -5,6 +5,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 // MARK: - Root View
 
@@ -158,13 +159,15 @@ struct LoginView: View {
                 
                 Spacer()
                 
-                // Display userId (for reference)
-                if !viewModel.userId.isEmpty {
-                    Text("User ID: \(viewModel.userId)")
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                        .padding(.bottom, 8)
+                // Display user IDs (for reference)
+                VStack(spacing: 4) {
+                    if !viewModel.firebaseUid.isEmpty {
+                        Text("User ID: \(viewModel.firebaseUid)")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                    }
                 }
+                .padding(.bottom, 8)
             }
             .padding(.horizontal, 24)
             .padding(.top, 24)
@@ -230,9 +233,9 @@ struct MFASetupView: View {
                 }
                 .padding(.top, 24)
                 
-                // Display userId (for reference)
-                if !viewModel.userId.isEmpty {
-                    Text("User ID: \(viewModel.userId)")
+                // Display ID for reference
+                if !viewModel.firebaseUid.isEmpty {
+                    Text("User ID: \(viewModel.firebaseUid)")
                         .font(.caption2)
                         .foregroundColor(.gray)
                         .padding(.top, 24)
@@ -271,7 +274,7 @@ struct EmailOTPVerificationView: View {
                     .onChange(of: viewModel.otpDigits[index]) { newValue in
                         // Allow only one digit
                         if newValue.count > 1 {
-                            viewModel.otpDigits[index] = String(newValue.last!)
+                            viewModel.otpDigits[index] = String(newValue.suffix(1))
                         }
                         // Move to next field if current is filled
                         if !newValue.isEmpty && index < 5 {
@@ -317,9 +320,9 @@ struct EmailOTPVerificationView: View {
             
             Spacer()
             
-            // Display userId (for reference)
-            if !viewModel.userId.isEmpty {
-                Text("User ID: \(viewModel.userId)")
+            // Display user ID
+            if !viewModel.firebaseUid.isEmpty {
+                Text("User ID: \(viewModel.firebaseUid)")
                     .font(.caption2)
                     .foregroundColor(.gray)
                     .padding(.bottom, 8)
@@ -383,7 +386,7 @@ struct DriverHomeScreen: View {
                 Text("Driver Dashboard").font(.largeTitle).padding()
                 Text("Welcome to the Driver Portal").font(.title2)
                 
-                Text("Your User ID: \(viewModel.userId)")
+                Text("User ID: \(viewModel.firebaseUid)")
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(8)
@@ -415,7 +418,7 @@ struct FleetManagerHomeScreen: View {
                 Text("Fleet Manager Dashboard").font(.largeTitle).padding()
                 Text("Welcome to the Fleet Management Portal").font(.title2)
                 
-                Text("Your User ID: \(viewModel.userId)")
+                Text("User ID: \(viewModel.firebaseUid)")
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(8)
@@ -447,7 +450,7 @@ struct MaintenanceHomeScreen: View {
                 Text("Maintenance Dashboard").font(.largeTitle).padding()
                 Text("Welcome to the Maintenance Portal").font(.title2)
                 
-                Text("Your User ID: \(viewModel.userId)")
+                Text("User ID: \(viewModel.firebaseUid)")
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(8)
@@ -480,7 +483,7 @@ struct UnknownRoleScreen: View {
                 .multilineTextAlignment(.center)
                 .padding()
             
-            Text("Your User ID: \(viewModel.userId)")
+            Text("User ID: \(viewModel.firebaseUid)")
                 .padding()
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(8)
