@@ -96,7 +96,7 @@ struct DashboardView: View {
             }
             
             // Display User ID at bottom for debugging
-            Text("User ID: \(viewModel.firebaseUid)")
+            Text("User ID: \(viewModel.userId)")
                 .font(.caption2)
                 .foregroundColor(.gray)
                 .padding(.bottom, 4)

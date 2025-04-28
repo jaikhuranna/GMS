@@ -6,8 +6,6 @@
 
 import SwiftUI
 import Appwrite
-import FirebaseAuth
-import FirebaseFirestore
 
 enum AuthScreen {
     case login
@@ -34,45 +32,30 @@ class AuthViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var userRole: UserRole = .unknown
     @Published var otpDigits: [String] = Array(repeating: "", count: 6)
-    @Published var appwriteUserId: String = ""
-    @Published var firebaseUid: String = ""
+    @Published var userId: String = ""
+    @Published var debugRoleString: String = "No role fetched"
     
     // MARK: - Private Properties
     private let appwrite = Appwrite()
     private var challengeId: String = ""
-    private var handle: AuthStateDidChangeListenerHandle?
-
     
     // MARK: - Initialization
     
-    deinit {
-       if let handle = handle {
-         Auth.auth().removeStateDidChangeListener(handle)
-       }
-     }
-    
     init() {
-        if let savedUserId = appwrite.getAppwriteUserId() {
-            self.appwriteUserId = savedUserId
-        }
-        
-        handle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
-          self?.firebaseUid = user?.uid ?? ""
-        }
-        
-        
-        if let firebaseUid = appwrite.getFirebaseUid() {
-            self.firebaseUid = firebaseUid
+        if let savedUserId = appwrite.getUserId() {
+            self.userId = savedUserId
         }
         
         // Try to restore session
         Task {
             do {
-                if Auth.auth().currentUser != nil && !appwriteUserId.isEmpty {
-                    try await fetchUserRole()
-                }
+                let user = try await appwrite.getCurrentUser()
+//                self.userId = user.id
+//                try await fetchUserRole()
             } catch {
-                print("No active session: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    print("No active session: \(error.localizedDescription)")
+                }
             }
         }
     }
@@ -87,16 +70,9 @@ class AuthViewModel: ObservableObject {
         
         Task {
             do {
-                // Register with Appwrite (which now handles Firebase registration too)
+                // Register with Appwrite
                 let user = try await appwrite.onRegister(email, password)
-                self.appwriteUserId = user.id
-                
-                if let firebaseUid = appwrite.getFirebaseUid() {
-                    self.firebaseUid = firebaseUid
-                }
-                
-                // Set default role and proceed to home or MFA setup
-                userRole = .driver
+                self.userId = user.id
                 
                 // Check if MFA needs to be set up
                 let factors = try await appwrite.listMFAFactors()
@@ -105,6 +81,7 @@ class AuthViewModel: ObservableObject {
                     try await enableMFA()
                 } else {
                     // MFA already set up, go to home
+                    userRole = .driver // Default role for new users
                     screen = .home
                 }
                 
@@ -124,29 +101,28 @@ class AuthViewModel: ObservableObject {
         
         Task {
             do {
-                // Login with Appwrite (which also handles Firebase login)
+                // Login with Appwrite
                 let _ = try await appwrite.onLogin(email, password)
                 
-                // Update user IDs
-                if let savedAppwriteId = appwrite.getAppwriteUserId() {
-                    self.appwriteUserId = savedAppwriteId
-                }
-                
-                if let savedFirebaseUid = appwrite.getFirebaseUid() {
-                    self.firebaseUid = savedFirebaseUid
+                // Update user ID
+                if let savedId = appwrite.getUserId() {
+                    self.userId = savedId
                 }
                 
                 // Fetch role and go to home
                 try await fetchUserRole()
-                isLoading = false
             } catch let error as AppwriteError {
                 // Handle MFA required errors
-                print("Login error: \(String(describing: error.type)) - \(error.message)")
+                DispatchQueue.main.async {
+                    print("Login error: \(String(describing: error.type)) - \(error.message)")
+                }
                 
                 if error.type == "user_mfa_required" ||
                    error.type == "user_more_factors_required" {
                     // Create MFA challenge for second factor
-                    print("MFA required, creating challenge")
+                    DispatchQueue.main.async {
+                        print("MFA required, creating challenge")
+                    }
                     await createMFAChallenge()
                 } else {
                     errorMessage = error.message
@@ -161,9 +137,13 @@ class AuthViewModel: ObservableObject {
     
     private func createMFAChallenge() async {
         do {
-            print("Creating email challenge")
+            DispatchQueue.main.async {
+                print("Creating email challenge")
+            }
             let challenge = try await appwrite.createEmailChallenge()
-            print("Challenge created: \(challenge.id)")
+            DispatchQueue.main.async {
+                print("Challenge created: \(challenge.id)")
+            }
             self.challengeId = challenge.id
             screen = .verifyMFA
             isLoading = false
@@ -178,13 +158,11 @@ class AuthViewModel: ObservableObject {
         
         Task {
             do {
-                // Logout from both systems
+                // Logout from Appwrite
                 try await appwrite.onLogout()
-                appwriteUserId = ""
-                firebaseUid = ""
+                userId = ""
                 resetFields()
                 screen = .login
-                try? Auth.auth().signOut()
             } catch {
                 errorMessage = error.localizedDescription
             }
@@ -222,26 +200,26 @@ class AuthViewModel: ObservableObject {
         }
         
         isLoading = true
-        print("Verifying challenge: \(challengeId) with OTP: \(otp)")
+        DispatchQueue.main.async {
+            print("Verifying challenge: \(self.challengeId) with OTP: \(otp)")
+        }
         
         Task {
             do {
                 // Verify OTP with Appwrite
                 let _ = try await appwrite.verifyEmailChallenge(challengeId: challengeId, otp: otp)
                 
-                // Update user IDs if needed
-                if let savedAppwriteId = appwrite.getAppwriteUserId(), appwriteUserId.isEmpty {
-                    self.appwriteUserId = savedAppwriteId
-                }
-                
-                if let savedFirebaseUid = appwrite.getFirebaseUid(), firebaseUid.isEmpty {
-                    self.firebaseUid = savedFirebaseUid
+                // Update user ID if needed
+                if let savedId = appwrite.getUserId(), userId.isEmpty {
+                    self.userId = savedId
                 }
                 
                 // Fetch role and go to home
                 try await fetchUserRole()
             } catch {
-                print("Challenge verification failed: \(error)")
+                DispatchQueue.main.async {
+                    print("Challenge verification failed: \(error)")
+                }
                 errorMessage = "Verification failed: \(error.localizedDescription)"
                 isLoading = false
             }
@@ -252,26 +230,54 @@ class AuthViewModel: ObservableObject {
     
     private func fetchUserRole() async throws {
         do {
-            // Get role from Appwrite (which checks Firebase as fallback)
+            // Make sure we have a userId
+            if userId.isEmpty {
+                let user = try await appwrite.getCurrentUser()
+                userId = user.id
+            }
+            
+            // Get role from Appwrite
             let role = try await appwrite.getUserRole()
-            print("Retrieved role string from database: \(role)")
+            DispatchQueue.main.async {
+                print("Retrieved role string from database: \(role)")
+                self.debugRoleString = "DB role: \(role)"
+            }
             
             // Convert string role to enum
             if let userRole = UserRole(rawValue: role) {
-                print("Successfully converted to enum: \(userRole)")
+                DispatchQueue.main.async {
+                    print("Successfully converted to enum: \(userRole)")
+                }
                 self.userRole = userRole
             } else {
-                print("⚠️ Failed to convert role string to enum: \(role)")
-                self.userRole = .unknown  // Change: Set to unknown instead of driver
+                DispatchQueue.main.async {
+                    print("⚠️ Failed to convert role string to enum: \(role)")
+                }
+                self.userRole = .unknown
             }
             
             screen = .home
             isLoading = false
         } catch {
-            print("❌ Error fetching user role: \(error)")
-            userRole = .unknown  // Change: Set to unknown instead of driver
+            DispatchQueue.main.async {
+                print("❌ Error fetching user role: \(error)")
+            }
+            userRole = .unknown
             screen = .home
             isLoading = false
+        }
+    }
+    
+    // MARK: - Debugging
+    
+    func forceRoleRefresh() {
+        Task {
+            do {
+                userRole = .unknown
+                try await fetchUserRole()
+            } catch {
+                print("Role refresh failed: \(error)")
+            }
         }
     }
     

@@ -7,9 +7,7 @@
 import Foundation
 import Appwrite
 import JSONCodable
-import FirebaseAuth
 import AppwriteEnums
-import FirebaseFirestore
 
 typealias AppwriteUser = AppwriteModels.User<[String: AnyCodable]>
 
@@ -18,12 +16,8 @@ class Appwrite {
     var account: Account
     var databases: Databases
     
-    // Store user IDs for reference
-    private let appwriteUserIdKey = "com.navora.appwriteUserId"
-    private let firebaseUidKey = "com.navora.firebaseUid"
-    
-    // Firebase references
-    private let firestore = Firestore.firestore()
+    // Store user ID for reference
+    private let userIdKey = "com.navora.userId"
     
     public init() {
         self.client = Client()
@@ -40,68 +34,40 @@ class Appwrite {
         _ email: String,
         _ password: String
     ) async throws -> AppwriteUser {
-        // First register with Firebase to get the UID
-        let firebaseUser = try await createFirebaseUser(email: email, password: password)
-        let firebaseUid = firebaseUser.uid
-        
-        // Save Firebase UID
-        
-        saveFirebaseUid(firebaseUid)
-        
-        // Then create Appwrite user with same credentials
-        let appwriteUser = try await account.create(
-            userId: ID.unique(), // Generate Appwrite ID
+        // Create Appwrite user
+        let user = try await account.create(
+            userId: ID.unique(),
             email: email,
             password: password
         )
         
-        // Save Appwrite user ID
-        saveAppwriteUserId(appwriteUser.id)
+        // Save user ID
+        saveUserId(user.id)
         
-        // Create user document in Appwrite database using Firebase UID as document ID
+        // Create user profile with default role
         try await createUserProfile(
-            firebaseUid: firebaseUid,
-            appwriteUserId: appwriteUser.id,
+            userId: user.id,
             email: email,
-            name: firebaseUser.displayName ?? "",
+            name: email.components(separatedBy: "@").first ?? "",
             role: "driver" // Default role
         )
         
-        return appwriteUser
+        return user
     }
     
     public func onLogin(
         _ email: String,
         _ password: String
     ) async throws -> Session {
-        // First authenticate with Firebase
-        let firebaseUser = try await signInWithFirebase(email: email, password: password)
-        saveFirebaseUid(firebaseUser.uid)
-        
-        // Then authenticate with Appwrite (which handles MFA)
+        // Login with Appwrite
         let session = try await account.createEmailPasswordSession(
             email: email,
             password: password
         )
         
-        // Get Appwrite user ID and save it
-        let appwriteUser = try await account.get()
-        saveAppwriteUserId(appwriteUser.id)
-        
-        // Check if mapping exists, create if it doesn't
-        do {
-            _ = try await getUserDocument(firebaseUid: firebaseUser.uid)
-        } catch {
-            // If document doesn't exist, create mapping
-            try await createUserProfile(
-                firebaseUid: firebaseUser.uid,
-                appwriteUserId: appwriteUser.id,
-                email: email,
-                name: firebaseUser.displayName ?? "",
-                role: await fetchRoleFromFirebase(uid: firebaseUser.uid)
-                
-            )
-        }
+        // Get user ID and save it
+        let user = try await account.get()
+        saveUserId(user.id)
         
         return session
     }
@@ -110,12 +76,8 @@ class Appwrite {
         // Logout from Appwrite
         _ = try await account.deleteSession(sessionId: "current")
         
-        // Logout from Firebase
-        try await Auth.auth().signOut()
-        
-        // Clear stored IDs
-        clearAppwriteUserId()
-        clearFirebaseUid()
+        // Clear stored ID
+        clearUserId()
     }
     
     // MARK: - MFA Methods
@@ -146,24 +108,21 @@ class Appwrite {
     
     public func getCurrentUser() async throws -> AppwriteUser {
         let user = try await account.get()
-        saveAppwriteUserId(user.id)
+        saveUserId(user.id)
         return user
     }
-    
     public func createUserProfile(
-        firebaseUid: String,
-        appwriteUserId: String,
+        userId: String,
         email: String,
         name: String,
         role: String
     ) async throws -> Document<[String: AnyCodable]> {
-        // Create document in Appwrite using Firebase UID as the document ID
+        // Create document in Appwrite database
         return try await databases.createDocument(
             databaseId: "680e57380037ef7f5b77",
-            collectionId: "users",
-            documentId: firebaseUid, // Using Firebase UID as the document ID
+            collectionId: "680e57bb000cc438803d", // Correct collection ID
+            documentId: userId, // Using Appwrite user ID as document ID
             data: [
-                "appwriteUserId": appwriteUserId,
                 "email": email,
                 "name": name,
                 "role": role,
@@ -171,102 +130,60 @@ class Appwrite {
             ]
         )
     }
-    
-    public func getUserDocument(firebaseUid: String) async throws -> Document<[String: AnyCodable]> {
+    public func getUserDocument(userId: String) async throws -> Document<[String: AnyCodable]> {
         return try await databases.getDocument(
             databaseId: "680e57380037ef7f5b77",
-            collectionId: "users",
-            documentId: firebaseUid
+            collectionId: "680e57bb000cc438803d", // Correct collection ID
+            documentId: userId
         )
     }
     
     public func getUserRole() async throws -> String {
-        guard let firebaseUid = getFirebaseUid() else {
-            throw NSError(domain: "Auth", code: 1, userInfo: [NSLocalizedDescriptionKey: "No Firebase UID available"])
+        guard let userId = getUserId() else {
+            throw NSError(domain: "Auth", code: 1, userInfo: [NSLocalizedDescriptionKey: "No user ID available"])
         }
         
         do {
-            // First try to get from Appwrite
-            let document = try await getUserDocument(firebaseUid: firebaseUid)
+            // Get user document from Appwrite
+            let document = try await getUserDocument(userId: userId)
+            DispatchQueue.main.async {
+                print("Document data: \(document.data)")
+            }
+            
             if let roleValue = document.data["role"],
                let role = roleValue.value as? String {
                 return role
             }
             throw NSError(domain: "Auth", code: 2, userInfo: [NSLocalizedDescriptionKey: "Role not found in document"])
         } catch {
-            // If not found in Appwrite or role missing, try Firebase
-            return try await fetchRoleFromFirebase(uid: firebaseUid)
-        }
-    }
-    
-    // MARK: - Firebase Integration
-    
-    private func createFirebaseUser(email: String, password: String) async throws -> FirebaseAuth.User {
-        return try await withCheckedThrowingContinuation { continuation in
-            Auth.auth().createUser(withEmail: email, password: password) { result, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else if let user = result?.user {
-                    continuation.resume(returning: user)
-                } else {
-                    continuation.resume(throwing: NSError(domain: "Auth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Firebase user"]))
+            DispatchQueue.main.async {
+                print("❌ ACTUAL ERROR FETCHING ROLE: \(error)")
+            }
+            
+            // Check for permission error (most likely issue)
+            if let appwriteError = error as? AppwriteError,
+               appwriteError.message.contains("missing scope") {
+                DispatchQueue.main.async {
+                    print("⚠️ Permission error - user doesn't have access to read their document")
                 }
             }
+            
+            throw error  // Re-throw instead of returning "unknown"
         }
     }
-    
-    private func signInWithFirebase(email: String, password: String) async throws -> FirebaseAuth.User {
-        return try await withCheckedThrowingContinuation { continuation in
-            Auth.auth().signIn(withEmail: email, password: password) { result, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else if let user = result?.user {
-                    continuation.resume(returning: user)
-                } else {
-                    continuation.resume(throwing: NSError(domain: "Auth", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to sign in with Firebase"]))
-                }
-            }
-        }
-    }
-    
-    private func fetchRoleFromFirebase(uid: String) async throws -> String {
-        return try await withCheckedThrowingContinuation { continuation in
-            firestore.collection("users").document(uid).getDocument { document, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else if let document = document, document.exists,
-                          let role = document.data()?["role"] as? String {
-                    continuation.resume(returning: role)
-                } else {
-                    continuation.resume(returning: "driver") // Default role
-                }
-            }
-        }
-    }
+
     
     // MARK: - User ID Management
     
-    private func saveAppwriteUserId(_ userId: String) {
-        UserDefaults.standard.set(userId, forKey: appwriteUserIdKey)
+    private func saveUserId(_ userId: String) {
+        UserDefaults.standard.set(userId, forKey: userIdKey)
     }
     
-    public func getAppwriteUserId() -> String? {
-        return UserDefaults.standard.string(forKey: appwriteUserIdKey)
+    public func getUserId() -> String? {
+        return UserDefaults.standard.string(forKey: userIdKey)
     }
     
-    private func clearAppwriteUserId() {
-        UserDefaults.standard.removeObject(forKey: appwriteUserIdKey)
-    }
-    
-    private func saveFirebaseUid(_ uid: String) {
-        UserDefaults.standard.set(uid, forKey: firebaseUidKey)
-    }
-    
-    public func getFirebaseUid() -> String? {
-        return UserDefaults.standard.string(forKey: firebaseUidKey)
-    }
-    
-    private func clearFirebaseUid() {
-        UserDefaults.standard.removeObject(forKey: firebaseUidKey)
+    private func clearUserId() {
+        UserDefaults.standard.removeObject(forKey: userIdKey)
     }
 }

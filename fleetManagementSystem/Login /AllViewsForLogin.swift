@@ -5,7 +5,6 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 
 // MARK: - Root View
 
@@ -159,15 +158,13 @@ struct LoginView: View {
                 
                 Spacer()
                 
-                // Display user IDs (for reference)
-                VStack(spacing: 4) {
-                    if !viewModel.firebaseUid.isEmpty {
-                        Text("User ID: \(viewModel.firebaseUid)")
-                            .font(.caption2)
-                            .foregroundColor(.gray)
-                    }
+                // Display user ID (for reference)
+                if !viewModel.userId.isEmpty {
+                    Text("User ID: \(viewModel.userId)")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                        .padding(.bottom, 8)
                 }
-                .padding(.bottom, 8)
             }
             .padding(.horizontal, 24)
             .padding(.top, 24)
@@ -234,8 +231,8 @@ struct MFASetupView: View {
                 .padding(.top, 24)
                 
                 // Display ID for reference
-                if !viewModel.firebaseUid.isEmpty {
-                    Text("User ID: \(viewModel.firebaseUid)")
+                if !viewModel.userId.isEmpty {
+                    Text("User ID: \(viewModel.userId)")
                         .font(.caption2)
                         .foregroundColor(.gray)
                         .padding(.top, 24)
@@ -321,8 +318,8 @@ struct EmailOTPVerificationView: View {
             Spacer()
             
             // Display user ID
-            if !viewModel.firebaseUid.isEmpty {
-                Text("User ID: \(viewModel.firebaseUid)")
+            if !viewModel.userId.isEmpty {
+                Text("User ID: \(viewModel.userId)")
                     .font(.caption2)
                     .foregroundColor(.gray)
                     .padding(.bottom, 8)
@@ -362,11 +359,12 @@ struct HomeScreenRouter: View {
     @ObservedObject var viewModel: AuthViewModel
     
     var body: some View {
+        let _ = print("Current user role: \(viewModel.userRole.rawValue)")
+        
         switch viewModel.userRole {
         case .driver:
             DriverHomeScreen(viewModel: viewModel)
         case .fleetManager:
-            // Replace FleetManagerHomeScreen with your DashboardView
             DashboardView(viewModel: viewModel)
         case .maintenance:
             MaintenanceHomeScreen(viewModel: viewModel)
@@ -375,7 +373,6 @@ struct HomeScreenRouter: View {
         }
     }
 }
-
 
 // MARK: - Driver Home Screen
 
@@ -388,7 +385,7 @@ struct DriverHomeScreen: View {
                 Text("Driver Dashboard").font(.largeTitle).padding()
                 Text("Welcome to the Driver Portal").font(.title2)
                 
-                Text("User ID: \(viewModel.firebaseUid)")
+                Text("User ID: \(viewModel.userId)")
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(8)
@@ -420,7 +417,7 @@ struct FleetManagerHomeScreen: View {
                 Text("Fleet Manager Dashboard").font(.largeTitle).padding()
                 Text("Welcome to the Fleet Management Portal").font(.title2)
                 
-                Text("User ID: \(viewModel.firebaseUid)")
+                Text("User ID: \(viewModel.userId)")
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(8)
@@ -452,7 +449,7 @@ struct MaintenanceHomeScreen: View {
                 Text("Maintenance Dashboard").font(.largeTitle).padding()
                 Text("Welcome to the Maintenance Portal").font(.title2)
                 
-                Text("User ID: \(viewModel.firebaseUid)")
+                Text("User ID: \(viewModel.userId)")
                     .padding()
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(8)
@@ -485,7 +482,7 @@ struct UnknownRoleScreen: View {
                 .multilineTextAlignment(.center)
                 .padding()
             
-            Text("User ID: \(viewModel.firebaseUid)")
+            Text("User ID: \(viewModel.userId)")
                 .padding()
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(8)

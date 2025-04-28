@@ -3,7 +3,7 @@ import SwiftUI
 struct MainTabView: View {
     @State private var selectedTab = 0
     @ObservedObject var viewModel: AuthViewModel
-
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             // Tab 1: Home
@@ -17,18 +17,17 @@ struct MainTabView: View {
             
             // Tab 2: Fleet
             FleetVehicleListView() // Your fleet management view
-            .tabItem {
-                Label("Fleet", systemImage: selectedTab == 1 ? "box.truck.badge.clock.fill" : "box.truck.badge.clock")
-            }
-            .tag(1)
+                .tabItem {
+                    Label("Fleet", systemImage: selectedTab == 1 ? "box.truck.badge.clock.fill" : "box.truck.badge.clock")
+                }
+                .tag(1)
             
             // Tab 3: Driver
             FleetDriverListView()
-            
-            .tabItem {
-                Label("Driver", systemImage: selectedTab == 2 ? "person.crop.circle.fill.badge.plus" : "person.crop.circle.badge.plus")
-            }
-            .tag(2)
+                .tabItem {
+                    Label("Driver", systemImage: selectedTab == 2 ? "person.crop.circle.fill.badge.plus" : "person.crop.circle.badge.plus")
+                }
+                .tag(2)
             
             // Tab 4: Maintenance
             NavigationStack {
@@ -85,6 +84,7 @@ struct ScheduleView: View {
 }
 
 // MARK: - Preview
+
 struct MainTabView_Previews: PreviewProvider {
     static var previews: some View {
         MainTabView(viewModel: AuthViewModel())
