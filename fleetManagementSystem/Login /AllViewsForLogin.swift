@@ -8,6 +8,7 @@ import SwiftUI
 
 // MARK: - Root View
 
+
 struct AuthRootView: View {
     @StateObject private var viewModel = AuthViewModel()
     
@@ -16,6 +17,14 @@ struct AuthRootView: View {
             // Screen switching based on auth state
             Group {
                 switch viewModel.screen {
+                case .loading:
+                    // Show loading screen while checking session
+                    VStack {
+                        LogoView()
+                        ProgressView("Checking login status...")
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .padding(.top, 30)
+                    }
                 case .login:
                     LoginView(viewModel: viewModel)
                 case .setupMFA:
@@ -47,6 +56,7 @@ struct AuthRootView: View {
         }
     }
 }
+
 
 // MARK: - Logo View
 

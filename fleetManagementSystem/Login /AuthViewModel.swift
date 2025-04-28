@@ -8,6 +8,7 @@ import SwiftUI
 import Appwrite
 
 enum AuthScreen {
+    case loading // Add loading state
     case login
     case setupMFA
     case verifyMFA
@@ -24,7 +25,7 @@ enum UserRole: String {
 @MainActor
 class AuthViewModel: ObservableObject {
     // MARK: - Published Properties
-    @Published var screen: AuthScreen = .login
+    @Published var screen: AuthScreen = .loading // Start with loading
     @Published var email: String = ""
     @Published var password: String = ""
     @Published var isPasswordVisible: Bool = false
@@ -40,21 +41,32 @@ class AuthViewModel: ObservableObject {
     private var challengeId: String = ""
     
     // MARK: - Initialization
-    
     init() {
         if let savedUserId = appwrite.getUserId() {
             self.userId = savedUserId
+            DispatchQueue.main.async {
+                print("Found saved user ID: \(savedUserId)")
+            }
         }
         
         // Try to restore session
         Task {
             do {
+                // Attempt to get the current user (will throw if no valid session)
                 let user = try await appwrite.getCurrentUser()
-//                self.userId = user.id
-//                try await fetchUserRole()
+                self.userId = user.id
+                
+                DispatchQueue.main.async {
+                    print("Session restored for user: \(user.id)")
+                }
+                
+                // Fetch user role and navigate to home screen
+                try await fetchUserRole()
             } catch {
                 DispatchQueue.main.async {
                     print("No active session: \(error.localizedDescription)")
+                    // No valid session, show login screen
+                    self.screen = .login
                 }
             }
         }
