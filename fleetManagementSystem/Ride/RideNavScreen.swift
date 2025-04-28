@@ -381,13 +381,6 @@ struct NavigationMapView: View {
             .background(Color.clear)
             .edgesIgnoringSafeArea(.bottom)
 
-            // Home indicator
-            Rectangle()
-                .frame(width: 134, height: 5)
-                .cornerRadius(2.5)
-                .foregroundColor(.black)
-                .padding(.vertical, 8)
-                .background(Color.white)
         }
         .navigationBarHidden(true)
     }
@@ -635,3 +628,7 @@ struct RoundedCornerShape: Shape {
     }
 }
 
+
+#Preview{
+//    RouteOptionView()
+}

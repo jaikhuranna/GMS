@@ -10,7 +10,7 @@ struct TripAssignedView: View {
     @State private var isConfirmed = false
     
     var body: some View {
-        NavigationStack {   // <<<<< Add NavigationStack here
+        NavigationStack {
             ZStack(alignment: .bottom) {
                 Map(coordinateRegion: $region)
                     .ignoresSafeArea()
@@ -45,9 +45,9 @@ struct TripAssignedView: View {
                     }
                     .padding(20)
                     .background(Color(red: 0.25, green: 0.44, blue: 0.7))
-                    .cornerRadius(24, corners: [.topLeft, .topRight])
+                    .cornerRadius(24, corners: [.topLeft, .topRight]) // only top corners
                     
-                    VStack(spacing: 0) {
+                    VStack(spacing: 16) {
                         HStack {
                             Spacer()
                             Text("25 kms")
@@ -93,15 +93,16 @@ struct TripAssignedView: View {
                         SlideToConfirm {
                             isConfirmed = true
                         }
-                        .padding(.horizontal)
+                        .padding(.top, 20)
                     }
                     .padding(20)
                     .background(Color.white)
-                    .cornerRadius(24, corners: [.topLeft, .topRight])
-                    .frame(height: 220)
+                    .frame(maxWidth: .infinity)
                 }
+                .ignoresSafeArea(edges: .bottom) // important to remove safe space
+                .background(Color.white)
                 
-                // NavigationLink OUTSIDE background
+                // NavigationLink
                 NavigationLink(destination: InspectionbeforeRide(), isActive: $isConfirmed) {
                     EmptyView()
                 }
@@ -118,44 +119,47 @@ struct SlideToConfirm: View {
     @State private var isConfirmed = false
     
     var body: some View {
-        ZStack {
-            Capsule()
-                .fill(Color(red: 0.25, green: 0.44, blue: 0.7))
-                .frame(height: 60)
-            
-            Text(isConfirmed ? "Confirmed" : "Slide To Confirm")
-                .foregroundColor(.white)
-                .font(.system(size: 18, weight: .bold))
-            
-            HStack {
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 50, height: 50)
-                    .overlay(
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(Color(red: 0.25, green: 0.44, blue: 0.7))
-                            .font(.system(size: 24, weight: .bold))
-                    )
-                    .offset(x: dragOffset.width)
-                    .gesture(
-                        DragGesture()
-                            .updating($dragOffset) { value, state, _ in
-                                if value.translation.width > 0 && value.translation.width < 220 {
-                                    state = value.translation
-                                }
-                            }
-                            .onEnded { value in
-                                if value.translation.width > 180 {
-                                    isConfirmed = true
-                                    action()
-                                }
-                            }
-                    )
+        GeometryReader { geometry in
+            ZStack {
+                Capsule()
+                    .fill(Color(red: 0.25, green: 0.44, blue: 0.7))
+                    .frame(height: 60)
                 
-                Spacer()
+                Text(isConfirmed ? "Confirmed" : "Slide To Confirm")
+                    .foregroundColor(.white)
+                    .font(.system(size: 18, weight: .bold))
+                
+                HStack {
+                    Circle()
+                        .fill(Color.white)
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(Color(red: 0.25, green: 0.44, blue: 0.7))
+                                .font(.system(size: 24, weight: .bold))
+                        )
+                        .offset(x: dragOffset.width)
+                        .gesture(
+                            DragGesture()
+                                .updating($dragOffset) { value, state, _ in
+                                    if value.translation.width > 0 && value.translation.width < (geometry.size.width - 70) {
+                                        state = value.translation
+                                    }
+                                }
+                                .onEnded { value in
+                                    if value.translation.width > (geometry.size.width - 120) {
+                                        isConfirmed = true
+                                        action()
+                                    }
+                                }
+                        )
+                    
+                    Spacer()
+                }
+                .padding(.leading, 5)
             }
-            .padding(.leading, 5)
         }
+        .frame(height: 60)
     }
 }
 
