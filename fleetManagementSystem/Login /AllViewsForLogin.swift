@@ -366,7 +366,8 @@ struct HomeScreenRouter: View {
         case .driver:
             DriverHomeScreen(viewModel: viewModel)
         case .fleetManager:
-            FleetManagerHomeScreen(viewModel: viewModel)
+            // Replace FleetManagerHomeScreen with your DashboardView
+            DashboardView(viewModel: viewModel)
         case .maintenance:
             MaintenanceHomeScreen(viewModel: viewModel)
         case .unknown:
@@ -374,6 +375,7 @@ struct HomeScreenRouter: View {
         }
     }
 }
+
 
 // MARK: - Driver Home Screen
 

@@ -1,13 +1,21 @@
 //
-//  DashboardViewController.swift
-//  Fleet_Management
+// DashboardViewController.swift
+// Fleet_Management
 //
-//  Created by admin81 on 22/04/25.
+// Created by admin81 on 22/04/25.
 //
+
 import SwiftUI
 
 struct DashboardView: View {
+    // Add viewModel parameter
+    @ObservedObject var viewModel: AuthViewModel
     @State private var selectedTab: Int = 0
+    
+    // Get username from email for display
+    var username: String {
+        return viewModel.email.components(separatedBy: "@").first ?? "Manager"
+    }
     
     let infoCards = [
         InfoCard(number: "5", title: "Running Trips", icon: "person.line.dotted.person"),
@@ -35,7 +43,7 @@ struct DashboardView: View {
                         Text("Welcome,")
                             .font(.title3)
                             .foregroundColor(.black)
-                        Text("Manager")
+                        Text(username) // Use username variable instead of hardcoded "Manager"
                             .font(.title2)
                             .bold()
                             .foregroundColor(.black)
@@ -43,7 +51,16 @@ struct DashboardView: View {
                     Spacer()
                     HStack(spacing: 20) {
                         Image(systemName: "bell.fill").font(.system(size: 26))
-                        Image(systemName: "person.crop.circle").font(.system(size: 26))
+                        // Add logout functionality
+                        Menu {
+                            Button(action: {
+                                viewModel.logout()
+                            }) {
+                                Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            }
+                        } label: {
+                            Image(systemName: "person.crop.circle").font(.system(size: 26))
+                        }
                     }
                     .font(.title3)
                     .foregroundColor(.black)
@@ -77,8 +94,12 @@ struct DashboardView: View {
                     .padding(.bottom, 20)
                 }
             }
+            
+            // Display User ID at bottom for debugging
+            Text("User ID: \(viewModel.firebaseUid)")
+                .font(.caption2)
+                .foregroundColor(.gray)
+                .padding(.bottom, 4)
         }
     }
 }
-
-

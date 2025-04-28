@@ -40,13 +40,26 @@ class AuthViewModel: ObservableObject {
     // MARK: - Private Properties
     private let appwrite = Appwrite()
     private var challengeId: String = ""
+    private var handle: AuthStateDidChangeListenerHandle?
+
     
     // MARK: - Initialization
+    
+    deinit {
+       if let handle = handle {
+         Auth.auth().removeStateDidChangeListener(handle)
+       }
+     }
     
     init() {
         if let savedUserId = appwrite.getAppwriteUserId() {
             self.appwriteUserId = savedUserId
         }
+        
+        handle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+          self?.firebaseUid = user?.uid ?? ""
+        }
+        
         
         if let firebaseUid = appwrite.getFirebaseUid() {
             self.firebaseUid = firebaseUid
@@ -171,6 +184,7 @@ class AuthViewModel: ObservableObject {
                 firebaseUid = ""
                 resetFields()
                 screen = .login
+                try? Auth.auth().signOut()
             } catch {
                 errorMessage = error.localizedDescription
             }
@@ -240,19 +254,22 @@ class AuthViewModel: ObservableObject {
         do {
             // Get role from Appwrite (which checks Firebase as fallback)
             let role = try await appwrite.getUserRole()
+            print("Retrieved role string from database: \(role)")
             
             // Convert string role to enum
             if let userRole = UserRole(rawValue: role) {
+                print("Successfully converted to enum: \(userRole)")
                 self.userRole = userRole
             } else {
-                self.userRole = .driver
+                print("⚠️ Failed to convert role string to enum: \(role)")
+                self.userRole = .unknown  // Change: Set to unknown instead of driver
             }
             
             screen = .home
             isLoading = false
         } catch {
-            print("Error fetching user role: \(error)")
-            userRole = .driver
+            print("❌ Error fetching user role: \(error)")
+            userRole = .unknown  // Change: Set to unknown instead of driver
             screen = .home
             isLoading = false
         }

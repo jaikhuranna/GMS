@@ -7,11 +7,18 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseFirestore
 
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
+        // In your AppDelegate.swift or where you initialize Firebase
+
+
+        let settings = FirestoreSettings()
+        settings.cacheSettings = MemoryCacheSettings(garbageCollectorSettings: MemoryLRUGCSettings())
+        Firestore.firestore().settings = settings
 
         // let dbService = FleetDriverDBService()
         // dbService.uploadSampleFleetDrivers(sampleDrivers)
