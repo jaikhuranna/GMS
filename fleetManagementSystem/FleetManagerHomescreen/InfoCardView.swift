@@ -5,8 +5,146 @@
 //  Created by admin81 on 22/04/25.
 //
 
+//import SwiftUI
+//import Foundation
+//
+//struct InfoCard: Identifiable {
+//    let id = UUID()
+//    let number: String
+//    let title: String
+//    let icon: String
+//}
+//
+//struct Trip: Identifiable {
+//    let id = UUID()
+//    let driverName: String
+//    let vehicleNo: String
+//    let tripDetail: String
+//    let driverImage: String
+//}
+//
+////struct PastTrip: Identifiable {
+////    let id = UUID()
+////    let driverName: String
+////    let vehicleNo: String
+////    let tripDetail: String
+////    let driverImage: String
+////    let date: String // <-- Add this back
+////}
+//
+//struct PastMaintenance: Identifiable {
+//    let id = UUID()
+//    let note: String
+//    let observerName: String
+//    let dateOfMaintenance: String
+//    let vehicleNo: String
+//}
+//
+//
+//struct VehicleDetail: Identifiable{
+//    var id = UUID()
+//    let vehicleNo: String
+//    let engineNumber: String
+//    let modelNuumber: String
+//    let vehicleTyper: String
+//    let licenseRenewed: String
+//    let maintenanceDate: String
+//    let distanceTravelled: Int
+//}
+//
+//struct Vehicle: Identifiable {
+//    var id: String
+//    var vehicleNo: String
+//    var distanceTravelled: Int
+//    var vehicleCategory: String
+//    var vehicleType: String
+//    var modelName: String
+//    var averageMileage: Double
+//    var engineNo: String
+//    var licenseRenewalDate: Date
+//    var carImage: String // Optional: for static images from Assets
+//    
+//    enum VehicleType: String, CaseIterable, Identifiable {
+//        case HMV
+//        case LMV
+//        
+//        var id: String { rawValue }
+//    }
+//}
+//
+//struct Driver: Identifiable {
+//    var id: String
+//    var driverName: String
+//    var driverImage: String
+//    var driverExperience: Int
+//    var driverAge: Int
+//    var driverContactNo: String
+//    var driverLicenseNo: String
+//    var driverLicenseType: String
+//
+//
+//    enum DriverType {
+//        case HMV
+//        case LMV
+//    }
+//}
+//
+//
+//extension Color {
+//    init(hex: String) {
+//        let hex = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+//        let scanner = Scanner(string: hex)
+//        if hex.hasPrefix("#") { scanner.currentIndex = scanner.string.index(after: scanner.currentIndex) }
+//
+//        var rgb: UInt64 = 0
+//        scanner.scanHexInt64(&rgb)
+//
+//        let r = Double((rgb >> 16) & 0xFF) / 255.0
+//        let g = Double((rgb >> 8) & 0xFF) / 255.0
+//        let b = Double(rgb & 0xFF) / 255.0
+//
+//        self.init(red: r, green: g, blue: b)
+//    }
+//}
+//
+//struct InfoCardView: View {
+//    var card: InfoCard
+//
+//    var body: some View {
+//        VStack(alignment: .leading, spacing: 8) {
+//            HStack {
+//                Text(card.number)
+//                    .font(.title)
+//                    .bold()
+//                    .foregroundColor(Color(hex: "#396BAF"))
+//                Spacer()
+//                ZStack {
+//                    Circle()
+//                        .fill(Color.white)
+//                        .frame(width: 50, height: 50) // Increased size here
+//                    Image(systemName: card.icon)
+//                        .font(.system(size: 20))
+//                        .foregroundColor(Color(hex: "#396BAF"))
+//                }
+//            }
+//            Text(card.title)
+//                .font(.subheadline)
+//                .foregroundColor(Color(hex: "#396BAF"))
+//        }
+//        .padding()
+//        .background(Color(red: 237/255, green: 242/255, blue: 252/255))
+//        .cornerRadius(16)
+//    }
+//}
+//
+
+
 import SwiftUI
 import Foundation
+import Firebase
+import FirebaseFirestore
+import Combine
+
 
 struct InfoCard: Identifiable {
     let id = UUID()
@@ -23,20 +161,21 @@ struct Trip: Identifiable {
     let driverImage: String
 }
 
-struct PastTrip: Identifiable {
-    let id = UUID()
-    let driverName: String
-    let vehicleNo: String
-    let tripDetail: String
-    let driverImage: String
-    let date: String // <-- Add this back
-}
+//struct PastTrip: Identifiable {
+//    let id = UUID()
+//    let driverName: String
+//    let vehicleNo: String
+//    let tripDetail: String
+//    let driverImage: String
+//    let date: String // <-- Add this back
+//}
 
 struct PastMaintenance: Identifiable {
     let id = UUID()
-    let note: String  
+    let note: String
     let observerName: String
     let dateOfMaintenance: String
+    let vehicleNo: String
 }
 
 
@@ -52,22 +191,35 @@ struct VehicleDetail: Identifiable{
 }
 
 struct Vehicle: Identifiable {
-    let id = UUID()
-    let vehicleNo: String
-    let distanceTravelled: Int
-    let carImage: String
-
-    enum VehicleType {
+    var id: String
+    var vehicleNo: String
+    var distanceTravelled: Int
+    var vehicleCategory: String
+    var vehicleType: String
+    var modelName: String
+    var averageMileage: Double
+    var engineNo: String
+    var licenseRenewalDate: Date
+    var carImage: String // Optional: for static images from Assets
+    
+    enum VehicleType: String, CaseIterable, Identifiable {
         case HMV
         case LMV
+        
+        var id: String { rawValue }
     }
 }
 
 struct Driver: Identifiable {
-    let id = UUID()
-    let driverName: String
-    let driverExperience: Int
-    let driverImage: String
+    var id: String
+    var driverName: String
+    var driverImage: String
+    var driverExperience: Int
+    var driverAge: Int
+    var driverContactNo: String
+    var driverLicenseNo: String
+    var driverLicenseType: String
+
 
     enum DriverType {
         case HMV
@@ -109,7 +261,7 @@ struct InfoCardView: View {
                         .fill(Color.white)
                         .frame(width: 50, height: 50) // Increased size here
                     Image(systemName: card.icon)
-                        .font(.system(size: 20)) 
+                        .font(.system(size: 20))
                         .foregroundColor(Color(hex: "#396BAF"))
                 }
             }
@@ -123,3 +275,113 @@ struct InfoCardView: View {
     }
 }
 
+
+
+struct OngoingTrip: Identifiable {
+  let id: String
+  let driverName: String
+  let vehicleNo: String
+  let tripDetail: String
+  let driverImageUrl: String?
+}
+
+final class DashboardService: ObservableObject {
+  @Published var runningTripsCount      = 0
+  @Published var carsInMaintenanceCount = 0
+  @Published var idleVehiclesCount      = 0
+  @Published var idleDriversCount       = 0
+  @Published var ongoingTrips: [OngoingTrip] = []
+
+  private let db = Firestore.firestore()
+  private var cancellables = Set<AnyCancellable>()
+
+  func fetchAll() {
+    let group = DispatchGroup()
+
+    // 1) Running trips = bookingRequests where status == inProgress
+    group.enter()
+    db.collection("bookingRequests")
+      .whereField("status", isEqualTo: "inProgress")
+      .getDocuments { snap, _ in
+        self.runningTripsCount = snap?.documents.count ?? 0
+        self.ongoingTrips = snap?.documents.compactMap { doc in
+          let data = doc.data()
+          guard
+            let driverName = data["driverName"]  as? String,
+            let vehicleNo  = data["vehicleNo"]   as? String,
+            let from       = data["pickupName"]  as? String,
+            let to         = data["dropoffName"] as? String
+          else { return nil }
+          return OngoingTrip(
+            id: doc.documentID,
+            driverName: driverName,
+            vehicleNo: vehicleNo,
+            tripDetail: "\(from) → \(to)",
+            driverImageUrl: data["driverImageUrl"] as? String
+          )
+        } ?? []
+        group.leave()
+      }
+
+    // 2) Cars in maintenance = vehicles where inMaintenance == true
+    group.enter()
+    db.collection("vehicles")
+      .whereField("inMaintenance", isEqualTo: true)
+      .getDocuments { snap, _ in
+        self.carsInMaintenanceCount = snap?.documents.count ?? 0
+        group.leave()
+      }
+
+    // 3) Idle vehicles = total vehicles minus those in an inProgress trip
+    group.enter()
+    Publishers.Zip(
+      db.collection("vehicles")
+        .getDocumentsPublisher(),
+      db.collection("bookingRequests")
+        .whereField("status", isEqualTo: "inProgress")
+        .getDocumentsPublisher()
+    )
+    .sink(receiveCompletion: { _ in }) { vehSnap, tripSnap in
+      let allIds  = Set(vehSnap.documents.map { $0.documentID })
+      let busyIds = Set(tripSnap.documents.compactMap { $0.data()["vehicleId"] as? String })
+      self.idleVehiclesCount = allIds.subtracting(busyIds).count
+      group.leave()
+    }
+    .store(in: &cancellables)
+
+    // 4) Idle drivers = total drivers minus those on an inProgress trip
+    group.enter()
+    Publishers.Zip(
+      db.collection("fleetDrivers")
+        .getDocumentsPublisher(),
+      db.collection("bookingRequests")
+        .whereField("status", isEqualTo: "inProgress")
+        .getDocumentsPublisher()
+    )
+    .sink(receiveCompletion: { _ in }) { drvSnap, tripSnap in
+      let allIds  = Set(drvSnap.documents.map { $0.documentID })
+      let busyIds = Set(tripSnap.documents.compactMap { $0.data()["driverId"] as? String })
+      self.idleDriversCount = allIds.subtracting(busyIds).count
+      group.leave()
+    }
+    .store(in: &cancellables)
+  }
+}
+
+// MARK: – Firestore + Combine helper
+
+extension Query {
+  /// Wraps `getDocuments(completion:)` in a Combine publisher
+  func getDocumentsPublisher() -> AnyPublisher<QuerySnapshot, Error> {
+    Future<QuerySnapshot, Error> { promise in
+      self.getDocuments { snapshot, error in
+        if let error = error {
+          promise(.failure(error))
+        } else if let snapshot = snapshot {
+          promise(.success(snapshot))
+        }
+      }
+    }
+    .eraseToAnyPublisher()
+  }
+}

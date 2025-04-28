@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TripRowView: View {
-    var trip: Trip
+    var trip: OngoingTrip
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {

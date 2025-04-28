@@ -198,7 +198,8 @@ class NavigationViewModel: ObservableObject {
 
 struct NavigationMapView: View {
     @StateObject private var viewModel: NavigationViewModel
-
+    @Environment(\.presentationMode) var presentationMode
+    
     init(from startLocation: String, to destinationLocation: String) {
         _viewModel = StateObject(wrappedValue: NavigationViewModel(
             start: startLocation,
@@ -220,13 +221,14 @@ struct NavigationMapView: View {
 
             // Navigation UI overlay
             VStack(spacing: 0) {
-                // Status bar (would be managed by the system in a real app)
                 // Top buttons
                 ZStack {
                     VStack {
                         HStack {
                             // Back button
-                            Button(action: {}) {
+                            Button(action: {
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 24, weight: .medium))
                                     .foregroundColor(.black)
@@ -254,7 +256,7 @@ struct NavigationMapView: View {
                         Spacer()
                     }
 
-                    // Route time indicators (would be positioned by the map in real implementation)
+                    // Route time indicators
                     if !viewModel.routes.isEmpty && viewModel.selectedRouteIndex != nil {
                         RouteTimeBadges(routes: viewModel.routes)
                     }
@@ -310,7 +312,9 @@ struct NavigationMapView: View {
                                 .foregroundColor(.white)
                         }
                         Spacer()
-                        Button(action: {}) {
+                        Button(action: {
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
                             Image(systemName: "xmark")
                                 .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(.white)
@@ -372,32 +376,22 @@ struct NavigationMapView: View {
                     .padding(.top, -28)
                     .padding(.bottom)
                 }
-                
-                
-                
             }
             .frame(maxWidth: .infinity)
             .background(Color.clear)
             .edgesIgnoringSafeArea(.bottom)
 
-                // Home indicator
-                Rectangle()
-                    .frame(width: 134, height: 5)
-                    .cornerRadius(2.5)
-                    .foregroundColor(.black)
-                    .padding(.vertical, 8)
-                    .background(Color.white)
-
-                // Extra padding at the bottom to ensure all map elements are covered
-//                Color.white
-//                    .frame(height: 50)
-//                    .edgesIgnoringSafeArea(.bottom)
-            }
-            .edgesIgnoringSafeArea(.bottom) // Make sure it extends beyond safe area
-            .background(Color.white) // Set background for entire component
-            .zIndex(1) // Ensure it stays on top of the map
+            // Home indicator
+            Rectangle()
+                .frame(width: 134, height: 5)
+                .cornerRadius(2.5)
+                .foregroundColor(.black)
+                .padding(.vertical, 8)
+                .background(Color.white)
         }
+        .navigationBarHidden(true)
     }
+}
 
 
 struct MapWithOverlays: UIViewRepresentable {
@@ -571,6 +565,8 @@ struct RouteTimeBadges: View {
 }
 
 
+import SwiftUI
+
 struct RouteOptionView: View {
     let duration: String
     let eta: String
@@ -600,19 +596,24 @@ struct RouteOptionView: View {
             .padding(.leading, 24)
             .onTapGesture(perform: action)
             Spacer()
-            Button(action: navigateAction) {
-                Text("GO")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
-                    .frame(width: 60, height: 44)
-                    .background(Color.green)
-                    .cornerRadius(12)
-            }
+            NavigationLink(
+                destination: MoveToDirections(), // Navigate to MoveToDirections when button is clicked
+                label: {
+                    Text("GO")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(width: 60, height: 44)
+                        .background(Color.green)
+                        .cornerRadius(12)
+                }
+            )
             .padding(.trailing, 24)
         }
         .background(Color.white)
     }
 }
+
+
 // Extension to apply corner radius to specific corners
 //extension View {
 //    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
@@ -633,5 +634,4 @@ struct RoundedCornerShape: Shape {
         return Path(path.cgPath)
     }
 }
-
 
