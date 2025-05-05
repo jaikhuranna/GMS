@@ -35,7 +35,6 @@ class AuthViewModel: ObservableObject {
     @Published var otpDigits: [String] = Array(repeating: "", count: 6)
     @Published var userId: String = ""
     @Published var debugRoleString: String = "No role fetched"
-//    @Published var bookingService: BookingService?
     
     // MARK: - Private Properties
     private let appwrite = Appwrite()

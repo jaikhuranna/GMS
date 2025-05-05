@@ -39,33 +39,33 @@ import FirebaseFirestore
 //}
 
 
-//class FleetDriverDBService {
-//    private let db = Firestore.firestore()
-//    private let collectionName = "fleetDrivers"
-//
-//    // Upload a single FleetDriver
-//    func uploadFleetDriver(_ fleetDriver: FleetDriver, completion: @escaping (Result<Void, Error>) -> Void) {
-//        let data = fleetDriver.toDictionary()
-//        db.collection(collectionName).document(fleetDriver.id.uuidString).setData(data) { error in
-//            if let error = error {
-//                completion(.failure(error))
-//            } else {
-//                completion(.success(()))
-//            }
-//        }
-//    }
-//
-//    // Upload a list of sample FleetDrivers
-//    func uploadSampleFleetDrivers(_ fleetDrivers: [FleetDriver]) {
-//        for fleetDriver in fleetDrivers {
-//            uploadFleetDriver(fleetDriver) { result in
-//                switch result {
-//                case .success:
-//                    print("Uploaded: \(fleetDriver.name)")
-//                case .failure(let error):
-//                    print("Failed: \(error.localizedDescription)")
-//                }
-//            }
-//        }
-//    }
-//}
+class FleetDriverDBService {
+    private let db = Firestore.firestore()
+    private let collectionName = "fleetDrivers"
+
+    // Upload a single FleetDriver
+    func uploadFleetDriver(_ fleetDriver: FleetDriver, completion: @escaping (Result<Void, Error>) -> Void) {
+        let data = fleetDriver.toDictionary()
+        db.collection(collectionName).document(fleetDriver.id.uuidString).setData(data) { error in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
+            }
+        }
+    }
+
+    // Upload a list of sample FleetDrivers
+    func uploadSampleFleetDrivers(_ fleetDrivers: [FleetDriver]) {
+        for fleetDriver in fleetDrivers {
+            uploadFleetDriver(fleetDriver) { result in
+                switch result {
+                case .success:
+                    print("Uploaded: \(fleetDriver.name)")
+                case .failure(let error):
+                    print("Failed: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+}
