@@ -115,22 +115,27 @@ enum LicenseType: String, Codable {
 }
 
 struct FleetDriver: Identifiable, Codable {
-    let id: UUID
+    /// maps to the Firestore field `"id"` (your business-key)
+    let id: String
+
     var name: String
     var age: Int
     var licenseNo: String
     var contactNo: String
-    var experience: Int  // in years
+    var experience: Int
     var licenseType: LicenseType
-    var driverImage: UIImage?
-    var licenseImage: UIImage?
+
+    
+    var driverImage: UIImage?   = nil
+    var licenseImage: UIImage?  = nil
 
     enum CodingKeys: String, CodingKey {
         case id, name, age, licenseNo, contactNo, experience, licenseType
     }
 
+    /// normal app-side initializer
     init(
-        id: UUID = UUID(),
+        id: String = UUID().uuidString,
         name: String,
         age: Int,
         licenseNo: String,
@@ -140,50 +145,52 @@ struct FleetDriver: Identifiable, Codable {
         driverImage: UIImage? = nil,
         licenseImage: UIImage? = nil
     ) {
-        self.id = id
-        self.name = name
-        self.age = age
-        self.licenseNo = licenseNo
-        self.contactNo = contactNo
-        self.experience = experience
-        self.licenseType = licenseType
-        self.driverImage = driverImage
+        self.id           = id
+        self.name         = name
+        self.age          = age
+        self.licenseNo    = licenseNo
+        self.contactNo    = contactNo
+        self.experience   = experience
+        self.licenseType  = licenseType
+        self.driverImage  = driverImage
         self.licenseImage = licenseImage
     }
 
+    /// Codable conformance—all fields are Strings/Ints now
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decode(UUID.self, forKey: .id)
-        name = try container.decode(String.self, forKey: .name)
-        age = try container.decode(Int.self, forKey: .age)
-        licenseNo = try container.decode(String.self, forKey: .licenseNo)
-        contactNo = try container.decode(String.self, forKey: .contactNo)
-        experience = try container.decode(Int.self, forKey: .experience)
-        licenseType = try container.decode(LicenseType.self, forKey: .licenseType)
-        driverImage = nil
-        licenseImage = nil
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.id           = try c.decode(String.self, forKey: .id)
+        self.name         = try c.decode(String.self, forKey: .name)
+        self.age          = try c.decode(Int.self,    forKey: .age)
+        self.licenseNo    = try c.decode(String.self, forKey: .licenseNo)
+        self.contactNo    = try c.decode(String.self, forKey: .contactNo)
+        self.experience   = try c.decode(Int.self,    forKey: .experience)
+        self.licenseType  = try c.decode(LicenseType.self, forKey: .licenseType)
+        self.driverImage  = nil
+        self.licenseImage = nil
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
-        try container.encode(name, forKey: .name)
-        try container.encode(age, forKey: .age)
-        try container.encode(licenseNo, forKey: .licenseNo)
-        try container.encode(contactNo, forKey: .contactNo)
-        try container.encode(experience, forKey: .experience)
-        try container.encode(licenseType, forKey: .licenseType)
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id,           forKey: .id)
+        try c.encode(name,         forKey: .name)
+        try c.encode(age,          forKey: .age)
+        try c.encode(licenseNo,    forKey: .licenseNo)
+        try c.encode(contactNo,    forKey: .contactNo)
+        try c.encode(experience,   forKey: .experience)
+        try c.encode(licenseType,  forKey: .licenseType)
     }
 
+    /// when you need a Firestore-friendly dict
     func toDictionary() -> [String: Any] {
         return [
-            "id": id.uuidString,
-            "name": name,
-            "age": age,
-            "licenseNo": licenseNo,
-            "contactNo": contactNo,
-            "experience": experience,
-            "licenseType": licenseType.rawValue
+            "id":           id,
+            "name":         name,
+            "age":          age,
+            "licenseNo":    licenseNo,
+            "contactNo":    contactNo,
+            "experience":   experience,
+            "licenseType":  licenseType.rawValue
         ]
     }
 }

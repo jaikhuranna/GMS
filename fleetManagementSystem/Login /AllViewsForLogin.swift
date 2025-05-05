@@ -378,7 +378,7 @@ struct HomeScreenRouter: View {
         case .fleetManager:
             MainTabView()
         case .maintenance:
-            MaintenanceHomeScreen(viewModel: viewModel)
+            MaintenanceTabView()
         case .unknown:
             UnknownRoleScreen(viewModel: viewModel)
         }

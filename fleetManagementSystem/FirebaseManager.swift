@@ -1,76 +1,76 @@
+////
+////  FirebaseManger.swift
+////  fleetManagementSystem
+////
+////  Created by Steve on 25/04/25.
+////
 //
-//  FirebaseManger.swift
-//  fleetManagementSystem
+////
+////  Firebase Manager.swift
+////  fleetManagementSystem
+////
+////  Created by user@61 on 24/04/25.
+////
 //
-//  Created by Steve on 25/04/25.
 //
-
+//import Foundation
+//import Firebase
+//import FirebaseFirestore
 //
-//  Firebase Manager.swift
-//  fleetManagementSystem
-//
-//  Created by user@61 on 24/04/25.
-//
-
-
-import Foundation
-import Firebase
-import FirebaseFirestore
-
-class FirebaseManager {
-    static let shared = FirebaseManager()
-    private let db = Firestore.firestore()
-    
-    private let vehiclesCollection = "vehicles"
-    private let driversCollection = "fleetDrivers"
-    private let pastTripsCollection = "pastTrips" // Added collection name
-    private let pastMaintenancesCollection = "pastMaintenances" // Added collection name
-    
-    private init() {}
-    
-    // MARK: - Upload Single Vehicle
-    func uploadVehicle(_ vehicle: FleetVehicle, completion: @escaping (Result<Void, Error>) -> Void) {
-        let data = vehicle.toDictionary()
-        db.collection(vehiclesCollection).document(vehicle.id.uuidString).setData(data) { error in
-            error == nil ? completion(.success(())) : completion(.failure(error!))
-        }
-    }
-    
-    // MARK: - Upload Sample Fleet
-    func uploadSampleFleet(_ fleet: [FleetVehicle]) {
-        for vehicle in fleet {
-            uploadVehicle(vehicle) { result in
-                switch result {
-                case .success:
-                    print("Uploaded vehicle: \(vehicle.vehicleNo)")
-                case .failure(let error):
-                    print("Vehicle upload failed: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
-    
-    // MARK: - Upload Single Driver
-    func uploadFleetDriver(_ driver: FleetDriver, completion: @escaping (Result<Void, Error>) -> Void) {
-        let data = driver.toDictionary()
-        db.collection(driversCollection).document(driver.id.uuidString).setData(data) { error in
-            error == nil ? completion(.success(())) : completion(.failure(error!))
-        }
-    }
-    
-    // MARK: - Upload Sample Drivers
-    func uploadSampleFleetDrivers(_ drivers: [FleetDriver]) {
-        for driver in drivers {
-            uploadFleetDriver(driver) { result in
-                switch result {
-                case .success:
-                    print("Uploaded driver: \(driver.name)")
-                case .failure(let error):
-                    print("Driver upload failed: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
+//class FirebaseManager {
+//    static let shared = FirebaseManager()
+//    private let db = Firestore.firestore()
+//    
+//    private let vehiclesCollection = "vehicles"
+//    private let driversCollection = "fleetDrivers"
+//    private let pastTripsCollection = "pastTrips" // Added collection name
+//    private let pastMaintenancesCollection = "pastMaintenances" // Added collection name
+//    
+//    private init() {}
+//    
+//    // MARK: - Upload Single Vehicle
+//    func uploadVehicle(_ vehicle: FleetVehicle, completion: @escaping (Result<Void, Error>) -> Void) {
+//        let data = vehicle.toDictionary()
+//        db.collection(vehiclesCollection).document(vehicle.id.uuidString).setData(data) { error in
+//            error == nil ? completion(.success(())) : completion(.failure(error!))
+//        }
+//    }
+//    
+//    // MARK: - Upload Sample Fleet
+//    func uploadSampleFleet(_ fleet: [FleetVehicle]) {
+//        for vehicle in fleet {
+//            uploadVehicle(vehicle) { result in
+//                switch result {
+//                case .success:
+//                    print("Uploaded vehicle: \(vehicle.vehicleNo)")
+//                case .failure(let error):
+//                    print("Vehicle upload failed: \(error.localizedDescription)")
+//                }
+//            }
+//        }
+//    }
+//    
+//    // MARK: - Upload Single Driver
+//    func uploadFleetDriver(_ driver: FleetDriver, completion: @escaping (Result<Void, Error>) -> Void) {
+//        let data = driver.toDictionary()
+//        db.collection(driversCollection).document(driver.id.uuidString).setData(data) { error in
+//            error == nil ? completion(.success(())) : completion(.failure(error!))
+//        }
+//    }
+//    
+//    // MARK: - Upload Sample Drivers
+//    func uploadSampleFleetDrivers(_ drivers: [FleetDriver]) {
+//        for driver in drivers {
+//            uploadFleetDriver(driver) { result in
+//                switch result {
+//                case .success:
+//                    print("Uploaded driver: \(driver.name)")
+//                case .failure(let error):
+//                    print("Driver upload failed: \(error.localizedDescription)")
+//                }
+//            }
+//        }
+//    }
     //    func pushSampleTripAndMaintenanceDataToFirebase() {
     //            // Ensure Firebase is configured before calling this function
     //            // FirebaseApp.configure() should be called once in your App's setup (e.g., AppDelegate)
@@ -188,5 +188,5 @@ class FirebaseManager {
     //            completion(vehicles)
     //        }
     //    }
-    
-}
+//    
+//}
