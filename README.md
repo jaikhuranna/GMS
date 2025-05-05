@@ -1,2 +1,2 @@
 Hey Guys!
-This is our Gaari Management System!
+This is our Gaadi Management System!
