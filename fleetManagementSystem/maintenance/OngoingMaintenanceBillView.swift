@@ -66,29 +66,29 @@ struct OngoingMaintenanceBillView: View {
                 }
 
 
-//                // Post Maintenance Image
-//                Text("Post Maintenance Images")
-//                    .font(.headline)
-//                    .foregroundColor(.black)
-//
-//                ImageUploadView(selectedImage: $postMaintenanceImage, selectedItem: $postImageItem)
+                // Post Maintenance Image
+                Text("Post Maintenance Images")
+                    .font(.headline)
+                    .foregroundColor(.black)
+
+                ImageUploadView(selectedImage: $postMaintenanceImage, selectedItem: $postImageItem)
 
                 // Submit Button
                 Button(action: {
                     // Send for review logic
                 }) {
-                    Text("End Task")
+                    Text("Send for Review")
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.red)
+                        .background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(12)
                 }
             }
             .padding()
         }
-        .navigationTitle("Upcoming Maintenance Details")
+        .navigationTitle("OnGoing Maintenance Details")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
