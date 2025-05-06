@@ -3,8 +3,10 @@ import SwiftUI
 struct OngoingMaintenanceDetailView: View {
     let ongoingTasks: [MaintenanceTask] = [
         MaintenanceTask(taskTitle: "Tire Replace Task", vehicleNumber: "KN23CB4563", dateRange: nil),
-        MaintenanceTask(taskTitle: "Tire Replace Task", vehicleNumber: "KN23CB4563", dateRange: nil),MaintenanceTask(taskTitle: "Tire Replace Task", vehicleNumber: "KN23CB4563", dateRange: nil),
-        MaintenanceTask(taskTitle: "Tire Replace Task", vehicleNumber: "KN23CB4563", dateRange: nil)    ]
+        MaintenanceTask(taskTitle: "Tire Replace Task", vehicleNumber: "KN23CB4563", dateRange: nil),
+        MaintenanceTask(taskTitle: "Tire Replace Task", vehicleNumber: "KN23CB4563", dateRange: nil),
+        MaintenanceTask(taskTitle: "Tire Replace Task", vehicleNumber: "KN23CB4563", dateRange: nil)
+    ]
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -15,7 +17,9 @@ struct OngoingMaintenanceDetailView: View {
 
             ScrollView {
                 ForEach(ongoingTasks) { task in
-                    MaintenanceCardView(task: task, showDate: false)
+                    NavigationLink(destination: OngoingMaintenanceBillView()) {
+                        MaintenanceCardView(task: task, showDate: false)
+                    }
                 }
             }
         }
@@ -30,5 +34,3 @@ struct OngoingMaintenanceDetailView_Previews: PreviewProvider {
         }
     }
 }
-
-

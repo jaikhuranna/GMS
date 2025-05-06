@@ -17,7 +17,9 @@ struct UpcomingMaintenanceDetailView: View {
 
             ScrollView {
                 ForEach(upcomingTasks) { task in
-                    MaintenanceCardView(task: task, showDate: true)
+                    NavigationLink(destination: UpcomingMaintenanceBillView()){
+                        MaintenanceCardView(task: task, showDate: false)
+                    }
                 }
             }
         }
