@@ -337,7 +337,8 @@ struct SectionTitle: View {
 // MARK: - Preview
 struct TaskView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
+        NavigationStack{
+//        NavigationView {
             TaskView()
         }
     }
