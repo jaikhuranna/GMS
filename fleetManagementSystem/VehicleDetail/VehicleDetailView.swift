@@ -1,10 +1,7 @@
 
-
 import SwiftUI
 import Firebase
 import FirebaseFirestore
-
-
 
 // MARK: – InfoRow Helper
 struct InfoRow: View {
@@ -182,14 +179,19 @@ struct VehicleDetailView: View {
                     Text("Note: \(m.note)")
                         .font(.headline)
                         .foregroundColor(.red)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+
                     Text("Observer Name: \(m.observerName)")
                         .font(.subheadline)
                         .foregroundColor(.gray)
+
                     Text("Date of Maintenance: \(m.dateOfMaintenance)")
                         .font(.subheadline)
                         .foregroundColor(.gray)
                 }
                 .padding()
+                .frame(maxWidth: .infinity, minHeight: 120, alignment: .leading) // Fixed height for uniformity
                 .background(Color(hex: "396BAF").opacity(0.1))
                 .cornerRadius(12)
                 .padding(.horizontal)
@@ -289,15 +291,6 @@ struct TripDetailBottomSheetView: View {
         return f.string(from: date)
     }
 }
-
-
-    func formatDateString(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateStyle = .medium
-        return f.string(from: date)
-    }
-
-
 
 // MARK: – Tab Style Modifier
 fileprivate extension View {
