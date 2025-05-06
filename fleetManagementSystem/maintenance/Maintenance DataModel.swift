@@ -205,3 +205,53 @@ struct FluidsView: View {
         .scrollContentBackground(.hidden) // Hide default background on iOS 16+
     }
 }
+
+struct MaintenanceTask: Identifiable {
+    let id = UUID()
+    let taskTitle: String
+    let vehicleNumber: String
+    let dateRange: String? // Optional for ongoing
+}
+
+
+struct MaintenanceCardView: View {
+    let task: MaintenanceTask
+    let showDate: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "car.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(Color(hex: "#396BAF"))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(task.taskTitle)
+                        .font(.headline)
+                        .foregroundColor(.red)
+
+                    Text(task.vehicleNumber)
+                        .font(.subheadline)
+                        .foregroundColor(Color(hex: "#396BAF"))
+                    
+                    if showDate, let range = task.dateRange {
+                        Text(range)
+                            .font(.subheadline)
+                            .foregroundColor(Color(hex: "#396BAF"))
+                    } else if !showDate {
+                        Text("In Progress")
+                            .font(.subheadline)
+                            .foregroundColor(Color(hex: "#396BAF"))
+                    }
+                }
+            }
+            Divider()
+        }
+        .padding()
+        .background(Color(red: 231/255, green: 237/255, blue: 248/255))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+}
