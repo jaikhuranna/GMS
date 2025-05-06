@@ -51,32 +51,6 @@ struct HomeView: View {
                         RequestCard(carNumber: "TN 22 BP 9987", serviceDetail: "Oil Change", totalBill: 3200.0)
                     }
 
-                    SectionView(title: "On Going") {
-                        MaintenanceCard(
-                            carNumber: "TN 22 BP 9987",
-                            serviceDetail: "Oil Change",
-                            totalBill: 3200,
-                            buttonTitle: "All Ongoing",
-                            buttonColor: .green,
-                            icon: "clock.arrow.circlepath"
-                        ) {
-                            print("Ongoing tapped")
-                        }
-                    }
-
-                    SectionView(title: "Upcoming") {
-                        MaintenanceCard(
-                            carNumber: "TN 09 AB 1123",
-                            serviceDetail: "Tyre Rotation",
-                            totalBill: 1800,
-                            buttonTitle: "All Upcoming",
-                            buttonColor: .orange,
-                            icon: "calendar"
-                        ) {
-                            print("Upcoming tapped")
-                        }
-                    }
-
                     SectionView(title: "Inventory") {
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                             ForEach(inventoryItems) { item in
@@ -181,7 +155,6 @@ struct RequestCard: View {
                         .padding(.horizontal, 10)
                         .padding(.vertical, 12)
                         .frame(maxWidth: .infinity)
-//                        .background((decision == .accepted ? Color.green : Color.red).opacity(0.1))
                         .foregroundColor(decision == .accepted ? .green : .red)
                         .cornerRadius(8)
                         .bold()
@@ -189,7 +162,7 @@ struct RequestCard: View {
                 } else {
                     VStack(spacing: 12) {
                         if showDatePicker {
-                            DatePicker("", selection: $selectedDate, displayedComponents: .date)
+                            DatePicker("", selection: $selectedDate, in: Date()..., displayedComponents: .date)
                                 .labelsHidden()
                                 .datePickerStyle(.compact)
 
@@ -229,7 +202,6 @@ struct RequestCard: View {
                                     Label("Schedule Maintenance", systemImage: "calendar.badge.plus")
                                         .font(.headline)
                                         .padding(8)
-                                        //.background(Color.blue.opacity(0.1))
                                         .cornerRadius(8)
                                 }
                                 Spacer()
@@ -286,5 +258,3 @@ struct HomeView_Previews: PreviewProvider {
         HomeView()
     }
 }
-
-
