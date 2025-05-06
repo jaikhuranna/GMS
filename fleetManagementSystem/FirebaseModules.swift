@@ -461,58 +461,52 @@ class FirebaseModules {
         }
     }
 
-    
-    // New method: Upload images to Firebase Storage
-        func uploadMaintenanceImages(taskId: String, images: [UIImage], completion: @escaping ([String], Error?) -> Void) {
-            var imageURLs: [String] = []
-            let dispatchGroup = DispatchGroup()
-
-            for (index, image) in images.enumerated() {
-                dispatchGroup.enter()
-                guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-                    dispatchGroup.leave()
-                    continue
-                }
-
-                let imageRef = storage.child("maintenance_images/\(taskId)_\(index).jpg")
-                imageRef.putData(imageData, metadata: nil) { _, error in
-                    if let error = error {
-                        print("Error uploading image \(index): \(error.localizedDescription)")
-                        dispatchGroup.leave()
-                        return
-                    }
-
-                    imageRef.downloadURL { url, error in
-                        if let url = url {
-                            imageURLs.append(url.absoluteString)
-                        } else if let error = error {
-                            print("Error getting download URL for image \(index): \(error.localizedDescription)")
-                        }
-                        dispatchGroup.leave()
-                    }
-                }
+    // MARK: - Firebase - Add Maintenance Task
+    func addMaintenanceTask(_ taskData: [String: Any], taskId: String, completion: @escaping (Error?) -> Void) {
+        let docRef = Firestore.firestore().collection("maintenanceTasks").document(taskId)
+        
+        docRef.setData(taskData) { error in
+            if let error = error {
+                print("❌ Failed to add maintenance task: \(error.localizedDescription)")
+            } else {
+                print("✅ Maintenance task successfully added with ID: \(taskId)")
             }
-
-            dispatchGroup.notify(queue: .main) {
-                if imageURLs.isEmpty && !images.isEmpty {
-                    completion([], NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to upload images"]))
-                } else {
-                    completion(imageURLs, nil)
-                }
-            }
+            completion(error)
         }
+    }
 
-        // New method: Save maintenance task to Firestore
-        func addMaintenanceTask(_ taskData: [String: Any], taskId: String, completion: @escaping (Error?) -> Void) {
-            db.collection("maintenanceTasks").document(taskId).setData(taskData) { error in
+    func uploadMaintenanceImages(taskId: String, images: [UIImage], completion: @escaping ([String], Error?) -> Void) {
+        let storage = Storage.storage()
+        var uploadedURLs: [String] = []
+        let dispatchGroup = DispatchGroup()
+
+        for (index, image) in images.enumerated() {
+            guard let imageData = image.jpegData(compressionQuality: 0.8) else { continue }
+            let imageRef = storage.reference().child("maintenanceImages/\(taskId)_\(index).jpg")
+
+            dispatchGroup.enter()
+            imageRef.putData(imageData, metadata: nil) { _, error in
                 if let error = error {
-                    print("Error saving task: \(error.localizedDescription)")
-                } else {
-                    print("Task saved successfully with ID: \(taskId)")
+                    print("❌ Failed to upload image \(index): \(error)")
+                    dispatchGroup.leave()
+                    return
                 }
-                completion(error)
+
+                imageRef.downloadURL { url, error in
+                    if let url = url {
+                        uploadedURLs.append(url.absoluteString)
+                    }
+                    dispatchGroup.leave()
+                }
             }
         }
+
+        dispatchGroup.notify(queue: .main) {
+            completion(uploadedURLs, nil)
+        }
+    }
+
+   
     
     
 

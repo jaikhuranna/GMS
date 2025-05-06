@@ -205,3 +205,86 @@ struct FluidsView: View {
         .scrollContentBackground(.hidden) // Hide default background on iOS 16+
     }
 }
+
+struct MaintenanceTask: Identifiable {
+    let id = UUID()
+    let taskTitle: String
+    let vehicleNumber: String
+    let dateRange: String? // Optional for ongoing
+}
+
+
+struct MaintenanceCardView: View {
+    let task: MaintenanceTask
+    let showDate: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "car.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .foregroundColor(Color(hex: "#396BAF"))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(task.taskTitle)
+                        .font(.headline)
+                    .foregroundColor(.red)
+
+                    Text(task.vehicleNumber)
+                        .font(.subheadline)
+                        .foregroundColor(Color(hex: "#396BAF"))
+                    
+                    if showDate, let range = task.dateRange {
+                        Text(range)
+                            .font(.subheadline)
+                            .foregroundColor(Color(hex: "#396BAF"))
+                    } else if !showDate {
+                        Text("In Progress")
+                            .font(.subheadline)
+                            .foregroundColor(Color(hex: "#396BAF"))
+                    }
+                }
+            }
+            Divider()
+        }
+        .padding()
+        .background(Color(red: 231/255, green: 237/255, blue: 248/255))
+        .cornerRadius(12)
+        .padding(.horizontal)
+    }
+}
+
+struct BillSummary {
+    let billItems: [BillItem]
+    let subtotal: Int
+    let serviceCharge: Int = 500
+
+    var gst: Int {
+        Int(Double(subtotal + serviceCharge) * 0.18)
+    }
+
+    var total: Int {
+        subtotal + serviceCharge + gst
+    }
+
+    init(parts: [Part], fluids: [Part], inventory: [InventoryItem]) {
+        var items: [BillItem] = []
+        var subtotal = 0
+        var index = 1
+
+        let all = parts + fluids
+        for entry in all {
+            guard let match = inventory.first(where: { $0.name == entry.name }) else { continue }
+            let qty = Int(entry.quantity) ?? 1
+            let totalPrice = Int(Double(qty) * match.price)
+            items.append(BillItem(id: index, name: entry.name, quantity: qty, price: totalPrice))
+            subtotal += totalPrice
+            index += 1
+        }
+
+        self.billItems = items
+        self.subtotal = subtotal
+    }
+}

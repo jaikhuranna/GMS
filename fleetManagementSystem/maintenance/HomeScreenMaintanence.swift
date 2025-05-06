@@ -8,90 +8,96 @@ struct HomeView: View {
         InventoryItem(name: "Coolant", quantity: 2, price: 75.0)
     ]
 
+    @State private var isNavigatingToOngoing = false
+    @State private var isNavigatingToUpcoming = false
+
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            ZStack(alignment: .top) {
-                RoundedRectangle(cornerRadius: 30)
-                    .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
-                    .edgesIgnoringSafeArea(.top)
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Header
+                ZStack(alignment: .top) {
+                    RoundedRectangle(cornerRadius: 30)
+                        .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
+                        .edgesIgnoringSafeArea(.top)
 
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Welcome,")
-                            .font(.title3)
-                            .foregroundColor(.black)
-                        Text("Maintenance Manager")
-                            .font(.title2)
-                            .bold()
-                            .foregroundColor(.black)
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Welcome,")
+                                .font(.title3)
+                                .foregroundColor(.black)
+                            Text("Maintenance Manager")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(.black)
+                        }
+                        Spacer()
+                        HStack(spacing: 16) {
+                            Image(systemName: "bell.fill").font(.system(size: 20))
+                            Image(systemName: "gearshape.fill").font(.system(size: 20))
+                        }
+                        .foregroundColor(.black)
                     }
-                    Spacer()
-                    HStack(spacing: 16) {
-                        Image(systemName: "bell.fill").font(.system(size: 20))
-                        Image(systemName: "gearshape.fill").font(.system(size: 20))
-                    }
-                    .foregroundColor(.black)
+                    .padding(.horizontal)
+                    .padding(.top, 40)
                 }
-                .padding(.horizontal)
-                .padding(.top, 40)
-            }
-            .frame(height: 120)
-            .zIndex(1)
+                .frame(height: 120)
+                .zIndex(1)
 
-            // Scrollable Content
-            ScrollView {
-                VStack(alignment: .leading, spacing: 28) {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                        TaskSummaryCard(title: "On Going Tasks", count: 5, icon: "hammer")
-                        TaskSummaryCard(title: "Scheduled Tasks", count: 4, icon: "calendar")
-                    }
-
-                    SectionView(title: "Requests") {
-                        RequestCard(carNumber: "TN 22 BP 9987", serviceDetail: "Oil Change", totalBill: 3200.0)
-                    }
-
-                    SectionView(title: "On Going") {
-                        MaintenanceCard(
-                            carNumber: "TN 22 BP 9987",
-                            serviceDetail: "Oil Change",
-                            totalBill: 3200,
-                            buttonTitle: "All Ongoing",
-                            buttonColor: .green,
-                            icon: "clock.arrow.circlepath"
-                        ) {
-                            print("Ongoing tapped")
-                        }
-                    }
-
-                    SectionView(title: "Upcoming") {
-                        MaintenanceCard(
-                            carNumber: "TN 09 AB 1123",
-                            serviceDetail: "Tyre Rotation",
-                            totalBill: 1800,
-                            buttonTitle: "All Upcoming",
-                            buttonColor: .orange,
-                            icon: "calendar"
-                        ) {
-                            print("Upcoming tapped")
-                        }
-                    }
-
-                    SectionView(title: "Inventory") {
+                // Scrollable Content
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 28) {
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                            ForEach(inventoryItems) { item in
-                                InventoryCard2(item: item)
+                            // On Going Tasks Card with NavigationLink
+                            Button(action: {
+                                isNavigatingToOngoing = true
+                            }) {
+                                TaskSummaryCard(title: "On Going Tasks", count: 5, icon: "hammer")
+                            }
+                            .background(
+                                NavigationLink(
+                                    destination: OngoingMaintenanceDetailView(),
+                                    isActive: $isNavigatingToOngoing,
+                                    label: { EmptyView() }
+                                )
+                                .hidden()
+                            )
+
+                            // Scheduled Tasks Card with NavigationLink
+                            Button(action: {
+                                isNavigatingToUpcoming = true
+                            }) {
+                                TaskSummaryCard(title: "Scheduled Tasks", count: 4, icon: "calendar")
+                            }
+                            .background(
+                                NavigationLink(
+                                    destination: UpcomingMaintenanceDetailView(),
+                                    isActive: $isNavigatingToUpcoming,
+                                    label: { EmptyView() }
+                                )
+                                .hidden()
+                            )
+                        }
+
+                        SectionView(title: "Requests") {
+                            RequestCard(carNumber: "TN 22 BP 9987", serviceDetail: "Oil Change", totalBill: 3200.0)
+                        }
+
+                        SectionView(title: "Inventory") {
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                ForEach(inventoryItems) { item in
+                                    InventoryCard2(item: item)
+                                }
                             }
                         }
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 16)
+                    .padding(.bottom, 40)
                 }
-                .padding(.horizontal)
-                .padding(.top, 16)
-                .padding(.bottom, 40)
             }
+            .background(Color.white)
+            .navigationBarHidden(true)
         }
-        .background(Color.white)
-        .navigationBarHidden(true)
     }
 }
 
@@ -181,7 +187,6 @@ struct RequestCard: View {
                         .padding(.horizontal, 10)
                         .padding(.vertical, 12)
                         .frame(maxWidth: .infinity)
-//                        .background((decision == .accepted ? Color.green : Color.red).opacity(0.1))
                         .foregroundColor(decision == .accepted ? .green : .red)
                         .cornerRadius(8)
                         .bold()
@@ -189,7 +194,7 @@ struct RequestCard: View {
                 } else {
                     VStack(spacing: 12) {
                         if showDatePicker {
-                            DatePicker("", selection: $selectedDate, displayedComponents: .date)
+                            DatePicker("", selection: $selectedDate, in: Date()..., displayedComponents: .date)
                                 .labelsHidden()
                                 .datePickerStyle(.compact)
 
@@ -226,10 +231,9 @@ struct RequestCard: View {
                                         showDatePicker = true
                                     }
                                 }) {
-                                    Label("Schedule Maintenance", systemImage: "calendar.badge.plus")
+                                    Label("Schedule Maintenance Date", systemImage: "calendar.badge.plus")
                                         .font(.headline)
                                         .padding(8)
-                                        //.background(Color.blue.opacity(0.1))
                                         .cornerRadius(8)
                                 }
                                 Spacer()
@@ -286,5 +290,3 @@ struct HomeView_Previews: PreviewProvider {
         HomeView()
     }
 }
-
-

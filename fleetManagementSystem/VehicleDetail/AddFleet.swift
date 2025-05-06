@@ -130,7 +130,7 @@ struct AddFleetVehicleView: View {
                     Divider()
                     inputRow(title: "Model Name", text: $vehicle.modelName, field: .modelName)
                     Divider()
-                    inputRow(title: "Engine No.", text: $vehicle.engineNo, field: .engineNo)
+                    inputRow(title: "Chasis No.", text: $vehicle.engineNo, field: .engineNo)
                     Divider()
                     datePickerRow
                     Divider()
@@ -148,15 +148,29 @@ struct AddFleetVehicleView: View {
     }
     
     private func inputRow(title: String, text: Binding<String>, field: Field) -> some View {
-        HStack(alignment: .center, spacing: 16) { // Modified: Changed alignment to .center for consistent vertical alignment
+        HStack(alignment: .center, spacing: 16) {
             Text(title)
                 .foregroundColor(Color(hex: "#396BAF"))
                 .frame(width: 120, alignment: .leading)
             
             VStack(alignment: .leading, spacing: 4) {
-                TextField("Enter \(title.lowercased())", text: text)
-                    .focused($focusedField, equals: field)
-                    .frame(minHeight: 30) // Modified: Ensure TextField has a consistent height
+                if title == "Vehicle No." {
+                    TextField("AB11AC0000", text: text)
+                        .focused($focusedField, equals: field)
+                        .frame(minHeight: 30)
+                } else if title == "Model Name" {
+                    TextField("Swift Dzire", text: text)
+                        .focused($focusedField, equals: field)
+                        .frame(minHeight: 30)
+                } else if title == "Chasis No." {
+                    TextField("1A2BCDE34F5678901", text: text)
+                        .focused($focusedField, equals: field)
+                        .frame(minHeight: 30)
+                } else {
+                    TextField("Enter \(title.lowercased())", text: text)
+                        .focused($focusedField, equals: field)
+                        .frame(minHeight: 30)
+                }
                 
                 if let error = validationErrors[title] {
                     Text(error)
@@ -173,7 +187,7 @@ struct AddFleetVehicleView: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         
-        return HStack(alignment: .center, spacing: 16) { // Modified: Changed alignment to .center for consistent vertical alignment
+        return HStack(alignment: .center, spacing: 16) {
             Text(title)
                 .foregroundColor(Color(hex: "#396BAF"))
                 .frame(width: 120, alignment: .leading)
@@ -182,7 +196,7 @@ struct AddFleetVehicleView: View {
                 TextField("Enter \(title.lowercased())", value: value, formatter: formatter)
                     .keyboardType(.decimalPad)
                     .focused($focusedField, equals: field)
-                    .frame(minHeight: 30) // Modified: Ensure TextField has a consistent height
+                    .frame(minHeight: 30)
                 
                 if let error = validationErrors[title] {
                     Text(error)
@@ -196,7 +210,7 @@ struct AddFleetVehicleView: View {
     }
     
     private var datePickerRow: some View {
-        HStack(alignment: .center, spacing: 16) { // Modified: Changed alignment to .center to match other rows
+        HStack(alignment: .center, spacing: 16) {
             Text("License Date")
                 .foregroundColor(Color(hex: "#396BAF"))
                 .frame(width: 120, alignment: .leading)
@@ -204,7 +218,7 @@ struct AddFleetVehicleView: View {
             VStack(alignment: .leading, spacing: 4) {
                 DatePicker("", selection: $vehicle.licenseRenewalDate, displayedComponents: .date)
                     .labelsHidden()
-                    .frame(minHeight: 30) // Modified: Set a consistent height to match TextField
+                    .frame(minHeight: 30)
                 
                 if let error = validationErrors["License Date"] {
                     Text(error)
@@ -218,7 +232,7 @@ struct AddFleetVehicleView: View {
     }
     
     private var vehicleCategoryPicker: some View {
-        HStack(alignment: .center, spacing: 16) { // Modified: Changed alignment to .center for consistency
+        HStack(alignment: .center, spacing: 16) {
             Text("Vehicle Category")
                 .foregroundColor(Color(hex: "#396BAF"))
                 .font(.subheadline)
@@ -324,7 +338,7 @@ struct AddFleetVehicleView: View {
             let vehicleNoRegex = "^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$"
             let predicate = NSPredicate(format: "SELF MATCHES %@", vehicleNoRegex)
             if !predicate.evaluate(with: vehicleNoTrimmed) {
-                validationErrors["Vehicle No."] = "Vehicle No. must be in format XX12XX1234."
+                validationErrors["Vehicle No."] = "Vehicle No. must be in format AB11AC0000 (2 letters, 2 digits, 2 letters, 4 digits)."
             }
         }
         
@@ -336,15 +350,15 @@ struct AddFleetVehicleView: View {
             validationErrors["Model Name"] = "Model Name cannot contain numbers."
         }
         
-        // Engine No. validation (alphanumeric, 10-17 characters)
-        let engineNoTrimmed = vehicle.engineNo.trimmingCharacters(in: .whitespaces)
-        if engineNoTrimmed.isEmpty {
-            validationErrors["Engine No."] = "Engine No. is required."
+        // Chassis No. validation (exactly 17 alphanumeric characters, e.g., 1A2BCDE34F5678901)
+        let chassisNoTrimmed = vehicle.engineNo.trimmingCharacters(in: .whitespaces)
+        if chassisNoTrimmed.isEmpty {
+            validationErrors["Chasis No."] = "Chassis No. is required."
         } else {
-            let engineNoRegex = "^[A-Z0-9]{10,17}$"
-            let predicate = NSPredicate(format: "SELF MATCHES %@", engineNoRegex)
-            if !predicate.evaluate(with: engineNoTrimmed) {
-                validationErrors["Engine No."] = "Engine No. must be 10-17 alphanumeric characters."
+            let chassisNoRegex = "^[A-Z0-9]{17}$"
+            let predicate = NSPredicate(format: "SELF MATCHES %@", chassisNoRegex)
+            if !predicate.evaluate(with: chassisNoTrimmed) {
+                validationErrors["Chasis No."] = "Chassis No. must be exactly 17 alphanumeric characters (e.g., 1A2BCDE34F5678901)."
             }
         }
         
