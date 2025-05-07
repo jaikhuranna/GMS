@@ -259,32 +259,90 @@ struct MaintenanceCardView: View {
 struct BillSummary {
     let billItems: [BillItem]
     let subtotal: Int
-    let serviceCharge: Int = 500
+    let serviceCharge: Int
+    let gst: Int
+    let total: Int
 
-    var gst: Int {
-        Int(Double(subtotal + serviceCharge) * 0.18)
+    // Use this in Fleet Manager screen
+    init(billItems: [BillItem], subtotal: Int, serviceCharge: Int, gst: Int, total: Int) {
+        self.billItems = billItems
+        self.subtotal = subtotal
+        self.serviceCharge = serviceCharge
+        self.gst = gst
+        self.total = total
     }
 
-    var total: Int {
-        subtotal + serviceCharge + gst
-    }
-
+    // Use this in Maintenance screen during live calculation
     init(parts: [Part], fluids: [Part], inventory: [InventoryItem]) {
         var items: [BillItem] = []
         var subtotal = 0
-        var index = 1
+        var id = 1
 
         let all = parts + fluids
         for entry in all {
             guard let match = inventory.first(where: { $0.name == entry.name }) else { continue }
             let qty = Int(entry.quantity) ?? 1
-            let totalPrice = Int(Double(qty) * match.price)
-            items.append(BillItem(id: index, name: entry.name, quantity: qty, price: totalPrice))
-            subtotal += totalPrice
-            index += 1
+            let price = Int(Double(qty) * match.price)
+            items.append(BillItem(id: id, name: entry.name, quantity: qty, price: price))
+            subtotal += price
+            id += 1
         }
 
         self.billItems = items
         self.subtotal = subtotal
+        self.serviceCharge = 500
+        self.gst = Int(Double(subtotal + serviceCharge) * 0.18)
+        self.total = subtotal + serviceCharge + gst
+    }
+}
+
+
+// MARK: - Bill Request Model for Fleet Manager
+
+struct BillRequest: Identifiable {
+    let id: String
+    let vehicleNo: String
+    let taskName: String
+    let description: String
+    let summary: BillSummary
+
+    static func from(_ doc: QueryDocumentSnapshot) -> BillRequest? {
+        let data = doc.data()
+        guard
+            let vehicleNo = data["vehicleNo"] as? String,
+            let taskName = data["taskName"] as? String,
+            let description = data["description"] as? String,
+            let items = data["parts"] as? [[String: Any]]
+        else {
+            print("⚠️ Error parsing BillRequest from Firestore.")
+            return nil
+        }
+
+        let billItems: [BillItem] = items.enumerated().compactMap { (i, dict) in
+            guard
+                let name = dict["name"] as? String,
+                let qty = dict["quantity"] as? Int,
+                let price = dict["price"] as? Int
+            else {
+                return nil
+            }
+
+            return BillItem(id: i + 1, name: name, quantity: qty, price: price)
+        }
+
+        let subtotal = data["subtotal"] as? Int ?? 0
+        let serviceCharge = data["serviceCharge"] as? Int ?? 500
+        let gst = data["gst"] as? Int ?? Int(Double(subtotal + serviceCharge) * 0.18)
+        let total = data["total"] as? Int ?? subtotal + serviceCharge + gst
+
+        let summary = BillSummary(billItems: billItems, subtotal: subtotal, serviceCharge: serviceCharge, gst: gst, total: total)
+
+        return BillRequest(
+            id: doc.documentID,
+            vehicleNo: vehicleNo,
+            taskName: taskName,
+            description: description,
+            summary: summary
+        )
     }
 }
