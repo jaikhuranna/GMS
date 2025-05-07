@@ -266,6 +266,7 @@ extension Query {
 
 
 struct BookingRequest: Identifiable, Equatable {
+    var driverId: String
     let id: String
     let pickupName: String
     let pickupAddress: String
@@ -283,6 +284,7 @@ struct BookingRequest: Identifiable, Equatable {
     init?(_ document: DocumentSnapshot) {
         let data = document.data() ?? [:]
         guard
+            let driverId      = data["driverId"]      as? String,
             let pickupName    = data["pickupName"]    as? String,
             let pickupAddress = data["pickupAddress"] as? String,
             let pickupLat     = data["pickupLatitude"] as? Double,
@@ -296,6 +298,7 @@ struct BookingRequest: Identifiable, Equatable {
             let vehicleNo     = data["vehicleNo"]     as? String
         else { return nil }
 
+        self.driverId         = driverId
         self.id               = document.documentID
         self.pickupName       = pickupName
         self.pickupAddress    = pickupAddress
@@ -312,6 +315,7 @@ struct BookingRequest: Identifiable, Equatable {
 
     // Non-failable init for previews/mocks
     init(
+        driverId: String,
         id: String,
         pickupName: String,
         pickupAddress: String,
@@ -325,6 +329,7 @@ struct BookingRequest: Identifiable, Equatable {
         createdAt: Date,
         vehicleNo: String
     ) {
+        self.driverId         = driverId
         self.id               = id
         self.pickupName       = pickupName
         self.pickupAddress    = pickupAddress

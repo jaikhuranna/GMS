@@ -7,9 +7,55 @@
 
 
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
+
+//struct TripCompletedCard: View {
+//    let onDone: () -> Void
+//    @State private var navigateToDriverProfile = false
+//
+//    var body: some View {
+//        VStack(spacing: 16) {
+//            Capsule()
+//                .frame(width: 40, height: 6)
+//                .foregroundColor(.gray.opacity(0.4))
+//                .padding(.top, 8)
+//
+//            Text("Trip Completed!")
+//                .font(.title2).bold()
+//
+//            Text("Thanks for driving safely.")
+//                .font(.subheadline)
+//                .foregroundColor(.secondary)
+//
+//            NavigationLink(destination: DriverProfile(), isActive: $navigateToDriverProfile) {
+//                Button("Done") {
+//                    // Action when done is tapped
+//                    navigateToDriverProfile = true
+//                    onDone()
+//                }
+//                .font(.headline)
+//                .frame(maxWidth: .infinity)
+//                .padding()
+//                .background(Color.blue)
+//                .foregroundColor(.white)
+//                .cornerRadius(12)
+//            }
+//        }
+//        .padding()
+//        .cornerRadius(24, corners: [.topLeft, .topRight])
+//        .shadow(radius: 6)
+//    }
+//}
+//
+
+
 
 struct TripCompletedCard: View {
+    let bookingRequestID: String
     let onDone: () -> Void
+    let driverId: String
+    @State private var navigateToDriverProfile = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -24,16 +70,31 @@ struct TripCompletedCard: View {
             Text("Thanks for driving safely.")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-
-            Button("Done") {
-                onDone()
+            NavigationLink(
+                   destination: DriverProfile(driverId: driverId),
+                   isActive:   $navigateToDriverProfile
+                 ) {
+                   Button("Done") {
+                     let ref = Firestore.firestore()
+                       .collection("bookingRequests")
+                       .document(bookingRequestID)
+                     ref.updateData(["status": "completed"]) { error in
+                       if let error = error {
+                         print("Complete error:", error)
+                       } else {
+                         print("Trip completed")
+                         onDone()
+                         navigateToDriverProfile = true
+                       }
+                     }
+                   }
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(12)
             }
-            .font(.headline)
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(12)
         }
         .padding()
         .cornerRadius(24, corners: [.topLeft, .topRight])
@@ -41,3 +102,11 @@ struct TripCompletedCard: View {
     }
 }
 
+// MARK: — Booking Service Extension
+extension BookingService {
+    func clearBooking() {
+        DispatchQueue.main.async {
+            self.booking = nil
+        }
+    }
+}

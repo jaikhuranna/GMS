@@ -35,3 +35,4 @@ class BookingService: ObservableObject {
     listener?.remove()
   }
 }
+

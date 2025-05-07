@@ -34,6 +34,7 @@ class AuthViewModel: ObservableObject {
     @Published var userRole: UserRole = .unknown
     @Published var otpDigits: [String] = Array(repeating: "", count: 6)
     @Published var userId: String = ""
+    @Published var bookingService: BookingService?
     @Published var debugRoleString: String = "No role fetched"
 //    @Published var bookingService: BookingService?
     

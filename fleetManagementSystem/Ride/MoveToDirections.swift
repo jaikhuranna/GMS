@@ -4,6 +4,7 @@ import MapKit
 struct MoveToDirections: View {
     @StateObject private var viewModel = NavigationViewModelDirections()
     @Environment(\.presentationMode) private var presentationMode // Add this line to get the presentation mode
+    @State private var navigateToSOS = false
     
     var body: some View {
         NavigationView {  // Wrap the view inside NavigationView
@@ -62,10 +63,12 @@ struct MoveToDirections: View {
                         }
 
                         Spacer()
+                        NavigationLink(
+                          destination: EmergencyHelpView(),
+                          isActive: $navigateToSOS
+                        ) { EmptyView() }
 
-                        Button(action: {
-                            viewModel.triggerSOS()
-                        }) {
+                        Button{ navigateToSOS = true } label: {
                             Text("SOS")
                                 .font(.headline)
                                 .foregroundColor(.white)

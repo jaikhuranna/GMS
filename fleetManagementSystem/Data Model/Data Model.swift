@@ -124,13 +124,15 @@ struct FleetDriver: Identifiable, Codable {
     var contactNo: String
     var experience: Int
     var licenseType: LicenseType
-
-    
+    var totalTrips: Int
+    var totalTime: Double
+    var totalDistance: Double
     var driverImage: UIImage?   = nil
     var licenseImage: UIImage?  = nil
 
     enum CodingKeys: String, CodingKey {
         case id, name, age, licenseNo, contactNo, experience, licenseType
+        case totalTrips, totalTime, totalDistance
     }
 
     /// normal app-side initializer
@@ -142,6 +144,9 @@ struct FleetDriver: Identifiable, Codable {
         contactNo: String,
         experience: Int,
         licenseType: LicenseType,
+        totalTrips: Int = 0,
+        totalTime: Double = 0,
+        totalDistance: Double = 0,
         driverImage: UIImage? = nil,
         licenseImage: UIImage? = nil
     ) {
@@ -152,6 +157,9 @@ struct FleetDriver: Identifiable, Codable {
         self.contactNo    = contactNo
         self.experience   = experience
         self.licenseType  = licenseType
+        self.totalTrips    = totalTrips
+        self.totalTime     = totalTime
+        self.totalDistance = totalDistance
         self.driverImage  = driverImage
         self.licenseImage = licenseImage
     }
@@ -166,6 +174,9 @@ struct FleetDriver: Identifiable, Codable {
         self.contactNo    = try c.decode(String.self, forKey: .contactNo)
         self.experience   = try c.decode(Int.self,    forKey: .experience)
         self.licenseType  = try c.decode(LicenseType.self, forKey: .licenseType)
+        totalTrips    = try c.decode(Int.self,    forKey: .totalTrips)
+        totalTime     = try c.decode(Double.self, forKey: .totalTime)
+        totalDistance = try c.decode(Double.self, forKey: .totalDistance)
         self.driverImage  = nil
         self.licenseImage = nil
     }
@@ -179,6 +190,9 @@ struct FleetDriver: Identifiable, Codable {
         try c.encode(contactNo,    forKey: .contactNo)
         try c.encode(experience,   forKey: .experience)
         try c.encode(licenseType,  forKey: .licenseType)
+        try c.encode(totalTrips,    forKey: .totalTrips)
+        try c.encode(totalTime,     forKey: .totalTime)
+        try c.encode(totalDistance, forKey: .totalDistance)
     }
 
     /// when you need a Firestore-friendly dict
@@ -190,7 +204,10 @@ struct FleetDriver: Identifiable, Codable {
             "licenseNo":    licenseNo,
             "contactNo":    contactNo,
             "experience":   experience,
-            "licenseType":  licenseType.rawValue
+            "licenseType":  licenseType.rawValue,
+            "totalTrips":    totalTrips,
+            "totalTime":     totalTime,
+            "totalDistance": totalDistance
         ]
     }
 }
