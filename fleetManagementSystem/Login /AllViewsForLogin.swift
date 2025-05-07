@@ -376,7 +376,7 @@ struct HomeScreenRouter: View {
 //            DriverHomeScreen(viewModel: viewModel)
 //            TripAssignedView()
             if let service = viewModel.bookingService {
-              TripAssignedView(bookingService: service)
+                TripAssignedView(bookingService: service, viewModel: AuthViewModel())
             } else {
               ProgressView("Loading your trip…")
             }

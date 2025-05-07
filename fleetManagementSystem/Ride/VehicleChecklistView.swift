@@ -7,11 +7,12 @@ import CoreLocation
 import FirebaseFirestore
 
 struct VehicleChecklistView: View {
-    let vehicleNumber:    String
-    let bookingRequestID: String
-    let phase:            InspectionPhase
-    let driverId: String
+    let vehicleNumber: String
+     let bookingRequestID: String
+     let phase: InspectionPhase
+     let driverId: String
 
+    @EnvironmentObject var authViewModel: AuthViewModel
     private let db = Firestore.firestore()
 
     @State private var navigateToMap   = false
@@ -156,17 +157,14 @@ struct VehicleChecklistView: View {
                         .ignoresSafeArea()
                         .transition(.opacity)
 
-                    // Completed card
                     TripCompletedCard(
-                      bookingRequestID: bookingRequestID,
-                      onDone: {
-                       
-                        withAnimation { showCompleted = false }
-                      
-                        presentationMode.wrappedValue.dismiss()
-                      },
-                      driverId: driverId,
-                    )
+                           bookingRequestID: bookingRequestID,
+                           onDone: {
+                               withAnimation { showCompleted = false }
+                               presentationMode.wrappedValue.dismiss()
+                           },
+                           viewModel: authViewModel // Use the AuthViewModel object instead of driverId string
+                       )
                     .frame(maxWidth: 350)
                     .padding(.horizontal)
                     .background(

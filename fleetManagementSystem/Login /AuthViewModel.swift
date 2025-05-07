@@ -263,6 +263,15 @@ class AuthViewModel: ObservableObject {
                     print("Successfully converted to enum: \(userRole)")
                 }
                 self.userRole = userRole
+                
+                // Initialize BookingService for drivers
+                if userRole == .driver {
+                    DispatchQueue.main.async {
+                        // Initialize the bookingService here
+                        self.bookingService = BookingService(driverId: self.userId)
+                        print("BookingService initialized for driver: \(self.userId)")
+                    }
+                }
             } else {
                 DispatchQueue.main.async {
                     print("⚠️ Failed to convert role string to enum: \(role)")
@@ -281,6 +290,7 @@ class AuthViewModel: ObservableObject {
             isLoading = false
         }
     }
+
     
     // MARK: - Debugging
     

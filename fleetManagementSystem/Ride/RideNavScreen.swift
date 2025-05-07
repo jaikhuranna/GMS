@@ -463,6 +463,7 @@ struct OffRouteSheet: View {
 
 
 struct NavigationMapView: View {
+    
     @StateObject private var vm: NavigationViewModel
     @State private var showArrived       = false
     @State private var showPostTrip      = false
@@ -675,7 +676,7 @@ struct NavigationMapView: View {
                     onDone: {
                         withAnimation { showTripCompleted = false }
                     },
-                    driverId:         driverId
+                    viewModel: AuthViewModel()
                 )
                 .background(Color.white)
                 .cornerRadius(24, corners: [.topLeft, .topRight])
