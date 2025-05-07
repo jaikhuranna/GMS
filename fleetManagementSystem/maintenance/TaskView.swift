@@ -38,7 +38,7 @@ struct TaskView: View {
                         VStack(spacing: 12) {
                             CustomTextField(title: "Name", text: $parts[index].name)
                             quantityControl(index: index, isPart: true)
-                            partPickerSection(title: "Part ID", selection: $parts[index].id)
+                        //    partPickerSection(title: "Part ID", selection: $parts[index].id)
                         }
                         .padding()
                         .background(Color(.systemGray6).opacity(0.2))
@@ -145,7 +145,7 @@ struct TaskView: View {
                 .foregroundColor(Color(hex: "#396BAF"))
 
             TextEditor(text: $description)
-                .frame(height: 120)
+                .frame(height: 90)
                 .padding()
                 .font(.system(size: 16))
                 .background(Color.white)
@@ -198,7 +198,7 @@ struct TaskView: View {
                 }
             } else {
                 multiUploadButton()
-                    .frame(height: 100)
+                    .frame(height: 110)
                     .frame(maxWidth: .infinity)
                     .background(Color(hex: "#EDF2FC"))
                     .cornerRadius(10)
@@ -254,7 +254,12 @@ struct TaskView: View {
                     .background(Color.white.clipShape(Circle()))
             }
             .offset(x: 5, y: -5)
+            .padding(6)
         }
+        
+        .compositingGroup() // Prevents clipping of the button
+            .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 2)
+        
     }
 
     private func sectionDivider() -> some View {
