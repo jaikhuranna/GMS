@@ -7,6 +7,9 @@
 
 import SwiftUI
 import PhotosUI
+import FirebaseCore
+
+
 
 struct TaskView: View {
     @State private var vehicleNumber = ""
@@ -18,8 +21,44 @@ struct TaskView: View {
     @State private var selectedImages: [UIImage] = []
     @State private var isSaving = false
     @State private var showGeneratedBill = false
+    @State private var inventoryItems: [InventoryItem] = []
 
-    private let partOptions = ["A", "B", "C", "D"]
+    @ViewBuilder
+    private func generateBillSection() -> some View {
+        VStack(spacing: 8) {
+            Button(action: saveTaskToFirebase) {
+                Text(isSaving ? "Saving..." : "Generate Bill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(hex: "#396BAF"))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+            }
+            .disabled(isSaving)
+
+            if isSaving {
+                ProgressView("Generating bill...")
+                    .padding(.top, 10)
+                    .frame(maxWidth: .infinity)
+            }
+
+            
+        }
+        .padding(.top, 20)
+        .navigationDestination(isPresented: $showGeneratedBill) {
+            let bill = BillSummary(parts: parts, fluids: fluids, inventory: inventoryItems)
+            GeneratedBillView(
+                vehicleNo: vehicleNumber,
+                taskName: taskName,
+                description: description,
+                bill: bill
+            )
+        }
+    }
+
+
+   
 
     var body: some View {
         ScrollView {
@@ -36,9 +75,28 @@ struct TaskView: View {
                     SectionTitle("Log Parts Needed")
                     ForEach(parts.indices, id: \.self) { index in
                         VStack(spacing: 12) {
-                            CustomTextField(title: "Name", text: $parts[index].name)
+                            //MARK: Adding dropdown
+                            Menu {
+                                ForEach(inventoryItems.filter { $0.type == .part }, id: \.name) { item in
+                                    Button(item.name) {
+                                        parts[index].name = item.name
+                                    }
+                                }
+                            } label: {
+                                HStack {
+                                    Text(parts[index].name.isEmpty ? "Select Part" : parts[index].name)
+                                        .foregroundColor(parts[index].name.isEmpty ? .gray : .primary)
+                                    Spacer()
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(.gray)
+                                }
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .cornerRadius(10)
+                            }
+
                             quantityControl(index: index, isPart: true)
-                        //    partPickerSection(title: "Part ID", selection: $parts[index].id)
+                            
                         }
                         .padding()
                         .background(Color(.systemGray6).opacity(0.2))
@@ -56,7 +114,26 @@ struct TaskView: View {
                     SectionTitle("Log Fluids Needed")
                     ForEach(fluids.indices, id: \.self) { index in
                         VStack(spacing: 12) {
-                            CustomTextField(title: "Name", text: $fluids[index].name)
+                            //MARK: Adding dropdown
+                            Menu {
+                                ForEach(inventoryItems.filter { $0.type == .fluid }, id: \.name) { item in
+                                    Button(item.name) {
+                                        fluids[index].name = item.name
+                                    }
+                                }
+                            } label: {
+                                HStack {
+                                    Text(fluids[index].name.isEmpty ? "Select Fluid" : fluids[index].name)
+                                        .foregroundColor(fluids[index].name.isEmpty ? .gray : .primary)
+                                    Spacer()
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(.gray)
+                                }
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .cornerRadius(10)
+                            }
+
                             quantityControl(index: index, isPart: false)
                         }
                         .padding()
@@ -77,19 +154,20 @@ struct TaskView: View {
                 imageUploadSection()
 
                 // Generate Bill
-                NavigationLink(destination: GeneratedBillView()) {
-                    Text("Generate Bill")
-                        .font(.system(size: 16, weight: .semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(hex: "#396BAF"))
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
-                }
+
+                generateBillSection()
+
                 .padding(.top, 20)
             }
+            
             .padding()
         }
+        .onAppear {
+            FirebaseModules.shared.fetchInventoryItems { items in
+                self.inventoryItems = items
+            }
+        }
+        
         .navigationTitle("Add New Task")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -145,7 +223,7 @@ struct TaskView: View {
                 .foregroundColor(Color(hex: "#396BAF"))
 
             TextEditor(text: $description)
-                .frame(height: 90)
+                .frame(height: 120)
                 .padding()
                 .font(.system(size: 16))
                 .background(Color.white)
@@ -157,27 +235,7 @@ struct TaskView: View {
         }
     }
 
-    // MARK: - Picker
-    private func partPickerSection(title: String, selection: Binding<String>) -> some View {
-        Menu {
-            ForEach(partOptions, id: \.self) { option in
-                Button(option) {
-                    selection.wrappedValue = option
-                }
-            }
-        } label: {
-            HStack {
-                Text(selection.wrappedValue.isEmpty ? "Select \(title)" : selection.wrappedValue)
-                    .foregroundColor(selection.wrappedValue.isEmpty ? .gray : .primary)
-                Spacer()
-                Image(systemName: "chevron.down")
-                    .foregroundColor(.gray)
-            }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
-        }
-    }
+ 
 
     // MARK: - Image Upload
     private func imageUploadSection() -> some View {
@@ -198,7 +256,7 @@ struct TaskView: View {
                 }
             } else {
                 multiUploadButton()
-                    .frame(height: 110)
+                    .frame(height: 100)
                     .frame(maxWidth: .infinity)
                     .background(Color(hex: "#EDF2FC"))
                     .cornerRadius(10)
@@ -254,12 +312,7 @@ struct TaskView: View {
                     .background(Color.white.clipShape(Circle()))
             }
             .offset(x: 5, y: -5)
-            .padding(6)
         }
-        
-        .compositingGroup() // Prevents clipping of the button
-            .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 2)
-        
     }
 
     private func sectionDivider() -> some View {
@@ -267,14 +320,60 @@ struct TaskView: View {
             .fill(Color.gray.opacity(0.3))
             .frame(height: 1)
     }
+    
+    //MARK: Saving details to firebase
+    private func saveTaskToFirebase() {
+        isSaving = true
+        let taskId = UUID().uuidString
+
+        FirebaseModules.shared.uploadMaintenanceImages(taskId: taskId, images: selectedImages) { urls, error in
+            if let error = error {
+                print("❌ Image upload failed: \(error.localizedDescription)")
+                isSaving = false
+                return
+            }
+
+            let partsData = parts
+                .filter { !$0.name.isEmpty }
+                .map { ["name": $0.name, "quantity": Int($0.quantity) ?? 1] }
+
+            let fluidsData = fluids
+                .filter { !$0.name.isEmpty }
+                .map { ["name": $0.name, "quantity": Int($0.quantity) ?? 1] }
+
+            let taskData: [String: Any] = [
+                "taskId": taskId,
+                "vehicleNo": vehicleNumber,
+                "taskName": taskName,
+                "description": description,
+                "timestamp": Timestamp(date: Date()),
+                "parts": partsData,
+                "fluids": fluidsData,
+                "imageURLs": urls
+            ]
+
+            FirebaseModules.shared.addMaintenanceTask(taskData, taskId: taskId) { error in
+                isSaving = false
+                if let error = error {
+                    print("❌ Failed to save task: \(error.localizedDescription)")
+                } else {
+                    print("✅ Maintenance task saved.")
+                    showGeneratedBill = true
+                }
+            }
+        }
+    }
+
 }
+
+
 
 // MARK: - Models
 
 struct Part {
     var name: String = ""
     var quantity: String = "1"
-    var id: String = ""
+    
 }
 
 // MARK: - Reusable Components
@@ -348,5 +447,4 @@ struct TaskView_Previews: PreviewProvider {
         }
     }
 }
-
 

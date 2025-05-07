@@ -1,3 +1,11 @@
+//
+//  UpcomingMaintenanceDetailView.swift
+//  fleetManagementSystem
+//
+//  Created by Steve on 07/05/25.
+//
+
+
 import SwiftUI
 
 struct UpcomingMaintenanceDetailView: View {
@@ -22,7 +30,6 @@ struct UpcomingMaintenanceDetailView: View {
                     }
                 }
             }
-            .padding(.top, 24)
         }
         .navigationTitle("Upcoming Tasks")
     }
@@ -35,4 +42,3 @@ struct UpcomingMaintenanceDetailView_Previews: PreviewProvider {
         }
     }
 }
-

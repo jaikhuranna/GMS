@@ -1,3 +1,10 @@
+//
+//  OngoingMaintenanceBillView.swift
+//  fleetManagementSystem
+//
+//  Created by Steve on 06/05/25.
+//
+
 import SwiftUI
 import PhotosUI
 
@@ -66,29 +73,29 @@ struct OngoingMaintenanceBillView: View {
                 }
 
 
-                // Post Maintenance Image
-                Text("Post Maintenance Images")
-                    .font(.headline)
-                    .foregroundColor(.black)
-
-                ImageUploadView(selectedImage: $postMaintenanceImage, selectedItem: $postImageItem)
+//                // Post Maintenance Image
+//                Text("Post Maintenance Images")
+//                    .font(.headline)
+//                    .foregroundColor(.black)
+//
+//                ImageUploadView(selectedImage: $postMaintenanceImage, selectedItem: $postImageItem)
 
                 // Submit Button
                 Button(action: {
                     // Send for review logic
                 }) {
-                    Text("Send for Review")
+                    Text("End Task")
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.green)
+                        .background(Color.red)
                         .foregroundColor(.white)
                         .cornerRadius(12)
                 }
             }
             .padding()
         }
-        .navigationTitle("OnGoing Maintenance Details")
+        .navigationTitle("Upcoming Maintenance Details")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -182,5 +189,4 @@ struct OngoingMaintenanceBillView_Previews: PreviewProvider {
         }
     }
 }
-
 

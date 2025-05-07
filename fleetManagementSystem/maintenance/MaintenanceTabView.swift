@@ -8,39 +8,38 @@
 import SwiftUI
 
 struct MaintenanceTabView: View {
+    // Use a reference to the AuthViewModel passed from parent
+    @ObservedObject var viewModel: AuthViewModel
+    
     var body: some View {
         TabView {
-            // Home Tab with Navigation Stack
-            NavigationStack {
-                HomeView()
+            // Home Tab - Pass the viewModel to HomeView
+            NavigationStack{
+                HomeView(viewModel: viewModel)
             }
-            .tabItem {
-                Label("Home", systemImage: "house")
-            }
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
             
-            // Tasks Tab with Navigation Stack
-            NavigationStack {
+            // Add other tabs as needed
+            
+            NavigationStack{
                 TaskView()
             }
-            .tabItem {
-                Label("Tasks", systemImage: "slider.horizontal.3")
-            }
+                .tabItem {
+                    Label("Schedule", systemImage: "calendar")
+                }
             
-            // Inventory Tab with Navigation Stack
-            NavigationStack {
+            NavigationStack{
                 InventoryView()
             }
-            .tabItem {
-                Label("Inventory", systemImage: "drop")
-            }
+                .tabItem {
+                    Label("Inventory", systemImage: "shippingbox.fill")
+                }
+            
+            
         }
     }
 }
 
-struct MaintenanceTabView_Previews: PreviewProvider {
-    static var previews: some View {
-        MaintenanceTabView()
-            .background(Color.white)
-            .previewDevice("iPhone 14 Pro")
-    }
-}
+

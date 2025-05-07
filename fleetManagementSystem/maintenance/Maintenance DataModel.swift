@@ -230,7 +230,7 @@ struct MaintenanceCardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(task.taskTitle)
                         .font(.headline)
-                        .foregroundColor(.red)
+                    .foregroundColor(.red)
 
                     Text(task.vehicleNumber)
                         .font(.subheadline)
@@ -253,5 +253,38 @@ struct MaintenanceCardView: View {
         .background(Color(red: 231/255, green: 237/255, blue: 248/255))
         .cornerRadius(12)
         .padding(.horizontal)
+    }
+}
+
+struct BillSummary {
+    let billItems: [BillItem]
+    let subtotal: Int
+    let serviceCharge: Int = 500
+
+    var gst: Int {
+        Int(Double(subtotal + serviceCharge) * 0.18)
+    }
+
+    var total: Int {
+        subtotal + serviceCharge + gst
+    }
+
+    init(parts: [Part], fluids: [Part], inventory: [InventoryItem]) {
+        var items: [BillItem] = []
+        var subtotal = 0
+        var index = 1
+
+        let all = parts + fluids
+        for entry in all {
+            guard let match = inventory.first(where: { $0.name == entry.name }) else { continue }
+            let qty = Int(entry.quantity) ?? 1
+            let totalPrice = Int(Double(qty) * match.price)
+            items.append(BillItem(id: index, name: entry.name, quantity: qty, price: totalPrice))
+            subtotal += totalPrice
+            index += 1
+        }
+
+        self.billItems = items
+        self.subtotal = subtotal
     }
 }

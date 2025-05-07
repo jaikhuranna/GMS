@@ -373,12 +373,12 @@ struct HomeScreenRouter: View {
         
         switch viewModel.userRole {
         case .driver:
-//            DriverHomeScreen(viewModel: viewModel)
             TripAssignedView()
         case .fleetManager:
             MainTabView()
         case .maintenance:
-            MaintenanceTabView()
+            // Pass the shared viewModel to MaintenanceTabView
+            MaintenanceTabView(viewModel: viewModel)
         case .unknown:
             UnknownRoleScreen(viewModel: viewModel)
         }
