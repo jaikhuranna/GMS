@@ -14,6 +14,7 @@ struct HomeView: View {
     @State private var isNavigatingToOngoing = false
     @State private var isNavigatingToUpcoming = false
     @State private var showSettings = false
+    @State private var showProfile = false
     
     var body: some View {
         NavigationStack {
@@ -39,9 +40,9 @@ struct HomeView: View {
                             Image(systemName: "bell.fill").font(.system(size: 25))
                             // Settings button
                             Button(action: {
-                                showSettings = true
+                                showProfile = true
                             }) {
-                                Image(systemName: "gearshape.fill")
+                                Image(systemName: "person.circle.fill")
                                     .font(.system(size: 20))
                                     .foregroundColor(.black)
                             }
@@ -107,9 +108,8 @@ struct HomeView: View {
             }
             .background(Color.white)
             .navigationBarHidden(true)
-            .sheet(isPresented: $showSettings) {
-                // Pass the shared viewModel to SettingsView
-                SettingsView(viewModel: viewModel)
+            .fullScreenCover(isPresented: $showProfile) {
+                MaintenanceProfileView(viewModel: viewModel)
             }
         }
     }
@@ -272,5 +272,6 @@ struct InventoryCard2: View {
         .cornerRadius(20)
     }
 }
+
 
 

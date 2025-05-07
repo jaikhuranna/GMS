@@ -36,7 +36,10 @@ struct DashboardView: View {
                     }
                     Spacer()
                     HStack(spacing: 20) {
-                        Image(systemName: "bell.fill").font(.system(size: 26))
+                        NavigationLink(destination: PendingBillsView()) {
+                            Image(systemName: "bell.fill")
+                        }
+
                         Image(systemName: "person.crop.circle").font(.system(size: 26))
                     }
                     .foregroundColor(.black)

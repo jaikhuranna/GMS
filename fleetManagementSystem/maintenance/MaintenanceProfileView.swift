@@ -2,7 +2,7 @@
 //  MaintenanceProfileView.swift
 //  fleetManagementSystem
 //
-//  Created by user@59 on 07/05/2025.
+//  Created by Steve on 07/05/25.
 //
 
 import SwiftUI
@@ -10,6 +10,7 @@ import SwiftUI
 struct MaintenanceProfileView: View {
     @Environment(\.dismiss) var dismiss
     @State private var showEditProfile = false
+    @ObservedObject var viewModel: AuthViewModel
 
     var body: some View {
             // Static Blue Header
@@ -120,10 +121,11 @@ struct MaintenanceProfileView: View {
 
                     // Sign Out Button
                     Button(action: {
+                        viewModel.logout()
                         dismiss()
                     }) {
                         HStack {
-                            Image(systemName: "arrow.left.square.fill")
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
                             Text("Sign Out")
                                 .fontWeight(.semibold)
                         }
@@ -199,6 +201,8 @@ struct ContactInfoView: View {
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        MaintenanceProfileView()
+        let mockViewModel = AuthViewModel()
+        MaintenanceProfileView(viewModel: mockViewModel)
     }
 }
+
