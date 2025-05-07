@@ -1,3 +1,5 @@
+
+
 import SwiftUI
 
 // MARK: - Home View
@@ -32,8 +34,8 @@ struct HomeView: View {
                         }
                         Spacer()
                         HStack(spacing: 16) {
-                            Image(systemName: "bell.fill").font(.system(size: 20))
-                            Image(systemName: "gearshape.fill").font(.system(size: 20))
+                            Image(systemName: "bell.fill").font(.system(size: 25))
+                            Image(systemName: "person.circle.fill").font(.system(size: 25))
                         }
                         .foregroundColor(.black)
                     }
@@ -112,7 +114,7 @@ struct TaskSummaryCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("\(count)")
-                    .font(.title)
+                    .font(.title2)
                     .bold()
                     .foregroundColor(Color(hex: "#396BAF"))
                 Spacer()
@@ -121,17 +123,18 @@ struct TaskSummaryCard: View {
                         .fill(Color.white)
                         .frame(width: 50, height: 50)
                     Image(systemName: icon)
-                        .font(.system(size: 20))
+                        .font(.system(size: 22))
                         .foregroundColor(Color(hex: "#396BAF"))
                 }
             }
             Text(title)
-                .font(.body)
+                .font(.headline)
                 .foregroundColor(Color(hex: "#396BAF"))
         }
-        .padding()
+        .padding(20)
+        .frame(minHeight: 120)
         .background(Color(red: 231/255, green: 237/255, blue: 248/255))
-        .cornerRadius(16)
+        .cornerRadius(20)
     }
 }
 
@@ -142,7 +145,7 @@ struct SectionView<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
-                .font(.headline)
+                .font(.title2)
                 .foregroundColor(Color(hex: "#396BAF"))
             content()
         }
@@ -163,7 +166,7 @@ struct RequestCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             // Header Information
             VStack(alignment: .leading, spacing: 4) {
                 Text("Car Number: \(carNumber)")
@@ -184,45 +187,19 @@ struct RequestCard: View {
                     Text(decision == .accepted ? "Request Accepted" : "Request Rejected")
                         .font(.headline)
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 12)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 8)
                         .frame(maxWidth: .infinity)
                         .foregroundColor(decision == .accepted ? .green : .red)
                         .cornerRadius(8)
                         .bold()
                         .transition(.opacity)
                 } else {
-                    VStack(spacing: 12) {
+                    VStack(spacing: 8) {
                         if showDatePicker {
                             DatePicker("", selection: $selectedDate, in: Date()..., displayedComponents: .date)
                                 .labelsHidden()
                                 .datePickerStyle(.compact)
-
-                            HStack(spacing: 16) {
-                                Button("Accept") {
-                                    withAnimation {
-                                        decision = .accepted
-                                    }
-                                }
-                                .font(.headline)
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 20)
-                                .background(Color.green.opacity(0.2))
-                                .foregroundColor(.green)
-                                .cornerRadius(8)
-
-                                Button("Reject") {
-                                    withAnimation {
-                                        decision = .rejected
-                                    }
-                                }
-                                .font(.headline)
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 20)
-                                .background(Color.red.opacity(0.2))
-                                .foregroundColor(.red)
-                                .cornerRadius(8)
-                            }
                         } else {
                             HStack {
                                 Spacer()
@@ -233,7 +210,7 @@ struct RequestCard: View {
                                 }) {
                                     Label("Schedule Maintenance Date", systemImage: "calendar.badge.plus")
                                         .font(.headline)
-                                        .padding(8)
+                                        .padding(6)
                                         .cornerRadius(8)
                                 }
                                 Spacer()
@@ -243,11 +220,11 @@ struct RequestCard: View {
                     .frame(maxWidth: .infinity)
                 }
             }
-            .frame(minHeight: 32)
+            .frame(minHeight: 24)
         }
-        .padding()
+        .padding(16)
         .background(Color(red: 231/255, green: 237/255, blue: 248/255))
-        .cornerRadius(16)
+        .cornerRadius(20)
         .shadow(color: .gray.opacity(0.05), radius: 2, x: 0, y: 1)
     }
 }
@@ -260,10 +237,10 @@ struct InventoryCard2: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.name)
-                        .font(.body)
+                        .font(.headline)
                         .foregroundColor(Color(hex: "#396BAF"))
                     Text("Only \(item.quantity) left in stock")
-                        .font(.footnote)
+                        .font(.subheadline)
                         .foregroundColor(.red)
                 }
                 Spacer()
@@ -272,18 +249,17 @@ struct InventoryCard2: View {
                         .fill(Color.white)
                         .frame(width: 50, height: 50)
                     Image(systemName: item.type == .part ? "wrench.and.screwdriver" : "drop.fill")
-                        .font(.system(size: 20))
+                        .font(.system(size: 22))
                         .foregroundColor(Color(hex: "#396BAF"))
                 }
             }
         }
-        .padding()
+        .padding(20)
+        .frame(minHeight: 100)
         .background(Color(red: 231/255, green: 237/255, blue: 248/255))
-        .cornerRadius(16)
+        .cornerRadius(20)
     }
 }
-
-// MARK: - Preview
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {

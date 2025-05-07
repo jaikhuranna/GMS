@@ -22,6 +22,7 @@ struct UpcomingMaintenanceDetailView: View {
                     }
                 }
             }
+            .padding(.top, 24)
         }
         .navigationTitle("Upcoming Tasks")
     }
