@@ -1,4 +1,6 @@
 import SwiftUI
+import FirebaseCore
+import FirebaseFirestore
 
 // MARK: - Main View
 struct GeneratedBillView: View {
@@ -92,7 +94,30 @@ struct GeneratedBillView: View {
 
                 // 🔹 Action Button
                 Button("Send For Approval") {
-                    // Add logic here
+                    let db = Firestore.firestore()
+                    let docId = UUID().uuidString
+
+                    let billData: [String: Any] = [
+                        "id": docId,
+                        "vehicleNo": vehicleNo,
+                        "taskName": taskName,
+                        "description": description,
+                        "parts": bill.billItems.map { ["name": $0.name, "quantity": $0.quantity, "price": $0.price] },
+                        "subtotal": bill.subtotal,
+                        "gst": bill.gst,
+                        "serviceCharge": bill.serviceCharge,
+                        "total": bill.total,
+                        "status": "pending",
+                        "timestamp": Timestamp(date: Date())
+                    ]
+
+                    db.collection("pendingBills").document(docId).setData(billData) { error in
+                        if let error = error {
+                            print("❌ Failed to send bill: \(error.localizedDescription)")
+                        } else {
+                            print("✅ Bill sent for approval.")
+                        }
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .padding()

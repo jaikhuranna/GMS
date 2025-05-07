@@ -43,11 +43,7 @@ struct TaskView: View {
                     .frame(maxWidth: .infinity)
             }
 
-            Text("All task details will be saved to the system and bill will be generated.")
-                .font(.footnote)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
-                .padding(.top, 6)
+            
         }
         .padding(.top, 20)
         .navigationDestination(isPresented: $showGeneratedBill) {
