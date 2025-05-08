@@ -6,23 +6,30 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 struct BillApprovalView: View {
+    let request: BillRequest
+    @State private var showAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @Environment(\.presentationMode) var presentationMode
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 
                 // Vehicle Info Box
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Vehicle Number: GH 89 YG 2345\n")
+                    Text("Vehicle Number: \(request.vehicleNo)\n")
                         .font(.body)
                         .foregroundColor(Color(hex: "#396BAF"))
                     
-                    Text("Regular Check Up Task:")
+                    Text("\(request.taskName):")
                         .font(.subheadline)
                         .foregroundColor(Color(hex: "#396BAF"))
 
-                    Text("The tires need to be changed")
+                    Text(request.description)
                         .font(.subheadline)
                         .foregroundColor(.red)
                         .multilineTextAlignment(.leading)
@@ -54,7 +61,7 @@ struct BillApprovalView: View {
                 
                     Divider()
 
-                    ForEach(billItems) { item in
+                    ForEach(request.summary.billItems) { item in
                         HStack {
                             Text("\(item.id)")
                                 .frame(width: 44, alignment: .leading)
@@ -68,9 +75,9 @@ struct BillApprovalView: View {
                             Text("₹\(item.price)")
                                 .frame(width: 70, alignment: .trailing)
                         }
+                        .font(.body)
+                        .foregroundColor(Color(hex: "#396BAF"))
                     }
-                    .font(.body)
-                    .foregroundColor(Color(hex: "#396BAF"))
                 }
                 .padding()
                 .frame(maxWidth: .infinity, minHeight: 150, alignment: .leading)
@@ -82,7 +89,7 @@ struct BillApprovalView: View {
                     HStack {
                         Text("Service Charge")
                         Spacer()
-                        Text("₹500")
+                        Text("₹\(request.summary.serviceCharge)")
                     }
                     .font(.body)
                     .foregroundColor(Color(hex: "#396BAF"))
@@ -90,7 +97,7 @@ struct BillApprovalView: View {
                     HStack {
                         Text("GST 18%")
                         Spacer()
-                        Text("₹1512")
+                        Text("₹\(request.summary.gst)")
                     }
                     .font(.body)
                     .foregroundColor(Color(hex: "#396BAF"))
@@ -100,7 +107,7 @@ struct BillApprovalView: View {
                         Text("Total")
                             .font(.headline)
                         Spacer()
-                        Text("₹9912")
+                        Text("₹\(request.summary.total)")
                             .font(.headline)
                     }
                     .font(.body)
@@ -114,7 +121,7 @@ struct BillApprovalView: View {
                 // Action Buttons
                 HStack(spacing: 16) {
                     Button(action: {
-                        // Needs Review logic
+                        updateBillStatus(to: "rejected")
                     }) {
                         Text("Reject")
                             .font(.headline)
@@ -126,7 +133,7 @@ struct BillApprovalView: View {
                     }
 
                     Button(action: {
-                        // Approved logic
+                        updateBillStatus(to: "approved")
                     }) {
                         Text("Accept")
                             .font(.headline)
@@ -143,6 +150,33 @@ struct BillApprovalView: View {
         }
         .navigationTitle("Maintenance Request Approval")
         .navigationBarTitleDisplayMode(.inline)
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text(alertTitle),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK")) {
+                    if alertTitle.contains("Success") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+            )
+        }
+    }
+    
+    func updateBillStatus(to status: String) {
+        Firestore.firestore().collection("pendingBills")
+            .document(request.id)
+            .updateData(["status": status]) { error in
+                if let error = error {
+                    alertTitle = "Error"
+                    alertMessage = "Failed to update status: \(error.localizedDescription)"
+                    showAlert = true
+                } else {
+                    alertTitle = "Success"
+                    alertMessage = "Request has been \(status == "approved" ? "approved" : "rejected")"
+                    showAlert = true
+                }
+            }
     }
 }
 
@@ -150,9 +184,26 @@ struct BillApprovalView: View {
 
 struct BillApprovalView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            BillApprovalView()
+        let sampleRequest = BillRequest(
+            id: "sample123",
+            vehicleNo: "GH 89 YG 2345",
+            taskName: "Regular Check Up Task",
+            description: "The tires need to be changed",
+            summary: BillSummary(
+                billItems: [
+                    BillItem(id: 1, name: "Front Tires", quantity: 2, price: 3200),
+                    BillItem(id: 2, name: "Rear Tires", quantity: 2, price: 3200),
+                    BillItem(id: 3, name: "Wheel Alignment", quantity: 1, price: 1500)
+                ],
+                subtotal: 7900,
+                serviceCharge: 500,
+                gst: 1512,
+                total: 9912
+            )
+        )
+
+        return NavigationView {
+            BillApprovalView(request: sampleRequest)
         }
     }
 }
-

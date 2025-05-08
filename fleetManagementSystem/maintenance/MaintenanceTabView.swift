@@ -42,4 +42,10 @@ struct MaintenanceTabView: View {
     }
 }
 
+struct MaintenanceTabView_Previews: PreviewProvider {
+    static var previews: some View {
+        let mockViewModel = AuthViewModel()
+        MaintenanceTabView(viewModel: mockViewModel)
+    }
+}
 
