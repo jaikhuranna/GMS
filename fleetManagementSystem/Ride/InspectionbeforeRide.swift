@@ -57,7 +57,8 @@ struct InspectionbeforeRide: View {
   let phase:            InspectionPhase
   let driverId: String
   
-    
+    @ObservedObject var viewModel: AuthViewModel
+
   @State private var trackingMode: MapUserTrackingMode = .follow
 
   @Environment(\.presentationMode) var presentationMode
@@ -156,20 +157,6 @@ struct InspectionbeforeRide: View {
                 Text("Tata ACE")
                   .font(.system(size: 22, weight: .bold))
                   .foregroundColor(.white)
-
-                  HStack(spacing: 8) {
-                                    Image(systemName: "location.fill")
-
-                                    // ← Use your computed distance here:
-                                    Text("377 km")
-
-                                    Image(systemName: "arrow.triangle.swap")
-
-                                    // ← And your odometer reading here:
-                      Text(" km")
-                                  }
-                                  .font(.system(size: 14))
-                                  .foregroundColor(.white.opacity(0.8))
                                 }
                                 Spacer()
                               }
@@ -253,7 +240,7 @@ struct InspectionbeforeRide: View {
             vehicleNumber: vehicleNumber,
             bookingRequestID: bookingRequestID,
             phase: phase,
-            driverId: driverId
+            driverId: driverId, viewModel: viewModel
           ),
           isActive: $navigateToInspection
         ) { EmptyView() }
@@ -370,19 +357,19 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
-
-// MARK: — Preview
-
-struct InspectionbeforeRide_Previews: PreviewProvider {
-  static var previews: some View {
-    NavigationView {
-      InspectionbeforeRide(
-        bookingRequestID: "PREVIEW_ID",
-        vehicleNumber:   "KA05AK0434",
-        phase:           .post,
-        driverId: "PREVIEW_ID"
-       
-      )
-    }
-  }
-}
+//
+//// MARK: — Preview
+//
+//struct InspectionbeforeRide_Previews: PreviewProvider {
+//  static var previews: some View {
+//    NavigationView {
+//      InspectionbeforeRide(
+//        bookingRequestID: "PREVIEW_ID",
+//        vehicleNumber:   "KA05AK0434",
+//        phase:           .post,
+//        driverId: "PREVIEW_ID"
+//       
+//      )
+//    }
+//  }
+//}

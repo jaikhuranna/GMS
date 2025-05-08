@@ -80,7 +80,7 @@ struct TripAssignedView: View {
                             bookingRequestID: trip.id,
                             vehicleNumber: trip.vehicleNo,
                             phase: .pre,
-                            driverId: trip.driverId
+                            driverId: trip.driverId, viewModel: viewModel
                         ),
                         isActive: $navigateToInspection
                     ) {
@@ -134,7 +134,11 @@ struct TripAssignedView: View {
                 print("Reject error:", error)
             } else {
                 print("Trip rejected")
-                bookingService.clearBooking()
+//                bookingService.clearBooking()
+                DispatchQueue.main.async {
+                    bookingService.booking = nil
+                }
+
             }
         }
     }
@@ -150,7 +154,11 @@ struct TripAssignedView: View {
             } else {
                 print("Trip completed")
                 showCompletedCard = false
-                bookingService.clearBooking()
+//                bookingService.clearBooking()
+                DispatchQueue.main.async {
+                    bookingService.booking = nil
+                }
+
             }
         }
     }
