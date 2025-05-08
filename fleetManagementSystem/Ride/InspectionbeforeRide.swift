@@ -221,8 +221,8 @@ struct InspectionbeforeRide: View {
             Image("truck")
               .resizable()
               .aspectRatio(contentMode: .fit)
-              .frame(width: 140, height: 60)
-              .offset(x: -20, y: -50)
+              .frame(width: 200, height: 110)
+              .offset(x: -20, y: -90)
               .zIndex(2)
           }
           .zIndex(1)
