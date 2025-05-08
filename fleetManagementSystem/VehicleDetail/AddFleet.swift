@@ -129,8 +129,8 @@ struct AddFleetVehicleView: View {
                     inputRow(title: "Vehicle No.", text: $vehicle.vehicleNo, field: .vehicleNo)
                     Divider()
                     inputRow(title: "Model Name", text: $vehicle.modelName, field: .modelName)
-                    Divider()
-                    inputRow(title: "Chasis No.", text: $vehicle.engineNo, field: .engineNo)
+//                    Divider()
+//                    inputRow(title: "Chasis No.", text: $vehicle.engineNo, field: .engineNo)
                     Divider()
                     datePickerRow
                     Divider()

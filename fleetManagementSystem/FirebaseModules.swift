@@ -506,11 +506,80 @@ class FirebaseModules {
         }
     }
 
-   
-    
-    
 
+    //MARK: - Firebase - fetch pending Bill Notifications
+    func fetchPendingBillNotifications(completion: @escaping ([NotificationItem]) -> Void) {
+            let db = Firestore.firestore()
+            db.collection("pendingBills")
+                .whereField("status", isEqualTo: "pending")
+                .getDocuments { snapshot, error in
+                    var items: [NotificationItem] = []
+
+                    guard let documents = snapshot?.documents else {
+                        completion([])
+                        return
+                    }
+
+                    for doc in documents {
+                        let data = doc.data()
+                        if let task = data["taskName"] as? String,
+                           let vehicle = data["vehicleNo"] as? String {
+                            items.append(.billRaised(id: doc.documentID, task: task, vehicle: vehicle))
+                        }
+                    }
+
+                    completion(items)
+                }
+        }
+    
+    //MARK: - Firebase - Change the status to approved
+    func updateBillToOngoing(billId: String, date: Date, completion: ((Error?) -> Void)? = nil) {
+        db.collection("pendingBills").document(billId).updateData([
+            "status": "ongoing",
+            "scheduledDate": Timestamp(date: date)
+        ]) { error in
+            if let error = error {
+                print("❌ Failed to update bill to ongoing:", error.localizedDescription)
+            } else {
+                print("✅ Bill moved to ongoing.")
+            }
+            completion?(error)
+        }
+    }
+
+
+
+    func fetchApprovedBills(completion: @escaping ([PendingBill]) -> Void) {
+        db.collection("pendingBills")
+            .whereField("status", isEqualTo: "approved")
+            .getDocuments { snapshot, error in
+                guard let docs = snapshot?.documents else {
+                    print("❌ Failed to fetch approved bills:", error?.localizedDescription ?? "")
+                    completion([])
+                    return
+                }
+
+                let bills = docs.compactMap { doc -> PendingBill? in
+                    let data = doc.data()
+                    guard
+                        let task = data["taskName"] as? String,
+                        let vehicle = data["vehicleNo"] as? String,
+                        let amount = data["total"] as? Double
+                    else {
+                        return nil
+                    }
+
+                    return PendingBill(id: doc.documentID, task: task, vehicle: vehicle, amount: amount)
+                }
+
+                completion(bills)
+            }
+    }
+
+
+    
 }
+
     
     
     //MARK: - Firebase - To upload past trips

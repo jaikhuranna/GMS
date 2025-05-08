@@ -2,6 +2,8 @@ import SwiftUI
 
 struct OrderFormView: View {
     @State private var newItem: OrderItem
+    @State private var showAlert = false
+    @State private var alertMessage = ""
     let itemType: String
     @Binding var inventoryItems: [InventoryItem]
     @Binding var showSheet: Bool
@@ -14,8 +16,13 @@ struct OrderFormView: View {
     }
     
     var body: some View {
-        // Added: Wrapped the content in a ScrollView to handle overflow and ensure the button is accessible
-        ScrollView {
+        ZStack {
+            Color.black.opacity(0.4)
+                .edgesIgnoringSafeArea(.all)
+                .onTapGesture {
+                    showSheet = false
+                }
+            
             VStack(spacing: 20) {
                 Text("Order New \(itemType)")
                     .font(.title2)
@@ -40,16 +47,6 @@ struct OrderFormView: View {
                             .padding(.horizontal)
                     }
                     
-                    if itemType == "Parts" {
-                        HStack {
-                            Text("Part ID").foregroundColor(Color(hex: "396BAF"))
-                            Spacer()
-                            TextField("Enter Part ID", text: $newItem.partID)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .padding(.horizontal)
-                        }
-                    }
-                    
                     HStack {
                         Text("Price").foregroundColor(Color(hex: "396BAF"))
                         Spacer()
@@ -70,44 +67,61 @@ struct OrderFormView: View {
                         .cornerRadius(10)
                 }
                 .padding(.horizontal)
-                
-                // Added: Spacer to push the button up and ensure space at the bottom
-                Spacer(minLength: 50) // Adjusted: Added minimum length to ensure space for the tab bar
+                .padding(.bottom)
             }
-            .padding(.bottom) // Added: Padding to ensure the content doesn't overlap with the tab bar
+            .frame(maxWidth: 320)
+            .background(Color(hex: "E5E5EA"))
+            .cornerRadius(20)
+            .shadow(radius: 10)
+            .padding()
         }
-        .background(Color(hex: "E5E5EA").ignoresSafeArea()) // Modified: Ensure background color extends behind the tab bar
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("Error"),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK"))
+                )
+        }
     }
     
     private func placeOrder() {
-        guard !newItem.name.isEmpty else { return }
-        guard let price = Double(newItem.price) else { return }
-
+        // Validate inputs
+        guard !newItem.name.isEmpty else {
+            showAlert(message: "Please enter a name for the item")
+            return
+        }
+        
+        guard let price = Double(newItem.price), price > 0 else {
+            showAlert(message: "Please enter a valid price")
+            return
+        }
+        
+        guard newItem.quantity > 0 else {
+            showAlert(message: "Please enter a valid quantity")
+            return
+        }
+        
+        // Create and add the new item
         withAnimation {
-            if itemType == "Parts" {
-                let item = InventoryItem(
-                    name: newItem.name,
-                    quantity: newItem.quantity,
-                    price: price,
-                    partID: newItem.partID
-                )
-                inventoryItems.append(item)
-
-                FirebaseModules.shared.addInventoryItem(item)
-            } else {
-                let item = InventoryItem(
-                    name: newItem.name,
-                    quantity: newItem.quantity,
-                    price: price
-                )
-                inventoryItems.append(item)
-
-                FirebaseModules.shared.addInventoryItem(item)
-            }
-
+            let item = InventoryItem(
+                name: newItem.name,
+                quantity: newItem.quantity,
+                price: price,
+                partID: itemType == "Parts" ? newItem.partID : ""
+            )
+            
+            inventoryItems.append(item)
+            FirebaseModules.shared.addInventoryItem(item)
+            
+            // Reset form and close sheet
             newItem = OrderItem(name: "", quantity: 1, partID: "", price: "")
             showSheet = false
         }
+    }
+    
+    private func showAlert(message: String) {
+        alertMessage = message
+        showAlert = true
     }
 }
 

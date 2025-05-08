@@ -7,7 +7,6 @@ struct InventoryView: View {
     @State private var inventoryItems: [InventoryItem] = []
     @State private var isLoading = true
     
-    
     // Computed properties for filtered items
     private var parts: [InventoryItem] {
         inventoryItems.filter { $0.type == .part }
@@ -19,40 +18,46 @@ struct InventoryView: View {
     
     var body: some View {
         ZStack {
-            if isLoading {
-                ProgressView("Loading inventory...")
-                    .font(.headline)
-                    .padding()
-            } else {
-                VStack {
-                    SearchBar(searchText: $searchText)
+            // Background content (to be blurred)
+            Group {
+                if isLoading {
+                    ProgressView("Loading inventory...")
+                        .font(.headline)
+                        .padding()
+                } else {
+                    VStack {
+                        SearchBar(searchText: $searchText)
 
-                    HStack(spacing: 4) {
-                        TabButton(title: "Parts", selectedTab: $selectedTab)
-                        TabButton(title: "Fluids", selectedTab: $selectedTab)
-                    }
-                    .padding(4)
-                    .background(Color(hex: "396BAF"))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
-
-                    if selectedTab == "Parts" {
-                        PartsView(searchText: searchText, items: $inventoryItems)
-                    } else {
-                        FluidsView(searchText: searchText, items: $inventoryItems)
-                    }
-
-                    OrderButton(itemType: selectedTab, showSheet: $showOrderSheet)
+                        HStack(spacing: 4) {
+                            TabButton(title: "Parts", selectedTab: $selectedTab)
+                            TabButton(title: "Fluids", selectedTab: $selectedTab)
+                        }
+                        .padding(4)
+                        .background(Color(hex: "396BAF"))
+                        .cornerRadius(12)
                         .padding(.horizontal)
-                        .padding(.bottom, 16)
-                }
-                .padding(.top)
-                .background(Color.white)
-            }
 
+                        if selectedTab == "Parts" {
+                            PartsView(searchText: searchText, items: $inventoryItems)
+                        } else {
+                            FluidsView(searchText: searchText, items: $inventoryItems)
+                        }
+
+                        OrderButton(itemType: selectedTab, showSheet: $showOrderSheet)
+                            .padding(.horizontal)
+                            .padding(.bottom, 16)
+                    }
+                    .padding(.top)
+                    .background(Color.white)
+                }
+            }
+            .blur(radius: showOrderSheet ? 3 : 0) // Apply blur to background content only
+
+            // Foreground content (OrderFormView and tap-to-dismiss)
             if showOrderSheet {
-                Color.black.opacity(0.4)
-                    .edgesIgnoringSafeArea(.all)
+                // Tap outside to dismiss
+                Color.clear
+                    .contentShape(Rectangle())
                     .onTapGesture {
                         withAnimation {
                             showOrderSheet = false
@@ -64,16 +69,8 @@ struct InventoryView: View {
                     inventoryItems: $inventoryItems,
                     showSheet: $showOrderSheet
                 )
-                .frame(maxWidth: .infinity)
-                .frame(height: UIScreen.main.bounds.height * 0.45)
-                .background(Color.white)
-                .cornerRadius(20, corners: [.topLeft, .topRight])
-                .shadow(radius: 10)
-                .transition(.move(edge: .bottom))
+                .transition(.opacity)
                 .animation(.linear(duration: 0.3), value: showOrderSheet)
-                .offset(y: showOrderSheet ? 0 : UIScreen.main.bounds.height)
-                .frame(maxHeight: .infinity, alignment: .bottom)
-                .edgesIgnoringSafeArea(.bottom)
             }
         }
         .onAppear {
@@ -84,7 +81,6 @@ struct InventoryView: View {
             }
         }
     }
-
     
     // MARK: - Subviews
     struct TabButton: View {
@@ -135,7 +131,6 @@ struct InventoryView: View {
             .padding(.horizontal)
         }
     }
-    
     
     struct OrderButton: View {
         let itemType: String
