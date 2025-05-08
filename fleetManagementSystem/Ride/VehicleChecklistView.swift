@@ -59,7 +59,7 @@ struct VehicleChecklistView: View {
                 
                 // Truck image & number
                 VStack(spacing: 8) {
-                    Image("Truck")
+                    Image("truck")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 100)
