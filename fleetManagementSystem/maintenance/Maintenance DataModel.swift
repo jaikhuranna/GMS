@@ -273,6 +273,8 @@ struct MaintenanceCardView: View {
     }
 }
 
+
+//MARK: Creating Bill
 struct BillSummary {
     let billItems: [BillItem]
     let subtotal: Int

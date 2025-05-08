@@ -369,192 +369,209 @@ struct OngoingDetailsView: View {
     @State private var errorMessage: String?
     @State private var showReviewSentAlert: Bool = false
     @Environment(\.dismiss) var dismiss
-
+    @State private var isUploading = false
+    
+    
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                if let error = errorMessage {
-                    // Display error message if fetching fails
-                    Text(error)
-                        .foregroundColor(.red)
-                        .font(.subheadline)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                } else if let req = request {
-                    // Pre Maintenance Images
-                    Text("Pre Maintenance Images")
-                        .font(.title3)
-                        .foregroundColor(Color(hex: "#396BAF"))
-
-                    let cleanedImageURLs = imageURLs.map { $0.replacingOccurrences(of: ":443", with: "") }
-
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                        ForEach(cleanedImageURLs, id: \.self) { urlString in
-                            if let url = URL(string: urlString) {
-                                AsyncImage(url: url) { phase in
-                                    switch phase {
-                                    case .empty:
-                                        ProgressView().frame(height: 100)
-                                    case .success(let image):
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(height: 100)
-                                            .clipped()
-                                            .cornerRadius(8)
-                                    case .failure:
-                                        Color.red.frame(height: 100).cornerRadius(8)
-                                    @unknown default:
-                                        Color.gray.frame(height: 100)
+        ZStack{
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if let error = errorMessage {
+                        // Display error message if fetching fails
+                        Text(error)
+                            .foregroundColor(.red)
+                            .font(.subheadline)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(10)
+                    } else if let req = request {
+                        // Pre Maintenance Images
+                        Text("Pre Maintenance Images")
+                            .font(.title3)
+                            .foregroundColor(Color(hex: "#396BAF"))
+                        
+                        let cleanedImageURLs = imageURLs.map { $0.replacingOccurrences(of: ":443", with: "") }
+                        
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                            ForEach(cleanedImageURLs, id: \.self) { urlString in
+                                if let url = URL(string: urlString) {
+                                    AsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            ProgressView().frame(height: 100)
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(height: 100)
+                                                .clipped()
+                                                .cornerRadius(8)
+                                        case .failure:
+                                            Color.red.frame(height: 100).cornerRadius(8)
+                                        @unknown default:
+                                            Color.gray.frame(height: 100)
+                                        }
                                     }
+                                } else {
+                                    Color.red.frame(height: 100).cornerRadius(8)
                                 }
-                            } else {
-                                Color.red.frame(height: 100).cornerRadius(8)
                             }
                         }
-                    }
-
-                    // Bill And Details
-                    Text("Bill And Details")
-                        .font(.title3)
-                        .foregroundColor(Color(hex: "#396BAF"))
-
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Vehicle Number: \(req.vehicleNo)")
-                            .font(.body)
+                        
+                        // Bill And Details
+                        Text("Bill And Details")
+                            .font(.title3)
                             .foregroundColor(Color(hex: "#396BAF"))
-
-                        Text(req.taskName)
-                            .font(.body)
-                            .foregroundColor(Color(hex: "#396BAF"))
-
-                        Text(req.description)
-                            .font(.body)
-                            .foregroundColor(.red)
-
-                        VStack(spacing: 0) {
-                            HStack {
-                                Text("S.No").frame(width: 60)
-                                Text("Name").frame(minWidth: 100, alignment: .leading)
-                                Text("Quantity").frame(width: 80)
-                                Text("Price").frame(width: 60, alignment: .trailing)
-                            }
-                            .font(.subheadline)
-                            .foregroundColor(Color(hex: "#396BAF"))
-
-                            ForEach(req.summary.billItems) { item in
-                                HStack {
-                                    Text("\(item.id).").frame(width: 60)
-                                    Text(item.name).frame(minWidth: 100, alignment: .leading)
-                                    Text("\(item.quantity)").frame(width: 80)
-                                    Text("₹\(item.price)").frame(width: 60, alignment: .trailing)
-                                }
+                        
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Vehicle Number: \(req.vehicleNo)")
                                 .font(.body)
                                 .foregroundColor(Color(hex: "#396BAF"))
-                            }
-
-                            Divider().padding(.vertical, 8)
-
-                            VStack(spacing: 8) {
-                                SummaryRow(label: "Service Charge", value: "₹\(req.summary.serviceCharge)")
-                                SummaryRow(label: "GST", value: "₹\(req.summary.gst)")
-                                Divider().padding(.vertical, 4)
-                                SummaryRow(label: "Total", value: "₹\(req.summary.total)", isBold: true)
-                            }
-                        }
-                    }
-                    .padding()
-                    .background(Color(hex: "#F5F8FF"))
-                    .cornerRadius(12)
-
-                    // Post Maintenance Images
-                    Text("Post Maintenance Images")
-                        .font(.title3)
-                        .foregroundColor(Color(hex: "#396BAF"))
-
-                    LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
-                        ForEach(postMaintenanceImages.indices, id: \.self) { i in
-                            ZStack(alignment: .topTrailing) {
-                                Image(uiImage: postMaintenanceImages[i])
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(height: 100)
-                                    .clipped()
-                                    .cornerRadius(8)
-
-                                Button {
-                                    postMaintenanceImages.remove(at: i)
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.red)
-                                        .padding(4)
+                            
+                            Text(req.taskName)
+                                .font(.body)
+                                .foregroundColor(Color(hex: "#396BAF"))
+                            
+                            Text(req.description)
+                                .font(.body)
+                                .foregroundColor(.red)
+                            
+                            VStack(spacing: 0) {
+                                HStack {
+                                    Text("S.No").frame(width: 60)
+                                    Text("Name").frame(minWidth: 100, alignment: .leading)
+                                    Text("Quantity").frame(width: 80)
+                                    Text("Price").frame(width: 60, alignment: .trailing)
                                 }
-                            }
-                        }
-
-                        if postMaintenanceImages.count < 4 {
-                            PhotosPicker(selection: $postImageItems, maxSelectionCount: 1, matching: .images) {
-                                ZStack {
-                                    Rectangle()
-                                        .fill(Color(hex: "#EDF2FC"))
-                                        .frame(height: 100)
-                                        .cornerRadius(8)
-                                    VStack {
-                                        Image(systemName: "plus.circle")
-                                            .font(.title)
-                                        Text("Upload")
-                                            .font(.caption)
+                                .font(.subheadline)
+                                .foregroundColor(Color(hex: "#396BAF"))
+                                
+                                ForEach(req.summary.billItems) { item in
+                                    HStack {
+                                        Text("\(item.id).").frame(width: 60)
+                                        Text(item.name).frame(minWidth: 100, alignment: .leading)
+                                        Text("\(item.quantity)").frame(width: 80)
+                                        Text("₹\(item.price)").frame(width: 60, alignment: .trailing)
                                     }
+                                    .font(.body)
                                     .foregroundColor(Color(hex: "#396BAF"))
                                 }
+                                
+                                Divider().padding(.vertical, 8)
+                                
+                                VStack(spacing: 8) {
+                                    SummaryRow(label: "Service Charge", value: "₹\(req.summary.serviceCharge)")
+                                    SummaryRow(label: "GST", value: "₹\(req.summary.gst)")
+                                    Divider().padding(.vertical, 4)
+                                    SummaryRow(label: "Total", value: "₹\(req.summary.total)", isBold: true)
+                                }
                             }
-                            .onChange(of: postImageItems) { items in
-                                guard let item = items.first else { return }
-                                Task {
-                                    if let data = try? await item.loadTransferable(type: Data.self),
-                                       let image = UIImage(data: data) {
-                                        postMaintenanceImages.append(image)
-                                        postImageItems = [] // Clear selection to allow new uploads
+                        }
+                        .padding()
+                        .background(Color(hex: "#F5F8FF"))
+                        .cornerRadius(12)
+                        
+                        // Post Maintenance Images
+                        Text("Post Maintenance Images")
+                            .font(.title3)
+                            .foregroundColor(Color(hex: "#396BAF"))
+                        
+                        LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
+                            ForEach(postMaintenanceImages.indices, id: \.self) { i in
+                                ZStack(alignment: .topTrailing) {
+                                    Image(uiImage: postMaintenanceImages[i])
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(height: 100)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                    
+                                    Button {
+                                        postMaintenanceImages.remove(at: i)
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.red)
+                                            .padding(4)
+                                    }
+                                }
+                            }
+                            
+                            if postMaintenanceImages.count < 4 {
+                                PhotosPicker(selection: $postImageItems, maxSelectionCount: 1, matching: .images) {
+                                    ZStack {
+                                        Rectangle()
+                                            .fill(Color(hex: "#EDF2FC"))
+                                            .frame(height: 100)
+                                            .cornerRadius(8)
+                                        VStack {
+                                            Image(systemName: "plus.circle")
+                                                .font(.title)
+                                            Text("Upload")
+                                                .font(.caption)
+                                        }
+                                        .foregroundColor(Color(hex: "#396BAF"))
+                                    }
+                                }
+                                .onChange(of: postImageItems) { items in
+                                    guard let item = items.first else { return }
+                                    Task {
+                                        if let data = try? await item.loadTransferable(type: Data.self),
+                                           let image = UIImage(data: data) {
+                                            postMaintenanceImages.append(image)
+                                            postImageItems = [] // Clear selection to allow new uploads
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-
-                    // Send for Review Button
-                    Button {
-                        FirebaseModules.shared.uploadPostMaintenanceImages(billId: billId, images: postMaintenanceImages) { error in
-                            if let error = error {
-                                print("❌ Failed to update status:", error.localizedDescription)
-                                self.errorMessage = "Failed to send for review: \(error.localizedDescription)"
-                            } else {
-                                print("✅ Status successfully updated to 'in Review'")
-                                showReviewSentAlert = true
+                        
+                        // Send for Review Button
+                        Button {
+                            isUploading = true
+                            FirebaseModules.shared.uploadPostMaintenanceImages(billId: billId, images: postMaintenanceImages) { error in
+                                isUploading = false
+                                if let error = error {
+                                    print("❌ Failed to update status:", error.localizedDescription)
+                                    self.errorMessage = "Failed to send for review: \(error.localizedDescription)"
+                                } else {
+                                    print("✅ Status successfully updated to 'in Review'")
+                                    showReviewSentAlert = true
+                                }
                             }
                         }
-                    } label: {
-                        Text("Send for Review")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 18)
-                            .background(Color(hex: "#55DA66"))
-                            .foregroundColor(.white)
-                            .cornerRadius(20)
-                    }
-                    .padding(.top, 16)
-                    .disabled(postMaintenanceImages.count != 4) // Disable unless exactly 4 images
-                    .alert("Your task has been sent for review", isPresented: $showReviewSentAlert) {
-                        Button("OK") {
-                            dismiss()
+                        
+                        label: {
+                            Text("Send for Review")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 18)
+                                .background(Color(hex: "#55DA66"))
+                                .foregroundColor(.white)
+                                .cornerRadius(20)
                         }
+                        .padding(.top, 16)
+                        .disabled(postMaintenanceImages.count != 4) // Disable unless exactly 4 images
+                        .alert("Your task has been sent for review", isPresented: $showReviewSentAlert) {
+                            Button("OK") {
+                                dismiss()
+                            }
+                        }
+                    } else {
+                        ProgressView("Loading task...")
                     }
-                } else {
-                    ProgressView("Loading task...")
                 }
+                .padding()
             }
-            .padding()
-        }
+            // ✅ Overlay spinner while uploading
+            if isUploading {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                
+                ProgressView("Uploading...")
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+            }}
         .navigationTitle("Ongoing Tasks")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -562,6 +579,8 @@ struct OngoingDetailsView: View {
         }
     }
 
+    
+    
     private func fetchBillDetails() {
         print("🔍 Fetching document with ID: \(billId)")
         let db = Firestore.firestore()

@@ -17,12 +17,23 @@ struct MaintenanceReport: Identifiable {
 
 final class MaintenanceNotificationViewModel: ObservableObject {
     @Published var reports: [MaintenanceReport] = []
+    @Published var approvedTasks: [NotificationData] = []
+
+    func fetchApprovedTasks() {
+        FirebaseModules.shared.fetchApprovedBills { items in
+            print("✅ Approved tasks fetched: \(items.count)")
+            DispatchQueue.main.async {
+                self.approvedTasks = items
+            }
+        }
+    }
 
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
 
     init() {
         fetchReports()
+        fetchApprovedTasks()
     }
 
     deinit {
@@ -109,20 +120,9 @@ struct MaintenanceNotificationScreen: View {
                 // ————————————————————————————
                 //  Static “Post Maintenance Reviews” Section
                 // ————————————————————————————
-                SectionView2(title: "Post Maintenance Reviews", items: [
-                    NotificationData(
-                        statusMessage: "Your work has been approved.",
-                        statusColor: .green,
-                        task: "Tire Replace Task",
-                        vehicle: "KN23CB4563"
-                    ),
-                    NotificationData(
-                        statusMessage: "Need to do the work again.",
-                        statusColor: .red,
-                        task: "Tire Replace Task",
-                        vehicle: "KN23CB4563"
-                    )
-                ])
+                if !viewModel.approvedTasks.isEmpty {
+                       SectionView2(title: "Post Maintenance Reviews", items: viewModel.approvedTasks)
+                   }
             }
             .padding()
         }
