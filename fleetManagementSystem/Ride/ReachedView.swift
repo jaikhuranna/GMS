@@ -81,7 +81,7 @@ struct ArrivalScreen: View {
             .padding()
             .background(
                 Color(hex: "#F2F2F2")
-                    .edgesIgnoringSafeArea(.bottom)
+                    .ignoresSafeArea(.container, edges: .bottom)
             )
         }
         .navigationBarHidden(true)

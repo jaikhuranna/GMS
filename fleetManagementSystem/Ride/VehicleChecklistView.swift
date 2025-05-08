@@ -126,13 +126,6 @@ struct VehicleChecklistView: View {
                     EmptyView()
                 }
                 .hidden()
-                
-                // Home indicator
-                Rectangle()
-                    .frame(width: 134, height: 5)
-                    .cornerRadius(2.5)
-                    .foregroundColor(.black)
-                    .padding(.bottom, 8)
             }
             .disabled(showCompleted || showReportPopup)
             .blur(radius: (showCompleted || showReportPopup) ? 2 : 0)

@@ -168,6 +168,7 @@ struct InspectionbeforeRide: View {
           .background(Color(red: 0.25, green: 0.44, blue: 0.7))
           .cornerRadius(24, corners: [.topLeft, .topRight])
           .zIndex(1)
+          .ignoresSafeArea(.container, edges: .bottom)
 
           ZStack(alignment: .topTrailing) {
             VStack(alignment: .leading, spacing: 16) {
@@ -250,29 +251,27 @@ struct InspectionbeforeRide: View {
   // MARK: — Subviews
 
   private var fuelCard: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      Image(systemName: "fuelpump.fill")
-        .font(.system(size: 24))
-        .foregroundColor(.black)
-      Text("Fuel")
-        .font(.system(size: 16, weight: .medium))
-      Text("Log Current Fuel Level")
-        .font(.system(size: 12))
-        .foregroundColor(.secondary)
-    }
-    .padding()
-    .background(Color(.systemGray6))
-    .cornerRadius(16)
-    .overlay(
-      Group {
-        if fuelLogged {
-          Image(systemName: "checkmark.circle.fill")
-            .font(.system(size: 20))
-            .foregroundColor(.green)
-            .offset(x: 12, y: -12)
-        }
+    ZStack(alignment: .topTrailing) {
+      VStack(alignment: .leading, spacing: 8) {
+        Image(systemName: "fuelpump.fill")
+          .font(.system(size: 24))
+          .foregroundColor(.black)
+        Text("Fuel")
+          .font(.system(size: 16, weight: .medium))
+        Text("Log Current Fuel Level")
+          .font(.system(size: 12))
+          .foregroundColor(.secondary)
       }
-    )
+      .padding()
+      .background(Color(.systemGray6))
+      .cornerRadius(16)
+      if fuelLogged {
+        Image(systemName: "checkmark.circle.fill")
+          .font(.system(size: 22))
+          .foregroundColor(.green)
+          .padding(8)
+      }
+    }
   }
 
   private var inspectionCard: some View {
