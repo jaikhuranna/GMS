@@ -100,7 +100,7 @@ struct PastTrip: Identifiable {
     let mileage: String
     let distanceKm: Double
     let durationMinutes: Int
-    var driverName: String? // optional, if you want to look it up separately
+    var driverName: String? 
     let vehicleNo: String
 }
 

@@ -134,6 +134,7 @@ struct TripAssignedView: View {
                 print("Reject error:", error)
             } else {
                 print("Trip rejected")
+                bookingService.clearBooking()
             }
         }
     }

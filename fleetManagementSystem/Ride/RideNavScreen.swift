@@ -53,6 +53,7 @@ class NavigationViewModel: NSObject, ObservableObject {
     @Published var isNavigating = false
     @Published var hasArrived = false
    
+    let driverId: String
 
    
 
@@ -61,6 +62,7 @@ class NavigationViewModel: NSObject, ObservableObject {
     @Published var distanceToNextStep: CLLocationDistance = 0
     @Published var timeToNextStep: TimeInterval = 0
     @Published var isOffRoute: Bool = false
+    private var offRouteNotified = false
 
     
     @Published var distanceCovered: CLLocationDistance = 0
@@ -97,7 +99,8 @@ class NavigationViewModel: NSObject, ObservableObject {
     let vehicleNumber: String
     
 
-    init(bookingRequestID: String, vehicleNumber: String) {
+    init( driverId: String,bookingRequestID: String, vehicleNumber: String) {
+        self.driverId         = driverId
         self.bookingRequestID = bookingRequestID
         self.vehicleNumber = vehicleNumber
         
@@ -296,77 +299,117 @@ class NavigationViewModel: NSObject, ObservableObject {
 // MARK: - CLLocationManagerDelegate
 
 extension NavigationViewModel: CLLocationManagerDelegate {
-
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locs: [CLLocation]) {
-            
-            guard isNavigating, let loc = locs.last else { return }
-            userLocation = loc
-
-            // 1️⃣ Off‐route detection
-            if let poly = fullRoutePolyline {
-                let offDist = poly.closestDistance(to: loc.coordinate)
-                if offDist > 50 {      // 50 m threshold
-                    isOffRoute = true
-                    manager.stopUpdatingLocation()
-                    return
-                }
-            }
-
-            // 2️⃣ Are we done with all steps?
-            guard currentStepIndex < navigationSteps.count else {
+        
+        guard isNavigating, let loc = locs.last else { return }
+        userLocation = loc
+        
+        // 1️⃣ Off‐route detection
+        //            if let poly = fullRoutePolyline {
+        //                let offDist = poly.closestDistance(to: loc.coordinate)
+        //                if offDist > 50 {      // 50 m threshold
+        //                    isOffRoute = true
+        //                    manager.stopUpdatingLocation()
+        //                    return
+        //                }
+        //            }
+        if let poly = fullRoutePolyline {
+            let offDist = poly.closestDistance(to: loc.coordinate)
+            if offDist > 50 {      // 50 m threshold
+                isOffRoute = true
                 manager.stopUpdatingLocation()
-                isNavigating = false
-                hasArrived = true
+                
+                if !offRouteNotified {
+                    offRouteNotified = true
+                    sendOffRouteAlert(driverLocation: loc)
+                }
                 return
             }
-
-            // 3️⃣ Compute distance to end of current step
-            let step = navigationSteps[currentStepIndex]
-            let coords = step.polyline.coordinates
-            guard let endCoord = coords.last else { return }
-            let endLoc = CLLocation(latitude: endCoord.latitude, longitude: endCoord.longitude)
-            let dist = loc.distance(from: endLoc)
-            distanceToNextStep = dist
-
-            // 4️⃣ Compute time remaining for this step
-            if dist > 0,
-               let sel = selectedRouteIndex,
-               currentMKRoutes.indices.contains(sel)
-            {
-                let route = currentMKRoutes[sel]
-                let fraction     = dist / step.distance
-                let stepFullTime = (step.distance / route.distance) * route.expectedTravelTime
-                timeToNextStep   = stepFullTime * fraction
-            } else {
-                timeToNextStep = 0
-            }
-
-           
-            let completed = navigationSteps
-                .prefix(currentStepIndex)
-                .reduce(0) { $0 + $1.distance }
-
-            let doneOnThisStep = max(
-                0,
-                step.distance - distanceToNextStep
-            )
-
-            distanceCovered = completed + doneOnThisStep
-           
-
-            // 6️⃣ Update the UI text
-            currentStepText = step.instructions
-
-            // 7️⃣ Advance when we’re within ~20 m of the maneuver point
-            if dist < 20 {
-                currentStepIndex += 1
-            }
         }
+        // 2️⃣ Are we done with all steps?
+        guard currentStepIndex < navigationSteps.count else {
+            manager.stopUpdatingLocation()
+            isNavigating = false
+            hasArrived = true
+            return
+        }
+        
+        // 3️⃣ Compute distance to end of current step
+        let step = navigationSteps[currentStepIndex]
+        let coords = step.polyline.coordinates
+        guard let endCoord = coords.last else { return }
+        let endLoc = CLLocation(latitude: endCoord.latitude, longitude: endCoord.longitude)
+        let dist = loc.distance(from: endLoc)
+        distanceToNextStep = dist
+        
+        // 4️⃣ Compute time remaining for this step
+        if dist > 0,
+           let sel = selectedRouteIndex,
+           currentMKRoutes.indices.contains(sel)
+        {
+            let route = currentMKRoutes[sel]
+            let fraction     = dist / step.distance
+            let stepFullTime = (step.distance / route.distance) * route.expectedTravelTime
+            timeToNextStep   = stepFullTime * fraction
+        } else {
+            timeToNextStep = 0
+        }
+        
+        
+        let completed = navigationSteps
+            .prefix(currentStepIndex)
+            .reduce(0) { $0 + $1.distance }
+        
+        let doneOnThisStep = max(
+            0,
+            step.distance - distanceToNextStep
+        )
+        
+        distanceCovered = completed + doneOnThisStep
+        
+        
+        // 6️⃣ Update the UI text
+        currentStepText = step.instructions
+        
+        // 7️⃣ Advance when we’re within ~20 m of the maneuver point
+        if dist < 20 {
+            currentStepIndex += 1
+        }
+    }
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Location error: \(error.localizedDescription)")
     }
+    
+    private func sendOffRouteAlert(driverLocation loc: CLLocation) {
+        // Apple Maps URL to show driver’s location
+        let mapsURL = "http://maps.apple.com/?ll=\(loc.coordinate.latitude),\(loc.coordinate.longitude)&q=Driver%20Location"
+        
+        let notifData: [String: Any] = [
+            "title": "Off-Route Alert",
+            "body":  "Driver \(driverId) (vehicle \(vehicleNumber)) has left the assigned route.",
+            "tripId": bookingRequestID,
+            "driverId": driverId,
+            "vehicleNumber": vehicleNumber,
+            "location": GeoPoint(
+                latitude: loc.coordinate.latitude,
+                longitude: loc.coordinate.longitude
+            ),
+            "mapsUrl": mapsURL,
+            "recipients": ["fleet_manager"],   // only fleet managers see this
+            "timestamp": Timestamp(date: Date())
+        ]
+        
+        db.collection("notifications")
+            .addDocument(data: notifData) { error in
+                if let error = error {
+                    print("❌ Failed to send off-route alert:", error)
+                } else {
+                    print("✅ Off-route alert sent to fleet manager")
+                }
+            }
+    }
 }
-
 
 // MARK: - MKPolyline helper
 
@@ -476,6 +519,7 @@ struct NavigationMapView: View {
         self.driverId = driverId
         _vm = StateObject(
             wrappedValue: NavigationViewModel(
+                driverId:          driverId, 
                 bookingRequestID: bookingRequestID,
                 vehicleNumber:   vehicleNumber
             )
