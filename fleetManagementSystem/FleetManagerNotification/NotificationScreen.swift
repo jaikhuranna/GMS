@@ -223,6 +223,7 @@ import MapKit
 struct NotificationScreen: View {
     @StateObject private var viewModel = NotificationViewModel()
     
+    
 
     var body: some View {
         ScrollView {
@@ -275,6 +276,8 @@ final class NotificationViewModel: ObservableObject {
     @Published var maintenanceReviews: [NotificationItem] = []
     @Published var tripCompletions:    [NotificationItem] = []
     @Published var inventoryNotifications: [NotificationItem] = []
+    @Published var inReviewBills: [NotificationItem] = []
+
 
     private let db = Firestore.firestore()
 
@@ -286,6 +289,8 @@ final class NotificationViewModel: ObservableObject {
         fetchMaintenanceReviews()
         fetchCompletedTrips()
         fetchInventory()
+        
+
     }
 
     private func fetchOffRouteAlerts() {
@@ -372,11 +377,13 @@ final class NotificationViewModel: ObservableObject {
 
 
     private func fetchMaintenanceReviews() {
-        maintenanceReviews = [
-            .maintenanceReview(task: "Oil Change Review",       vehicle: "KN23CB6463"),
-            .maintenanceReview(task: "Wheel Alignment Review", vehicle: "MH31LK7788"),
-        ]
+        FirebaseModules.shared.fetchInReviewBills { items in
+            DispatchQueue.main.async {
+                self.maintenanceReviews = items
+            }
+        }
     }
+
 
     private func fetchCompletedTrips() {
         tripCompletions = [
@@ -421,7 +428,8 @@ enum NotificationItem: Identifiable {
     case tripResponse(name: String, status: TripStatus, vehicle: String, route: String, date: String)
     case billRaised(id: String, task: String, vehicle: String)
 
-    case maintenanceReview(task: String, vehicle: String)
+    case maintenanceReview(billId: String, task: String, vehicle: String)
+
     case tripCompleted(name: String, vehicle: String, route: String, date: String)
     case inventoryRestock(item: String, quantity: Int)
     case inventoryNewPart(item: String, quantity: Int)
@@ -445,8 +453,9 @@ enum NotificationItem: Identifiable {
         case let .billRaised(id, task, vehicle):
             return "bill_\(id)_\(task)_\(vehicle)"
 
-        case let .maintenanceReview(task, vehicle):
+        case let .maintenanceReview(_, task, vehicle):
             return "review_\(task)_\(vehicle)"
+            
         case let .tripCompleted(name, vehicle, _, date):
             return "completed_\(name)_\(vehicle)_\(date)"
         case let .inventoryRestock(item, qty):
@@ -489,8 +498,9 @@ extension NotificationItem {
         case let .billRaised(id, _, _):
             BillApprovalLoaderView(billId: id)
 
-        case .maintenanceReview:
-            PostMaintenanceReviewView()
+        case let .maintenanceReview(billId, _, _):
+            PostMaintenanceReviewView(billId: billId)
+
         case .inventoryRestock, .inventoryNewPart:
             InventoryRequestNotification()
         default:
@@ -499,82 +509,81 @@ extension NotificationItem {
     }
 
     func notificationView() -> some View {
-        Group {
-            HStack(alignment: .top, spacing: 10) {
-                Image(systemName: iconName)
-                    .resizable()
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(iconColor)
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: iconName)
+                .resizable()
+                .frame(width: 24, height: 24)
+                .foregroundColor(iconColor)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    switch self {
-                    case let .tripResponse(name, status, vehicle, route, date):
-                        Text("\(name) has \(status.rawValue) the trip")
-                            .bold()
-                            .foregroundColor(status == .accepted ? .green : .red)
-                        Text("\(route), \(vehicle)")
-                        Text(date)
+            VStack(alignment: .leading, spacing: 4) {
+                switch self {
+                case let .tripResponse(name, status, vehicle, route, date):
+                    Text("\(name) has \(status.rawValue) the trip")
+                        .bold()
+                        .foregroundColor(status == .accepted ? .green : .red)
+                    Text("\(route), \(vehicle)")
+                    Text(date)
 
-                    case let .billRaised(_, task, vehicle):
-                        Text("Maintenance Manager raised a request")
-                            .bold()
-                            .foregroundColor(Color(hex: "#F18701"))
-                        Text(task)
-                        Text(vehicle)
+                case let .billRaised(_, task, vehicle):
+                    Text("Maintenance Manager raised a request")
+                        .bold()
+                        .foregroundColor(Color(hex: "#F18701"))
+                    Text(task)
+                    Text(vehicle)
 
-                    case let .maintenanceReview(task, vehicle):
-                        Text("Maintenance Manager raised a review")
-                            .bold()
-                            .foregroundColor(Color(hex: "#F18701"))
-                        Text(task)
-                        Text(vehicle)
+                case let .maintenanceReview(_, task, vehicle):
+                    Text("Maintenance Manager raised a review")
+                        .bold()
+                        .foregroundColor(Color(hex: "#F18701"))
+                    Text(task)
+                    Text(vehicle)
 
-                    case let .tripCompleted(name, vehicle, route, date):
-                        Text("\(name) has completed the trip")
-                            .bold()
-                            .foregroundColor(.green)
-                        Text("\(route), \(vehicle)")
-                        Text(date)
+                case let .tripCompleted(name, vehicle, route, date):
+                    Text("\(name) has completed the trip")
+                        .bold()
+                        .foregroundColor(.green)
+                    Text("\(route), \(vehicle)")
+                    Text(date)
 
-                    case let .inventoryRestock(item, qty):
-                        Text("Requested restocking")
-                            .bold()
-                            .foregroundColor(Color(hex: "#F18701"))
-                        Text(item)
-                        Text("Qty: \(qty)")
+                case let .inventoryRestock(item, qty):
+                    Text("Requested restocking")
+                        .bold()
+                        .foregroundColor(Color(hex: "#F18701"))
+                    Text(item)
+                    Text("Qty: \(qty)")
 
-                    case let .inventoryNewPart(item, qty):
-                        Text("Requested new part")
-                            .bold()
-                            .foregroundColor(Color(hex: "#F18701"))
-                        Text(item)
-                        Text("Qty: \(qty)")
+                case let .inventoryNewPart(item, qty):
+                    Text("Requested new part")
+                        .bold()
+                        .foregroundColor(Color(hex: "#F18701"))
+                    Text(item)
+                    Text("Qty: \(qty)")
 
-                    case let .maintenanceReport(vehicle, issues, notes, date):
-                        Text("Issue reported for \(vehicle)")
-                            .bold()
-                            .foregroundColor(.orange)
-                        Text("Issues: \(issues.joined(separator: ", "))")
-                        if !notes.isEmpty { Text("Notes: \(notes)") }
-                        Text(date, style: .date)
+                case let .maintenanceReport(vehicle, issues, notes, date):
+                    Text("Issue reported for \(vehicle)")
+                        .bold()
+                        .foregroundColor(.orange)
+                    Text("Issues: \(issues.joined(separator: ", "))")
+                    if !notes.isEmpty { Text("Notes: \(notes)") }
+                    Text(date, style: .date)
 
-                    case let .offRoute(vehicle, driver, _, _, _, _):
-                        Text("Off-Route: \(vehicle)")
-                            .bold()
-                            .foregroundColor(.orange)
-                        Text("Driver: \(driver)")
-                    }
+                case let .offRoute(vehicle, driver, _, _, _, _):
+                    Text("Off-Route: \(vehicle)")
+                        .bold()
+                        .foregroundColor(.orange)
+                    Text("Driver: \(driver)")
                 }
-                .font(.subheadline)
-                .foregroundColor(Color(hex: "#396BAF"))
-
-                Spacer()
             }
-            .padding()
-            .background(Color(red: 231/255, green: 237/255, blue: 248/255))
-            .cornerRadius(12) // ✅ This now works
+            .font(.subheadline)
+            .foregroundColor(Color(hex: "#396BAF"))
+
+            Spacer()
         }
+        .padding()
+        .background(Color(red: 231/255, green: 237/255, blue: 248/255))
+        .cornerRadius(12)
     }
+
 
 
     private var iconName: String {

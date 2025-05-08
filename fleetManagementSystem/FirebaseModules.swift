@@ -772,6 +772,100 @@ class FirebaseModules {
 
 
     
+    // MARK: - Firebase - Fetch inreview bills
+    func fetchInReviewBills(completion: @escaping ([NotificationItem]) -> Void) {
+        db.collection("pendingBills")
+            .whereField("status", isEqualTo: "in Review")
+            .getDocuments { snapshot, error in
+                var items: [NotificationItem] = []
+
+                guard let documents = snapshot?.documents else {
+                    completion([])
+                    return
+                }
+
+                for doc in documents {
+                    let data = doc.data()
+                    if let task = data["taskName"] as? String,
+                       let vehicle = data["vehicleNo"] as? String {
+                        items.append(.maintenanceReview(billId: doc.documentID, task: task, vehicle: vehicle))
+
+                    }
+                }
+
+                completion(items)
+            }
+    }
+
+    
+    func fetchPreMaintenanceImages(vehicleNo: String, taskName: String, completion: @escaping ([String]) -> Void) {
+        let db = Firestore.firestore()
+        print("🔎 Querying maintenanceTasks with vehicleNo: \(vehicleNo), taskName: \(taskName)")
+
+        db.collection("maintenanceTasks")
+            .whereField("vehicleNo", isEqualTo: vehicleNo)
+            .whereField("taskName", isEqualTo: taskName)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("❌ Firestore error:", error.localizedDescription)
+                }
+
+                guard let doc = snapshot?.documents.first else {
+                    print("⚠️ No matching task found for vehicle \(vehicleNo), task \(taskName)")
+                    completion([])
+                    return
+                }
+
+                let data = doc.data()
+                let urls = data["imageURLs"] as? [String] ?? []
+
+                print("✅ Found pre-maintenance images: \(urls.count)")
+                completion(urls)
+            }
+    }
+
+    
+    // MARK: - Firebase - Fetch approved bills
+    func fetchApprovedBills(limit: Int = 3, completion: @escaping ([NotificationData]) -> Void) {
+        Firestore.firestore()
+            .collection("pendingBills")
+            .whereField("status", isEqualTo: "approved")
+            // 🔥 Removed .order(by:) so no index is required
+            .getDocuments { snapshot, error in
+                guard let docs = snapshot?.documents else {
+                    print("❌ Error fetching approved bills:", error?.localizedDescription ?? "Unknown")
+                    completion([])
+                    return
+                }
+
+                let items: [NotificationData] = docs
+                    .prefix(limit) // ✅ Take first 3 manually
+                    .compactMap { doc in
+                        let data = doc.data()
+                        guard
+                            let taskName = data["taskName"] as? String,
+                            let vehicle = data["vehicleNo"] as? String
+                        else {
+                            return nil
+                        }
+
+                        return NotificationData(
+                            statusMessage: "Bill Approved",
+                            statusColor: .green,
+                            task: taskName,
+                            vehicle: vehicle
+                        )
+                    }
+
+                print("✅ Approved tasks fetched: \(items.count)")
+                completion(items)
+            }
+    }
+
+
+
+
+    
 }
 
     
