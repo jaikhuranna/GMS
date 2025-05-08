@@ -194,42 +194,63 @@ struct VehicleChecklistView: View {
         return ZStack {
             Color.black.opacity(0.35)
                 .edgesIgnoringSafeArea(.all)
-                .onTapGesture { /* block taps */ }
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
-                VStack(spacing: 24) {
-                    Capsule()
-                        .frame(width: 48, height: 6)
-                        .foregroundColor(Color.gray.opacity(0.18))
-                        .padding(.top, 18)
-                        .padding(.bottom, 8)
+                VStack(spacing: 28) {
+                    // Title
                     Text("Report Maintenance Issues")
-                        .font(.system(size: 22, weight: .bold))
-                        .padding(.bottom, 2)
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Issues:")
-                            .font(.subheadline).bold()
-                        ForEach(issues, id: \.self) { issue in
-                            Text("• \(issue)")
-                                .font(.body)
+                        .font(.system(size: 24, weight: .bold))
+                        .padding(.top, 32)
+                        .padding(.bottom, 8)
+                        .multilineTextAlignment(.center)
+
+                    // Issues Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Issues")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.secondary)
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(issues, id: \.self) { issue in
+                                HStack(alignment: .center, spacing: 10) {
+                                    Image(systemName: iconName(for: issue))
+                                        .font(.system(size: 20))
+                                        .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
+                                    Text(issue)
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.primary)
+                                }
+                            }
                         }
-                        Text("Notes:")
-                            .font(.subheadline).bold()
+                        .padding(12)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
+                    }
+                    .padding(.horizontal, 8)
+
+                    // Notes Section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Notes")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.secondary)
                         TextEditor(text: $reportNotes)
-                            .frame(height: 100)
+                            .frame(height: 90)
+                            .padding(8)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(10)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 8)
+                                RoundedRectangle(cornerRadius: 10)
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                             )
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 2)
+                    .padding(.horizontal, 8)
+
+                    // Buttons
                     VStack(spacing: 14) {
                         Button(action: { showReportPopup = false }) {
                             Text("Cancel")
                                 .font(.system(size: 18, weight: .semibold))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .padding(.vertical, 16)
                                 .background(Color.red)
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
@@ -238,21 +259,22 @@ struct VehicleChecklistView: View {
                             Text("Send")
                                 .font(.system(size: 18, weight: .semibold))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .padding(.vertical, 16)
                                 .background(Color(red: 57/255, green: 107/255, blue: 175/255))
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
                         }
                     }
-                    .padding(.horizontal, 2)
-                    .padding(.bottom, 8)
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 18)
                 }
                 .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+                .padding(.vertical, 16)
                 .background(Color.white)
-                .cornerRadius(28)
+                .cornerRadius(24)
                 .shadow(color: Color.black.opacity(0.10), radius: 18, x: 0, y: 8)
-                .frame(maxWidth: 380)
+                .frame(maxWidth: 420)
+                .padding(.horizontal, 16)
                 Spacer(minLength: 0)
             }
         }
