@@ -57,7 +57,8 @@ struct InspectionbeforeRide: View {
   let phase:            InspectionPhase
   let driverId: String
   
-    
+    @ObservedObject var viewModel: AuthViewModel
+
   @State private var trackingMode: MapUserTrackingMode = .follow
 
   @Environment(\.presentationMode) var presentationMode
@@ -253,7 +254,7 @@ struct InspectionbeforeRide: View {
             vehicleNumber: vehicleNumber,
             bookingRequestID: bookingRequestID,
             phase: phase,
-            driverId: driverId
+            driverId: driverId, viewModel: viewModel
           ),
           isActive: $navigateToInspection
         ) { EmptyView() }
@@ -370,19 +371,19 @@ struct RoundedCorner: Shape {
         return Path(path.cgPath)
     }
 }
-
-// MARK: — Preview
-
-struct InspectionbeforeRide_Previews: PreviewProvider {
-  static var previews: some View {
-    NavigationView {
-      InspectionbeforeRide(
-        bookingRequestID: "PREVIEW_ID",
-        vehicleNumber:   "KA05AK0434",
-        phase:           .post,
-        driverId: "PREVIEW_ID"
-       
-      )
-    }
-  }
-}
+//
+//// MARK: — Preview
+//
+//struct InspectionbeforeRide_Previews: PreviewProvider {
+//  static var previews: some View {
+//    NavigationView {
+//      InspectionbeforeRide(
+//        bookingRequestID: "PREVIEW_ID",
+//        vehicleNumber:   "KA05AK0434",
+//        phase:           .post,
+//        driverId: "PREVIEW_ID"
+//       
+//      )
+//    }
+//  }
+//}
