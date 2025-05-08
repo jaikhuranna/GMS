@@ -12,7 +12,9 @@ struct VehicleAddedSuccessView: View {
 
     var vehicleNumber: String
     var distanceTravelled: String
-
+    
+    
+    
     init(vehicleNumber: String, distanceTravelled: String) {
         self.vehicleNumber = vehicleNumber
         self.distanceTravelled = distanceTravelled
