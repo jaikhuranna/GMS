@@ -27,13 +27,13 @@ struct OffRouteMapView: View {
     var body: some View {
         NavigationStack {
             Map(position: $cameraPosition) {
-                // 1️⃣ Planned route
+                // Planned route
                 if routeCoords.count == 2 {
                     MapPolyline(coordinates: routeCoords)
                         .stroke(.blue, lineWidth: 3)
                 }
 
-                // 2️⃣ Geofence circle
+                // Geofence circle
                 if let center = routeCenter {
                     MapCircle(center: vehicleLocation, radius: geofenceRadius)
                       .foregroundStyle(Color.orange.opacity(0.2))
@@ -42,7 +42,7 @@ struct OffRouteMapView: View {
                       .stroke(Color.orange, lineWidth: 2)
                 }
 
-                // 3️⃣ Vehicle location
+                //  Vehicle location
                 Marker("Vehicle", coordinate: vehicleLocation)
                     .tint(.red)
 

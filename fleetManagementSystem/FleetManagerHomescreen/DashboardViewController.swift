@@ -10,10 +10,6 @@ struct DashboardView: View {
     @StateObject private var notifVM   = NotificationViewModel()
     @ObservedObject var viewModel: AuthViewModel
     
-    @State private var currentOffRoute: NotificationItem?
-    @State private var selectedOffRoute: NotificationItem?
-    @State private var showingOffRouteMap = false
-
     var body: some View {
         NavigationStack {
             VStack(spacing: 22) {
@@ -26,38 +22,6 @@ struct DashboardView: View {
                 .onAppear {
                     dashboard.fetchAll()
                     notifVM.fetchAllNotifications()
-                }
-                .onReceive(notifVM.$offRouteAlerts) { alerts in
-                    currentOffRoute = alerts.first
-                }
-            }
-            
-                    .alert(item: $currentOffRoute) { alert in
-                        // now binding all six slots (use underscores for the ones you don’t care about)
-                        guard case let .offRoute(vehicle, driverId, _, _, _, _) = alert else {
-                            return Alert(title: Text("Alert"),
-                                         message: Text("Unknown alert type"),
-                                         dismissButton: .default(Text("OK")))
-                        }
-                        return Alert(
-                            title: Text("Vehicle Off-Route"),
-                            message: Text("Vehicle \(vehicle) driven by \(driverId) has left the assigned route."),
-                            primaryButton: .default(Text("View on Map")) {
-                                selectedOffRoute = alert
-                                showingOffRouteMap = true
-                            },
-                            secondaryButton: .cancel()
-                        )
-                    }
-            
-            .fullScreenCover(isPresented: $showingOffRouteMap) {
-                // full-screen modal map
-                if let off = selectedOffRoute {
-                    OffRouteMapView(alert: off)
-                } else {
-                    Text("No location available")
-                        .font(.headline)
-                        .padding()
                 }
             }
         }

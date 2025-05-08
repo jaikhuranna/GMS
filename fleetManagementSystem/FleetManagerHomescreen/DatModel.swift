@@ -178,7 +178,7 @@ final class DashboardService: ObservableObject {
     // 1) Running trips = bookingRequests where status == inProgress
     group.enter()
     db.collection("bookingRequests")
-      .whereField("status", isEqualTo: "inProgress")
+      .whereField("status", isEqualTo: "accepted")
       .getDocuments { snap, _ in
         self.runningTripsCount = snap?.documents.count ?? 0
         self.ongoingTrips = snap?.documents.compactMap { doc in
