@@ -329,7 +329,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = fleetManagementSystem/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Fleetums;
+				INFOPLIST_KEY_CFBundleDisplayName = Navora;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to plan and finish trips.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -362,7 +362,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = fleetManagementSystem/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Fleetums;
+				INFOPLIST_KEY_CFBundleDisplayName = Navora;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to plan and finish trips.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
