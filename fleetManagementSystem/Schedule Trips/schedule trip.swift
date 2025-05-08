@@ -1,6 +1,3 @@
-
-
-
 // ScheduleTripView.swift
 
 import SwiftUI
@@ -144,8 +141,42 @@ struct ScheduleTripView: View {
                 print("🚨 fleetDrivers error:", error?.localizedDescription ?? "")
                 return
             }
-            let allDrivers = docs.compactMap {
-                try? $0.data(as: FleetDriver.self)
+            var allDrivers: [FleetDriver] = []
+            for doc in docs {
+                if let driver = try? doc.data(as: FleetDriver.self) {
+                    allDrivers.append(driver)
+                } else {
+                    let data = doc.data()
+                    print("[DEBUG] Raw driver data fallback:", data)
+                    // Manual fallback parsing
+                    if let id = data["id"] as? String,
+                       let name = data["name"] as? String,
+                       let licenseTypeStr = data["licenseType"] as? String,
+                       let licenseType = LicenseType(rawValue: licenseTypeStr.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()),
+                       let experience = data["experience"] as? Int,
+                       let licenseNo = data["licenseNo"] as? String,
+                       let contactNo = data["contactNo"] as? String {
+                        let age = data["age"] as? Int ?? 0
+                        let totalTrips = data["totalTrips"] as? Int ?? 0
+                        let totalTime = data["totalTime"] as? Double ?? 0
+                        let totalDistance = data["totalDistance"] as? Double ?? 0
+                        let driver = FleetDriver(
+                            id: id,
+                            name: name,
+                            age: age,
+                            licenseNo: licenseNo,
+                            contactNo: contactNo,
+                            experience: experience,
+                            licenseType: licenseType,
+                            totalTrips: totalTrips,
+                            totalTime: totalTime,
+                            totalDistance: totalDistance
+                        )
+                        allDrivers.append(driver)
+                    } else {
+                        print("[ERROR] Could not parse driver: ", data)
+                    }
+                }
             }
 
             // 2) load all in-progress bookings
@@ -160,9 +191,13 @@ struct ScheduleTripView: View {
                         tdocs.compactMap { $0.data()["driverId"] as? String }
                     )
 
-                    // 3) filter out busy ones
+                    // 3) filter out busy ones and filter by license type (robust)
+                    let vehicleCat = vehicle.vehicleCategory.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
                     let free = allDrivers.filter { driver in
-                        !busyIDs.contains(driver.id)
+                        let licType = driver.licenseType.rawValue.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                        let isFree = !busyIDs.contains(driver.id) && licType == vehicleCat
+                        print("Driver: \(driver.name), License: \(licType), VehicleCat: \(vehicleCat), isFree: \(isFree)")
+                        return isFree
                     }
                     DispatchQueue.main.async {
                         self.availableDrivers = free
@@ -367,8 +402,8 @@ private struct DriversSection: View {
                 .foregroundColor(Color(hex: "396BAF"))
 
             if drivers.isEmpty {
-                Text("Loading…")
-                    .foregroundColor(.gray)
+                Text("No drivers available for this vehicle type.")
+                    .foregroundColor(.red)
             } else {
                 ForEach(drivers) { drv in
                     HStack(spacing: 12) {
