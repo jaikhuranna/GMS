@@ -631,16 +631,11 @@ struct NavigationMapView: View {
             Button { navigateToSOS = true } label: {
                 Text("SOS")
                     .font(.subheadline).bold()
-                    .padding(8)
+                    .padding(15)
                     .background(Color.red)
                     .clipShape(Circle())
                     .foregroundColor(.white)
             }
-            Image(systemName: "person.circle.fill")
-                .resizable()
-                .frame(width: 32, height: 32)
-                .foregroundColor(.white)
-                .padding(.leading, 8)
         }
         .padding()
         .background(Color(red: 57/255, green: 107/255, blue: 175/255))

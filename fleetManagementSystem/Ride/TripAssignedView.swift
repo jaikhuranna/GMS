@@ -291,15 +291,13 @@ private struct TripDetails: View {
                     }
                     .padding(.bottom, 2)
                     
-                    // Vertical line
+                    // Vertical line (replaced with clear space)
                     HStack(alignment: .top, spacing: 0) {
                         Spacer().frame(width: 18)
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
+                        Color.clear
                             .frame(width: 2, height: 28)
                             .padding(.leading, 8)
                     }
-                    
                     // Dropoff
                     HStack(alignment: .center, spacing: 14) {
                         ZStack {

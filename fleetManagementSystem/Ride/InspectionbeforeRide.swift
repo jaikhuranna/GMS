@@ -153,13 +153,13 @@ struct InspectionbeforeRide: View {
             HStack(alignment: .top) {
               VStack(alignment: .leading, spacing: 2) {
                 Text("Tata ACE")
-                  .font(.system(size: 22, weight: .bold))
+                  .font(.system(size: 26, weight: .bold))
                   .foregroundColor(.white)
                                 }
                                 Spacer()
                               }
               Text(vehicleNumber)
-              .font(.system(size: 14))
+              .font(.system(size: 15))
               .foregroundColor(.white.opacity(0.8))
               .padding(.top, 2)
           }
@@ -172,9 +172,9 @@ struct InspectionbeforeRide: View {
           ZStack(alignment: .topTrailing) {
             VStack(alignment: .leading, spacing: 16) {
               Text(phase.headerText)
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(size: 22, weight: .semibold))
                 .padding(.horizontal, 20)
-                .padding(.top, 60)
+                .padding(.top, 40)
 
               HStack(spacing: 12) {
                 Button(action: { withAnimation { showFuelPicker.toggle() } }) {
@@ -284,7 +284,7 @@ struct InspectionbeforeRide: View {
         .font(.system(size: 16, weight: .medium))
       Text(phase == .pre
            ? "Start Pre-Trip Checklist"
-           : "Review Post-Trip Checklist")
+           : "Start Post-Trip Checklist")
         .font(.system(size: 12))
         .foregroundColor(.secondary)
     }
