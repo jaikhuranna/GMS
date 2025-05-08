@@ -18,7 +18,10 @@ struct DriverProfile: View {
         _driverService = StateObject(wrappedValue: DriverService(appwriteUserId: viewModel.userId))
         
         // Initialize with placeholder - we'll update when driver is loaded
-        _recentService = StateObject(wrappedValue: RecentBookingService(driverId: "placeholder"))
+//        _recentService = StateObject(wrappedValue: RecentBookingService(driverId: "placeholder"))
+              _recentService = StateObject(
+                 wrappedValue: RecentBookingService(driverId: viewModel.userId)
+               )
     }
     
     var body: some View {
@@ -269,34 +272,45 @@ class RecentBookingService: ObservableObject {
         }
     }
     
+
+    
     func fetchRecentBooking() {
-        // Skip if using placeholder
-        if driverId == "placeholder" { return }
+        guard driverId != "placeholder" else { return }
         
         let db = Firestore.firestore()
-        
-        // 1) Try completed first
         let completedQuery = db.collection("bookingRequests")
             .whereField("driverId", isEqualTo: driverId)
-            .whereField("status", isEqualTo: "completed")
+            .whereField("status",   isEqualTo: "completed")    // ← make sure this matches exactly what you’ve written in Firestore
             .order(by: "createdAt", descending: true)
             .limit(to: 1)
         
         completedQuery.getDocuments { snap, err in
+            if let err = err {
+                print(" completedQuery error:", err)
+            } else {
+                print(" completedQuery returned \(snap?.documents.count ?? 0) docs")
+            }
+            
             if let doc = snap?.documents.first,
-               let br = BookingRequest(doc) {
+               let br  = BookingRequest(doc) {
                 DispatchQueue.main.async { self.recent = br }
             } else {
-                // 2) Fallback to accepted
+                // … fallback to accepted …
                 let acceptedQuery = db.collection("bookingRequests")
                     .whereField("driverId", isEqualTo: self.driverId)
-                    .whereField("status", isEqualTo: "accepted")
+                    .whereField("status",   isEqualTo: "accepted")
                     .order(by: "createdAt", descending: true)
                     .limit(to: 1)
                 
-                acceptedQuery.getDocuments { snap2, _ in
+                acceptedQuery.getDocuments { snap2, err2 in
+                    if let err2 = err2 {
+                        print("🔥 acceptedQuery error:", err2)
+                    } else {
+                        print("✅ acceptedQuery returned \(snap2?.documents.count ?? 0) docs")
+                    }
+                    
                     if let doc2 = snap2?.documents.first,
-                       let br2 = BookingRequest(doc2) {
+                       let br2  = BookingRequest(doc2) {
                         DispatchQueue.main.async { self.recent = br2 }
                     }
                 }
@@ -304,7 +318,6 @@ class RecentBookingService: ObservableObject {
         }
     }
 }
-
 // Keep existing supporting views unchanged
 
 struct StatCardWithIcon: View {
@@ -360,4 +373,3 @@ struct TripLocationView: View {
         }
     }
 }
-

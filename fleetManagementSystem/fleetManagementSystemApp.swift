@@ -31,12 +31,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct fleetManagementSystemApp: App {
+    @StateObject private var authVM = AuthViewModel()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject private var geofence = GeofenceManager.shared
 
     var body: some Scene {
         WindowGroup {
             AuthRootView()
+                .environmentObject(authVM)
               .sheet(isPresented: $geofence.didEnterRegion) {
                 // wrap in a NavigationStack if you want a nav‐bar hidden
                 NavigationStack {

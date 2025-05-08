@@ -100,7 +100,7 @@ struct TripAssignedView: View {
                     if let trip = bookingService.booking {
                         TripCompletedCard(
                             bookingRequestID: trip.id,
-                            onDone: { complete() },
+                            onHideOverlay: { complete() },
                             viewModel: viewModel // Pass AuthViewModel instead of driverId
                         )
                     }

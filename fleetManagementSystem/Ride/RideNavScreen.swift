@@ -717,9 +717,9 @@ struct NavigationMapView: View {
             }else if showTripCompleted {
                 TripCompletedCard(
                     bookingRequestID: vm.bookingRequestID,
-                    onDone: {
-                        withAnimation { showTripCompleted = false }
-                    },
+                    onHideOverlay: {
+                           withAnimation { showTripCompleted = false }
+                         },
                     viewModel: AuthViewModel()
                 )
                 .background(Color.white)

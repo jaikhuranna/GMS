@@ -278,7 +278,9 @@ struct VehicleChecklistView: View {
         "Transmission",
         "Exhaust System"
     ]
-
+    private func closeOverlay() {
+      withAnimation { showCompleted = false }
+    }
     var body: some View {
         ZStack {
             // Main content
@@ -311,7 +313,7 @@ struct VehicleChecklistView: View {
                     .ignoresSafeArea()
                 TripCompletedCard(
                     bookingRequestID: bookingRequestID,
-                    onDone: closeView,
+                    onHideOverlay: closeOverlay,
                     viewModel: authViewModel
                 )
                 .frame(maxWidth: 350)
@@ -617,8 +619,10 @@ private struct ChecklistButton: View {
                     vehicleNumber:    "KA05AK0434",
                     bookingRequestID: "PREVIEW_ID",
                     phase:            .post,
-                    driverId: "PREVIEW_ID"
+                    driverId: "PREVIEW_ID",
+                 
                 )
+                .environmentObject(AuthViewModel())
             }
         }
     }
