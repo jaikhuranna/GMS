@@ -105,8 +105,8 @@ struct PostTripInspectionView: View {
                 Text("Finish Inspection")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(selectedItems.count == 6 ? Color.blue : Color.gray)
-                    .foregroundColor(.white)
+                    .background(selectedItems.count == 6 ? Color(red: 57/255, green: 107/255, blue: 175/255) : Color.gray)
+                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
                     .cornerRadius(12)
                     .padding()
             }
@@ -148,14 +148,14 @@ struct PostripInspectionViewcard: View {
             .frame(width: 140, height: 140)
             .background(Color.white)
             .cornerRadius(20)
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.blue, lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color(red: 57/255, green: 107/255, blue: 175/255), lineWidth: 1))
             .overlay(
                 Group {
                     if isSelected {
                         ZStack(alignment: .topTrailing) {
                             Color.clear
                             Circle()
-                                .fill(Color.blue)
+                                .fill(Color(red: 57/255, green: 107/255, blue: 175/255))
                                 .frame(width: 24, height: 24)
                                 .overlay(
                                     Image(systemName: "checkmark")
@@ -190,7 +190,7 @@ struct RouteCompleteView: View {
             )
             .ignoresSafeArea()
 
-            // Bottom “Route Complete” sheet
+            // Bottom "Route Complete" sheet
             VStack(spacing: 16) {
                 Text("Route Complete!")
                     .font(.title2).bold()
@@ -219,7 +219,7 @@ struct RouteCompleteView: View {
                 }
             }
             .padding()
-            .background(Color.blue)
+            .background(Color(red: 57/255, green: 107/255, blue: 175/255))
             .cornerRadius(24, corners: [.topLeft, .topRight])
         }
         // FuelLogScreen sheet

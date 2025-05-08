@@ -54,7 +54,8 @@ struct TripAssignedView: View {
                     }
                     // inset from edges + notch/status bar
                     .padding(.trailing, 16)
-                    .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0 + 8)
+                    .padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top ?? 0 + 2)
+                    .offset(y: -6)
                 }
                 .onAppear { updateRegionIfNeeded() }
                 .onChange(of: bookingService.booking) { _ in updateRegionIfNeeded() }

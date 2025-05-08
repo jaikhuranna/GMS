@@ -33,7 +33,7 @@ struct FuelLogScreen: View {
           // optionally show mileage
         }
         .padding()
-        .background(Color.blue)
+        .background(Color(red: 57/255, green: 107/255, blue: 175/255))
         .cornerRadius(24, corners: [.topLeft, .topRight])
 
         // — White card with fuel controls —

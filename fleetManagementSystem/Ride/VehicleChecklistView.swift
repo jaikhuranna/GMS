@@ -139,16 +139,7 @@ struct VehicleChecklistView: View {
             
             // ── Maintenance Report Popup ──
             if showReportPopup {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-                
                 reportPopup
-                    .frame(width: 300)
-                    .background(RoundedRectangle(cornerRadius: 16).fill(Color.white))
-                    .shadow(radius: 12)
-                    .padding(.horizontal)
-                    .transition(.scale)
             }
             
             // ── Trip Completed Overlay ──
@@ -201,44 +192,71 @@ struct VehicleChecklistView: View {
     // MARK: - Report Popup View
     private var reportPopup: some View {
         let issues = items.filter { !selectedItems.contains($0) }
-        return VStack(alignment: .leading, spacing: 16) {
-            Text("Report Maintenance Issues")
-                .font(.headline)
-            Text("Issues:")
-                .font(.subheadline).bold()
-            ForEach(issues, id: \.self) { issue in
-                Text("• \(issue)")
-                    .font(.body)
-            }
-            Text("Notes:")
-                .font(.subheadline).bold()
-            TextEditor(text: $reportNotes)
-                .frame(height: 100)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                )
-            HStack(spacing: 12) {
-                Button(action: { showReportPopup = false }) {
-                    Text("Cancel")
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+        return ZStack {
+            Color.black.opacity(0.35)
+                .edgesIgnoringSafeArea(.all)
+                .onTapGesture { /* block taps */ }
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                VStack(spacing: 24) {
+                    Capsule()
+                        .frame(width: 48, height: 6)
+                        .foregroundColor(Color.gray.opacity(0.18))
+                        .padding(.top, 18)
+                        .padding(.bottom, 8)
+                    Text("Report Maintenance Issues")
+                        .font(.system(size: 22, weight: .bold))
+                        .padding(.bottom, 2)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Issues:")
+                            .font(.subheadline).bold()
+                        ForEach(issues, id: \.self) { issue in
+                            Text("• \(issue)")
+                                .font(.body)
+                        }
+                        Text("Notes:")
+                            .font(.subheadline).bold()
+                        TextEditor(text: $reportNotes)
+                            .frame(height: 100)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 2)
+                    VStack(spacing: 14) {
+                        Button(action: { showReportPopup = false }) {
+                            Text("Cancel")
+                                .font(.system(size: 18, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(Color.red)
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                        Button(action: { sendMaintenanceReport(issues: issues) }) {
+                            Text("Send")
+                                .font(.system(size: 18, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(Color(red: 57/255, green: 107/255, blue: 175/255))
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                    }
+                    .padding(.horizontal, 2)
+                    .padding(.bottom, 8)
                 }
-                Button(action: { sendMaintenanceReport(issues: issues) }) {
-                    Text("Send")
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
+                .background(Color.white)
+                .cornerRadius(28)
+                .shadow(color: Color.black.opacity(0.10), radius: 18, x: 0, y: 8)
+                .frame(maxWidth: 380)
+                Spacer(minLength: 0)
             }
         }
-        .padding(20)
-        .fixedSize(horizontal: false, vertical: true)
     }
     
     // MARK: - Helpers

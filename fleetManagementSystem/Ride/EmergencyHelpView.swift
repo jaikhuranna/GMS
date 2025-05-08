@@ -104,10 +104,12 @@ struct SOSCard: View {
         Button(action: { action(number) }) {
             VStack(spacing: 8) {
                 Image(systemName: systemImage)
-                    .font(.system(size: 32))
+                                   .font(.system(size: 32))
+                                   .foregroundColor(Color(hex: "396BAF"))
                 Text(title)
-                    .font(.headline)
-            }
+                                   .font(.headline)
+                                   .foregroundColor(Color(hex: "396BAF"))
+                           }
             .frame(width: 140, height: 100)
             .background(Color(UIColor.secondarySystemBackground))
             .cornerRadius(12)
