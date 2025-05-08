@@ -207,11 +207,28 @@ struct FluidsView: View {
 }
 
 struct MaintenanceTask: Identifiable {
-    let id = UUID()
+    let id: String
     let taskTitle: String
     let vehicleNumber: String
-    let dateRange: String? // Optional for ongoing
+    let dateRange: String?
+
+    // Firestore init
+    init(id: String, taskTitle: String, vehicleNumber: String, dateRange: String?) {
+        self.id = id
+        self.taskTitle = taskTitle
+        self.vehicleNumber = vehicleNumber
+        self.dateRange = dateRange
+    }
+
+//    // UUID default init for previews/static use
+//    init(taskTitle: String, vehicleNumber: String, dateRange: String?) {
+//        self.id = UUID().uuidString
+//        self.taskTitle = taskTitle
+//        self.vehicleNumber = vehicleNumber
+//        self.dateRange = dateRange
+//    }
 }
+
 
 
 struct MaintenanceCardView: View {
