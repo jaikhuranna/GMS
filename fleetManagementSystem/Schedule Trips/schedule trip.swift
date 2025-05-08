@@ -82,7 +82,8 @@ struct ScheduleTripView: View {
                     // 5) Done button
                     DoneButton(
                         isDisabled: selectedDriverId == nil
-                                    || routeLocations.count < 2,
+                                    || routeLocations.count < 2
+                                    || journeyDate < Calendar.current.startOfDay(for: Date()),
                         action: scheduleTrip
                     )
                 }
@@ -279,6 +280,7 @@ private struct DateSection: View {
                 DatePicker(
                     "",
                     selection: $journeyDate,
+                    in: Date()...,
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 .datePickerStyle(.graphical)
