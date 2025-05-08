@@ -81,7 +81,7 @@ struct MoveToDirections: View {
                     .padding(.top, 40)
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
+                    .background(Color(red: 57/255, green: 107/255, blue: 175/255))
 
                     // Current Instruction
                     HStack {
@@ -146,7 +146,7 @@ struct MoveToDirections: View {
                     }
                     .foregroundColor(.white)
                     .padding()
-                    .background(Color.blue.opacity(0.9))
+                    .background(Color(red: 57/255, green: 107/255, blue: 175/255).opacity(0.9))
                     .cornerRadius(12)
                     .padding(.horizontal)
                     .padding(.bottom, 30)
@@ -204,7 +204,7 @@ struct RouteOverlayView: UIViewRepresentable {
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             if let polyline = overlay as? MKPolyline {
                 let renderer = MKPolylineRenderer(polyline: polyline)
-                renderer.strokeColor = .blue
+                renderer.strokeColor = UIColor(red: 57/255, green: 107/255, blue: 175/255, alpha: 1)
                 renderer.lineWidth = 5
                 return renderer
             }

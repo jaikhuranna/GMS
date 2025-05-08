@@ -69,7 +69,7 @@ struct DriverProfile: View {
                                 Spacer()
                                 Text("Navigation")
                                     .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
                                     .padding(.horizontal, 12)
                                     .padding(.vertical, 4)
                                     .background(Color(.systemGray6))
@@ -125,7 +125,7 @@ struct DriverProfile: View {
                         HStack {
                             HStack(spacing: 12) {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
                                     .font(.system(size: 24))
                                 
                                 Image(systemName: "drop.triangle.fill")
@@ -304,7 +304,7 @@ class RecentBookingService: ObservableObject {
         let db = Firestore.firestore()
         let completedQuery = db.collection("bookingRequests")
             .whereField("driverId", isEqualTo: driverId)
-            .whereField("status",   isEqualTo: "completed")    // ← make sure this matches exactly what you’ve written in Firestore
+            .whereField("status",   isEqualTo: "completed")    // ← make sure this matches exactly what you've written in Firestore
             .order(by: "createdAt", descending: true)
             .limit(to: 1)
         
@@ -361,14 +361,14 @@ struct StatCardWithIcon: View {
             
             Text(label)
                 .font(.system(size: 14))
-                .foregroundColor(.blue)
+                .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
         }
         .frame(maxWidth: .infinity, minHeight: 100)
         .padding()
         .background(Color(red: 0.95, green: 0.97, blue: 1.0))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.blue, lineWidth: 1)
+                .stroke(Color(red: 57/255, green: 107/255, blue: 175/255), lineWidth: 1)
         )
         .cornerRadius(12)
     }
@@ -392,7 +392,7 @@ struct TripLocationView: View {
                 
                 Text(subtitle)
                     .font(.system(size: 14))
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
             }
         }
     }

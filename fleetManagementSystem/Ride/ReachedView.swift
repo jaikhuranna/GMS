@@ -38,7 +38,7 @@ struct ArrivalScreen: View {
                     
                     Text("On your left: Mysuru Airport")
                         .font(.subheadline)
-                        .foregroundColor(.blue.opacity(0.8))
+                        .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255).opacity(0.8))
                 }
 
                 Divider().background(Color.white.opacity(0.6))
@@ -53,7 +53,7 @@ struct ArrivalScreen: View {
                         ForEach(1..<6) { index in
                             Image(systemName: index <= rating ? "star.fill" : "star")
                                 .font(.title2)
-                                .foregroundColor(index <= rating ? .yellow : .blue.opacity(0.6))
+                                .foregroundColor(index <= rating ? .yellow : Color(red: 57/255, green: 107/255, blue: 175/255).opacity(0.6))
                                 .onTapGesture {
                                     withAnimation {
                                         rating = index

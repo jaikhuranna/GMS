@@ -61,7 +61,7 @@ struct TripCompletedCard: View {
             .font(.headline)
             .frame(maxWidth: .infinity)
             .padding()
-            .background(isUpdating ? Color.gray : Color.blue)
+            .background(isUpdating ? Color.gray : Color(red: 57/255, green: 107/255, blue: 175/255))
             .foregroundColor(.white)
             .cornerRadius(12)
             .disabled(isUpdating)

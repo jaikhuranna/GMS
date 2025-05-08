@@ -1,5 +1,3 @@
-
-                    
 import SwiftUI
 import MapKit
 import FirebaseFirestore
@@ -100,7 +98,7 @@ struct InspectionbeforeRide: View {
           userTrackingMode:    $trackingMode,
           annotationItems:     [ MapLocation(coordinate: vehicleLocation) ]
         ) { item in
-          MapMarker(coordinate: item.coordinate, tint: .blue)
+          MapMarker(coordinate: item.coordinate, tint: Color(red: 57/255, green: 107/255, blue: 175/255))
         }
         .ignoresSafeArea()
         .onAppear {
@@ -168,7 +166,7 @@ struct InspectionbeforeRide: View {
           .padding(26)
           .frame(maxWidth: .infinity)
           .background(Color(red: 0.25, green: 0.44, blue: 0.7))
-          .cornerRadius(20, corners: [.topLeft, .topRight])
+          .cornerRadius(24, corners: [.topLeft, .topRight])
           .zIndex(1)
 
           ZStack(alignment: .topTrailing) {

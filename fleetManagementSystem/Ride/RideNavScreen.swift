@@ -1,4 +1,3 @@
-
 import SwiftUI
 import MapKit
 import CoreLocation
@@ -256,7 +255,7 @@ class NavigationViewModel: NSObject, ObservableObject {
                 distanceToNextStep = loc.distance(from: endLoc)
             }
 
-            // pro-rate the step’s time
+            // pro-rate the step's time
             let stepFullTime = (firstStep.distance / route.distance) * route.expectedTravelTime
             let fraction     = distanceToNextStep / firstStep.distance
             timeToNextStep   = stepFullTime * fraction
@@ -375,7 +374,7 @@ extension NavigationViewModel: CLLocationManagerDelegate {
         // 6️⃣ Update the UI text
         currentStepText = step.instructions
         
-        // 7️⃣ Advance when we’re within ~20 m of the maneuver point
+        // 7️⃣ Advance when we're within ~20 m of the maneuver point
         if dist < 20 {
             currentStepIndex += 1
         }
@@ -385,7 +384,7 @@ extension NavigationViewModel: CLLocationManagerDelegate {
     }
     
     private func sendOffRouteAlert(driverLocation loc: CLLocation) {
-        // Apple Maps URL to show driver’s location
+        // Apple Maps URL to show driver's location
         let mapsURL = "http://maps.apple.com/?ll=\(loc.coordinate.latitude),\(loc.coordinate.longitude)&q=Driver%20Location"
         
         let notifData: [String: Any] = [
@@ -452,54 +451,70 @@ struct OffRouteSheet: View {
                 .edgesIgnoringSafeArea(.all)
                 .onTapGesture { /* block taps */ }
 
-            VStack(spacing: 24) {
-                Capsule()
-                    .frame(width: 40, height: 6)
-                    .foregroundColor(Color.gray.opacity(0.5))
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                VStack(spacing: 28) {
+                    Capsule()
+                        .frame(width: 48, height: 6)
+                        .foregroundColor(Color.gray.opacity(0.18))
+                        .padding(.top, 18)
+                        .padding(.bottom, 8)
 
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 40))
-                    .foregroundColor(.yellow)
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 54))
+                        .foregroundColor(.yellow)
+                        .padding(.bottom, 2)
 
-                Text("You’re off the route")
-                    .font(.title2).bold()
+                    Text("You're off the route")
+                        .font(.system(size: 26, weight: .bold))
+                        .foregroundColor(.black)
+                        .multilineTextAlignment(.center)
+                        .padding(.bottom, 2)
 
-                Text("Your current location is outside the defined geofence boundary.\nPlease return to the assigned route to avoid delays or violations.")
-                    .font(.body)
-                    .foregroundColor(.gray)
-                    .multilineTextAlignment(.center)
+                    Text("Your current location is outside the defined geofence boundary. Please return to the assigned route to avoid delays or violations.")
+                        .font(.system(size: 16))
+                        .foregroundColor(Color.gray)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(2)
+                        .padding(.horizontal, 8)
+                        .padding(.bottom, 8)
 
-                Spacer()
-
-                Button(action: {
-                    isPresented = false
-                    onViewRoute()
-                }) {
-                    Text("View Route")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
+                    VStack(spacing: 14) {
+                        Button(action: {
+                            isPresented = false
+                            onViewRoute()
+                        }) {
+                            Text("View Route")
+                                .font(.system(size: 18, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color(red: 57/255, green: 107/255, blue: 175/255))
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                        Button(action: {
+                            onContactManager()
+                        }) {
+                            Text("Contact Manager (\(countdown)s)")
+                                .font(.system(size: 18, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color.red)
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 8)
                 }
-
-                Button(action: {
-                    onContactManager()
-                }) {
-                    Text("Contact Manager (\(countdown)s)")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
+                .background(Color.white)
+                .cornerRadius(28)
+                .shadow(color: Color.black.opacity(0.10), radius: 18, x: 0, y: 8)
+                .frame(maxWidth: 420)
+                Spacer(minLength: 0)
             }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .frame(height: 360)
-            .background(Color(UIColor.systemBackground))
-            .cornerRadius(16)
-            .padding(.horizontal)
             .onReceive(timer) { _ in
                 if countdown > 0 { countdown -= 1 }
             }
@@ -628,7 +643,7 @@ struct NavigationMapView: View {
                 .padding(.leading, 8)
         }
         .padding()
-        .background(Color.blue)
+        .background(Color(red: 57/255, green: 107/255, blue: 175/255))
     }
     private var statsBanner: some View {
          // figure out which route is selected, if any
@@ -651,7 +666,7 @@ struct NavigationMapView: View {
          .foregroundColor(.white)
      }
 
-     // MARK: – Once you’ve tapped “GO” and location updates are flowing
+     // MARK: – Once you've tapped "GO" and location updates are flowing
      private var turnByTurnBanner: some View {
          HStack {
              Image(systemName: currentManeuverIcon)
@@ -922,16 +937,16 @@ struct MapWithNavigation: UIViewRepresentable {
             if let idx = parent.vm.routes.firstIndex(where: { $0.polyline === poly }) {
                 if idx == parent.vm.selectedRouteIndex {
                     // Selected route: bold, opaque
-                    rend.strokeColor = UIColor.systemBlue
+                    rend.strokeColor = UIColor(red: 57/255, green: 107/255, blue: 175/255, alpha: 1)
                     rend.lineWidth   = 5
                 } else {
                     // Alternate: lighter, thinner
-                    rend.strokeColor = UIColor.systemBlue.withAlphaComponent(0.3)
+                    rend.strokeColor = UIColor(red: 57/255, green: 107/255, blue: 175/255, alpha: 0.3)
                     rend.lineWidth   = 3
                 }
             } else {
                 // Fallback style
-                rend.strokeColor = UIColor.systemBlue
+                rend.strokeColor = UIColor(red: 57/255, green: 107/255, blue: 175/255, alpha: 1)
                 rend.lineWidth   = 5
             }
 
@@ -949,7 +964,7 @@ struct MapWithNavigation: UIViewRepresentable {
             VStack(spacing: 0) {
                 // header
                 ZStack(alignment: .top) {
-                    Color.blue
+                    Color(red: 57/255, green: 107/255, blue: 175/255)
                         .clipShape(RoundedCornerShape(radius: 28, corners: [.topLeft, .topRight]))
                     HStack {
                         VStack(alignment: .leading) {
@@ -1018,7 +1033,7 @@ struct ArrivalSheet: View {
 
             Text("On your left: \(name)")
                 .font(.subheadline)
-                .foregroundColor(.blue) // Match desired UI color
+                .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
 
             HStack {
                 Text("Rate your route")
@@ -1026,11 +1041,11 @@ struct ArrivalSheet: View {
                 Spacer()
                 Button(action: {}) {
                     Image(systemName: "hand.thumbsup.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
                 }
                 Button(action: {}) {
                     Image(systemName: "hand.thumbsdown.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
                 }
             }
             .padding()
@@ -1089,7 +1104,7 @@ struct RouteTimeBadges: View {
                                 .font(.system(size:14, weight:.medium))
                                 .multilineTextAlignment(.center)
                                 .padding(8)
-                                .background(Color.blue)
+                                .background(Color(red: 57/255, green: 107/255, blue: 175/255))
                                 .foregroundColor(.white)
                                 .cornerRadius(10)
                             Spacer()
@@ -1143,7 +1158,7 @@ struct RouteOptionView: View {
     let distance: String         // e.g. "493 km"
     let isSelected: Bool         // highlight if this row is chosen
     let action: () -> Void       // called when row tapped
-    let navigateAction: () -> Void  // called when “GO” tapped
+    let navigateAction: () -> Void  // called when "GO" tapped
     
     @ObservedObject var viewModel: AuthViewModel
 
@@ -1176,13 +1191,13 @@ struct RouteOptionView: View {
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(.white)
                     .frame(width: 60, height: 44)
-                    .background(Color.green)
+                    .background(Color(red: 57/255, green: 107/255, blue: 175/255))
                     .cornerRadius(12)
             }
             .padding(.trailing, 24)
         }
         // subtle selected highlight
-        .background(isSelected ? Color.blue.opacity(0.1) : Color.white)
+        .background(isSelected ? Color(red: 57/255, green: 107/255, blue: 175/255).opacity(0.1) : Color.white)
     }
     
 
