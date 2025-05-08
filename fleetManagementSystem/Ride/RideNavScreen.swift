@@ -647,14 +647,11 @@ struct NavigationMapView: View {
          let rem   = max(0, total - vm.distanceCovered)
 
          return HStack {
-             Button { /* share action */ } label: {
-                 Image(systemName: "square.and.arrow.up")
-             }
              Spacer()
 
-             Text(String(format: "%.1f km", vm.distanceCovered / 1000))
+             Text(String(format: "%.1f km Covered", vm.distanceCovered / 1000))
              Text("•")
-             Text(String(format: "%.1f km", rem / 1000))
+             Text(String(format: "%.1f km Remaining", rem / 1000))
          }
          .padding()
          .background(Color.black.opacity(0.8))
@@ -683,9 +680,9 @@ struct NavigationMapView: View {
          if t.contains("left")  { return "arrow.turn.up.left"  }
          if t.contains("right") { return "arrow.turn.up.right" }
          if t.contains("straight") || t.contains("continue") {
-             return "arrow.up"
+             return "truck.box.fill"
          }
-         return "arrow.up"
+         return "truck.box.fill"
      }
  
 
