@@ -135,9 +135,9 @@ struct DashboardView: View {
                     }
                     Spacer()
                     HStack(spacing: 20) {
-                        NavigationLink(destination: PendingBillsView()) {
-                            Image(systemName: "bell.fill")
-                        }
+//                        NavigationLink(destination: PendingBillsView()) {
+//                            Image(systemName: "bell.fill")
+//                        }
                         
                         NavigationLink(destination: ManagerProfileView(viewModel: AuthViewModel())) {
                             Image(systemName: "person.crop.circle")
