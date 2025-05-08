@@ -63,7 +63,7 @@ struct TripAssignedView: View {
                 if let trip = bookingService.booking {
                     let displayKm = distanceKm(for: trip)
                     VStack(spacing: 0) {
-                        TripHeader(trip: trip, distanceKm: displayKm)
+//                        TripHeader(trip: trip, distanceKm: displayKm)
                         TripDetails(
                             trip: trip,
                             distanceKm: displayKm,
@@ -221,35 +221,6 @@ struct TripAssignedView: View {
     }
 }
 
-// MARK: - Trip Header & Details
-private struct TripHeader: View {
-    let trip: BookingRequest
-    let distanceKm: Double
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Trip Assigned")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
-                Spacer()
-            }
-            
-            HStack(spacing: 4) {
-                Image(systemName: "location.fill")
-                    .foregroundColor(.white.opacity(0.8))
-                    .font(.system(size: 14))
-                Text("\(trip.vehicleNo) < \(Int(distanceKm)) km")
-                    .font(.system(size: 14))
-                    .foregroundColor(.white.opacity(0.8))
-            }
-        }
-        .padding(20)
-        .background(Color(red: 0.25, green: 0.44, blue: 0.7))
-        .cornerRadius(20, corners: [.topLeft, .topRight])
-    }
-}
-
 private struct TripDetails: View {
     let trip: BookingRequest
     let distanceKm: Double
@@ -257,72 +228,122 @@ private struct TripDetails: View {
     let onReject: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Spacer()
-                Text("\(Int(distanceKm)) km")
+        VStack(spacing: 0) {
+            // Blue Header
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Trip Assigned")
                     .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(.black)
-            }
-            
-            // Pickup & Dropoff rows
-            VStack(alignment: .leading, spacing: 16) {
-                // Pickup
-                HStack(spacing: 12) {
-                    Image(systemName: "arrow.up.circle.fill")
-                        .foregroundColor(.green)
-                        .font(.system(size: 20))
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(trip.pickupName)
-                            .font(.system(size: 18, weight: .bold))
-                        Text(trip.pickupAddress)
-                            .font(.system(size: 14))
-                            .foregroundColor(.gray)
-                    }
+                    .foregroundColor(.white)
+                HStack(spacing: 6) {
+                    Image(systemName: "truck.box.fill")
+                        .foregroundColor(.white.opacity(0.8))
+                        .font(.system(size: 16, weight: .medium))
+                    Text("\(trip.vehicleNo)")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.white.opacity(0.8))
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                // Dropoff
-                HStack(spacing: 12) {
-                    Image(systemName: "arrow.down.circle.fill")
-                        .foregroundColor(.red)
-                        .font(.system(size: 20))
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(trip.dropoffName)
-                            .font(.system(size: 18, weight: .bold))
-                        Text(trip.dropoffAddress)
-                            .font(.system(size: 14))
-                            .foregroundColor(.gray)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            
-            // Accept / Reject buttons
-            HStack(spacing: 16) {
-                Button(action: onReject) {
-                    Text("Reject")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
+            .padding(.top, 24)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(red: 0.25, green: 0.44, blue: 0.7))
+            .cornerRadius(24, corners: [.topLeft, .topRight])
+
+            // White Card
+            VStack(alignment: .leading, spacing: 24) {
+                // Distance row
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text("\(Int(distanceKm))")
+                        .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.black)
-                        .cornerRadius(12)
+                    Text("kms")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(Color(red: 0.45, green: 0.56, blue: 0.81))
                 }
-                
-                Button(action: onAccept) {
-                    Text("Accept")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(red: 0.25, green: 0.44, blue: 0.7))
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                .padding(.top, 8)
+                // Pickup & Dropoff rows with vertical line
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .center, spacing: 14) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.green.opacity(0.15))
+                                .frame(width: 36, height: 36)
+                            Image(systemName: "location.circle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 22, height: 22)
+                                .foregroundColor(.green)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(trip.pickupName)
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.black)
+                            Text(trip.pickupAddress)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(Color(red: 0.45, green: 0.56, blue: 0.81))
+                        }
+                    }
+                    .padding(.bottom, 2)
+                    // Vertical line (color is white, dark mode issue? )
+                    HStack(alignment: .top, spacing: 0) {
+                        Spacer().frame(width: 18)
+                        Rectangle()
+                            .fill(Color(red: 255, green: 255, blue: 255))
+                            .frame(width: 2, height: 28)
+                            .padding(.leading, 8)
+                    }
+                    // Dropoff
+                    HStack(alignment: .center, spacing: 14) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.red.opacity(0.15))
+                                .frame(width: 36, height: 36)
+                            Image(systemName: "mappin.and.ellipse.circle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 22, height: 22)
+                                .foregroundColor(.red)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(trip.dropoffName)
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.black)
+                            Text(trip.dropoffAddress)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(Color(red: 0.45, green: 0.56, blue: 0.81))
+                        }
+                    }
                 }
+                // Accept / Reject buttons
+                HStack(spacing: 16) {
+                    Button(action: onReject) {
+                        Text("Reject")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.gray.opacity(0.15))
+                            .foregroundColor(.black)
+                            .cornerRadius(12)
+                    }
+                    Button(action: onAccept) {
+                        Text("Accept")
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(red: 0.25, green: 0.44, blue: 0.7))
+                            .foregroundColor(.white)
+                            .cornerRadius(12)
+                    }
+                }
+                .padding(.top, 8)
+                .padding(.bottom, 8)
             }
-            .padding(.top, 20)
+            .padding(.horizontal, 24)
+            .padding(.top, 0)
+            .background(Color.white)
+            .cornerRadius(24, corners: [.topLeft, .topRight])
         }
-        .padding(20)
         .background(Color.white)
-        .frame(maxWidth: .infinity)
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
@@ -358,3 +379,4 @@ struct TripAssignedView_Previews: PreviewProvider {
         )
     }
 }
+
