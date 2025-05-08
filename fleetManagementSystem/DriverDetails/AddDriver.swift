@@ -1,6 +1,5 @@
 import SwiftUI
 
-
 struct AddDriverView: View {
     @State private var driver = Driver(
         id: UUID().uuidString,
@@ -12,7 +11,6 @@ struct AddDriverView: View {
         driverLicenseNo: "",
         driverLicenseType: "LMV"
     )
-
     
     @State private var licenseProofImage: UIImage?
     @State private var profileImage: UIImage?
@@ -25,19 +23,16 @@ struct AddDriverView: View {
     @State private var showSuccessView = false
     @State private var firestoreError: String?
     @State private var isSaving = false
-     
-
-
-
+    
     enum ImagePickerType {
         case profile
         case license
     }
-
+    
     enum Field {
         case name, age, experience, licenseNo, contactNo
     }
-
+    
     var body: some View {
         ZStack {
             NavigationStack {
@@ -72,7 +67,7 @@ struct AddDriverView: View {
             }
         }
     }
-
+    
     private var profileUploadSection: some View {
         ZStack(alignment: .bottomTrailing) {
             Circle()
@@ -114,7 +109,7 @@ struct AddDriverView: View {
         .padding(.top, 32)
         .padding(.bottom, 16)
     }
-
+    
     private var driverDetailsContainer: some View {
         VStack(spacing: 6) {
             Text("Driver Details")
@@ -123,42 +118,34 @@ struct AddDriverView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 2)
                 .fontWeight(.bold)
-
+            
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color.white)
                     .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                 
                 VStack(spacing: 16) {
-                    // Name row
                     inputRow(title: "Name", text: $driver.driverName, field: .name)
                     Divider()
                     
-                    // Age row
                     inputRow(title: "Age", text: Binding(
                         get: { String(driver.driverAge) },
                         set: { driver.driverAge = Int($0) ?? 0 }
                     ), field: .age, keyboard: .numberPad)
                     Divider()
                     
-                    // License No row
                     inputRow(title: "Licence No.", text: $driver.driverLicenseNo, field: .licenseNo)
                     Divider()
                     
-                    // Contact No row
                     inputRow(title: "Contact No.", text: $driver.driverContactNo, field: .contactNo, keyboard: .phonePad)
-                    
                     Divider()
                     
-                    // Experience row
                     inputRow(title: "Experience", text: Binding(
                         get: { String(driver.driverExperience) },
                         set: { driver.driverExperience = Int($0) ?? 0 }
                     ), field: .experience, keyboard: .numberPad)
-                    
                     Divider()
                     
-                    // License Type row with dropdown
                     licenseTypeRow
                 }
                 .padding(.vertical, 12)
@@ -167,7 +154,7 @@ struct AddDriverView: View {
         }
         .padding(.horizontal)
     }
-
+    
     private func inputRow(title: String, text: Binding<String>, field: Field, keyboard: UIKeyboardType = .default) -> some View {
         HStack(alignment: .top, spacing: 16) {
             Text(title)
@@ -185,12 +172,13 @@ struct AddDriverView: View {
                     Text(error)
                         .foregroundColor(.red)
                         .font(.caption)
+                        .lineLimit(nil) // Allow text to wrap
+                        .fixedSize(horizontal: false, vertical: true) // Ensure it wraps instead of truncating
                 }
             }
         }
-        .frame(height: 40)
     }
-
+    
     private var licenseTypeRow: some View {
         HStack(alignment: .center, spacing: 16) {
             Text("Licence Type")
@@ -229,7 +217,7 @@ struct AddDriverView: View {
         }
         .frame(minHeight: 40, alignment: .top)
     }
-
+    
     private var licenseUploadSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Licence Proof")
@@ -271,97 +259,118 @@ struct AddDriverView: View {
                     .foregroundColor(.red)
                     .font(.caption)
                     .padding(.leading, 4)
+                    .lineLimit(nil) // Allow text to wrap
+                    .fixedSize(horizontal: false, vertical: true) // Ensure it wraps instead of truncating
             }
         }
         .padding(.horizontal)
     }
-
+    
     private var addDriverButton: some View {
-      Button(action: validateAndSave) {
-        if isSaving {
-          ProgressView()
-            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color(hex: "#396BAF"))
-            .cornerRadius(12)
-        } else {
-          Text("Add Driver")
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color(hex: "#396BAF"))
-            .foregroundColor(.white)
-            .font(.headline)
-            .cornerRadius(12)
+        Button(action: validateAndSave) {
+            if isSaving {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(hex: "#396BAF"))
+                    .cornerRadius(12)
+            } else {
+                Text("Add Driver")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(hex: "#396BAF"))
+                    .foregroundColor(.white)
+                    .font(.headline)
+                    .cornerRadius(12)
+            }
         }
-      }
-      .disabled(isSaving)
-      .padding(.horizontal)
-      .padding(.top, 8)
+        .disabled(isSaving)
+        .padding(.horizontal)
+        .padding(.top, 8)
     }
-
-
+    
     private func validateAndSave() {
-        // 1) Clear out any old errors
+        // Clear previous errors
         validationErrors.removeAll()
         firestoreError = nil
-
-        // 2) Your existing field checks…
-        if driver.driverName.trimmingCharacters(in: .whitespaces).isEmpty {
+        
+        // Name validation
+        let nameTrimmed = driver.driverName.trimmingCharacters(in: .whitespaces)
+        if nameTrimmed.isEmpty {
             validationErrors["Name"] = "Name is required."
+        } else if nameTrimmed.rangeOfCharacter(from: .decimalDigits) != nil {
+            validationErrors["Name"] = "Name cannot contain numbers."
         }
-        if driver.driverAge <= 0 {
-            validationErrors["Age"] = "Valid age is required."
+        
+        // Age validation
+        if driver.driverAge < 19 {
+            validationErrors["Age"] = "Age must be at least 19."
         }
-        if driver.driverLicenseNo.trimmingCharacters(in: .whitespaces).isEmpty {
-            validationErrors["Licence No."] = "Licence No. is required."
-        }
-        if driver.driverContactNo.trimmingCharacters(in: .whitespaces).isEmpty {
-            validationErrors["Contact No."] = "Contact No. is required."
-        }
+        
+        // Experience validation
         if driver.driverExperience <= 0 {
             validationErrors["Experience"] = "Experience is required."
+        } else if driver.driverAge >= 19 && driver.driverExperience > (driver.driverAge - 18) {
+            validationErrors["Experience"] = "Experience cannot exceed age minus 18 years."
         }
-
-        // 3) Ensure we have images
+        
+        // License number validation (assuming format: 2 letters followed by 13 digits)
+        let licenseTrimmed = driver.driverLicenseNo.trimmingCharacters(in: .whitespaces)
+        if licenseTrimmed.isEmpty {
+            validationErrors["Licence No."] = "Licence No. is required."
+        } else {
+            let licenseRegex = "^[A-Z]{2}[0-9]{13}$"
+            let predicate = NSPredicate(format: "SELF MATCHES %@", licenseRegex)
+            if !predicate.evaluate(with: licenseTrimmed) {
+                validationErrors["Licence No."] = "Licence No. must be 2 letters followed by 13 digits."
+            }
+        }
+        
+        // Contact number validation
+        let contactTrimmed = driver.driverContactNo.trimmingCharacters(in: .whitespaces)
+        if contactTrimmed.isEmpty {
+            validationErrors["Contact No."] = "Contact No. is required."
+        } else {
+            let phoneRegex = "^[0-9]{10}$"
+            let predicate = NSPredicate(format: "SELF MATCHES %@", phoneRegex)
+            if !predicate.evaluate(with: contactTrimmed) {
+                validationErrors["Contact No."] = "Contact No. must be exactly 10 digits."
+            }
+        }
+        
+        // Image validations
         if profileImage == nil {
             validationErrors["ProfileImage"] = "Profile image is required."
         }
         if licenseProofImage == nil {
             validationErrors["LicenseProof"] = "License proof is required."
         }
-
-        // 4) If anything failed, bail out
+        
+        // Exit if there are validation errors
         guard validationErrors.isEmpty else {
             return
         }
-
-        // 5) Grab unwrapped images
-        let profile    = profileImage!
+        
+        // Proceed with saving
+        let profile = profileImage!
         let licenseImg = licenseProofImage!
         
-        // 1) Show spinner
-          isSaving = true
-
-
-        // 6) Call your shared FirebaseModules helper
+        isSaving = true
+        
         FirebaseModules.shared.addDriver(
             driver,
             profileImage: profile,
             licenseImage: licenseImg
         ) { error in
-            
             isSaving = false
             if let err = error {
-                // Show the Firestore error below the button
                 self.firestoreError = err.localizedDescription
             } else {
-                // Success! show the success screen
                 self.showSuccessView = true
             }
         }
     }
-
 }
 
 struct AddDriverView_Previews: PreviewProvider {

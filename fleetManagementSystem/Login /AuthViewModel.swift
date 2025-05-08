@@ -34,7 +34,9 @@ class AuthViewModel: ObservableObject {
     @Published var userRole: UserRole = .unknown
     @Published var otpDigits: [String] = Array(repeating: "", count: 6)
     @Published var userId: String = ""
+    @Published var bookingService: BookingService?
     @Published var debugRoleString: String = "No role fetched"
+//    @Published var bookingService: BookingService?
     
     // MARK: - Private Properties
     private let appwrite = Appwrite()
@@ -261,6 +263,15 @@ class AuthViewModel: ObservableObject {
                     print("Successfully converted to enum: \(userRole)")
                 }
                 self.userRole = userRole
+                
+                // Initialize BookingService for drivers
+                if userRole == .driver {
+                    DispatchQueue.main.async {
+                        // Initialize the bookingService here
+                        self.bookingService = BookingService(driverId: self.userId)
+                        print("BookingService initialized for driver: \(self.userId)")
+                    }
+                }
             } else {
                 DispatchQueue.main.async {
                     print("⚠️ Failed to convert role string to enum: \(role)")
@@ -279,6 +290,7 @@ class AuthViewModel: ObservableObject {
             isLoading = false
         }
     }
+
     
     // MARK: - Debugging
     

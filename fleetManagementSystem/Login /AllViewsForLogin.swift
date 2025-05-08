@@ -374,11 +374,16 @@ struct HomeScreenRouter: View {
         switch viewModel.userRole {
         case .driver:
 //            DriverHomeScreen(viewModel: viewModel)
-            TripAssignedView()
+//            TripAssignedView()
+            if let service = viewModel.bookingService {
+                TripAssignedView(bookingService: service, viewModel: AuthViewModel())
+            } else {
+              ProgressView("Loading your trip…")
+            }
         case .fleetManager:
             MainTabView()
         case .maintenance:
-            MaintenanceHomeScreen(viewModel: viewModel)
+            MaintenanceTabView()
         case .unknown:
             UnknownRoleScreen(viewModel: viewModel)
         }

@@ -5,138 +5,7 @@
 //  Created by admin81 on 22/04/25.
 //
 
-//import SwiftUI
-//import Foundation
-//
-//struct InfoCard: Identifiable {
-//    let id = UUID()
-//    let number: String
-//    let title: String
-//    let icon: String
-//}
-//
-//struct Trip: Identifiable {
-//    let id = UUID()
-//    let driverName: String
-//    let vehicleNo: String
-//    let tripDetail: String
-//    let driverImage: String
-//}
-//
-////struct PastTrip: Identifiable {
-////    let id = UUID()
-////    let driverName: String
-////    let vehicleNo: String
-////    let tripDetail: String
-////    let driverImage: String
-////    let date: String // <-- Add this back
-////}
-//
-//struct PastMaintenance: Identifiable {
-//    let id = UUID()
-//    let note: String
-//    let observerName: String
-//    let dateOfMaintenance: String
-//    let vehicleNo: String
-//}
-//
-//
-//struct VehicleDetail: Identifiable{
-//    var id = UUID()
-//    let vehicleNo: String
-//    let engineNumber: String
-//    let modelNuumber: String
-//    let vehicleTyper: String
-//    let licenseRenewed: String
-//    let maintenanceDate: String
-//    let distanceTravelled: Int
-//}
-//
-//struct Vehicle: Identifiable {
-//    var id: String
-//    var vehicleNo: String
-//    var distanceTravelled: Int
-//    var vehicleCategory: String
-//    var vehicleType: String
-//    var modelName: String
-//    var averageMileage: Double
-//    var engineNo: String
-//    var licenseRenewalDate: Date
-//    var carImage: String // Optional: for static images from Assets
-//    
-//    enum VehicleType: String, CaseIterable, Identifiable {
-//        case HMV
-//        case LMV
-//        
-//        var id: String { rawValue }
-//    }
-//}
-//
-//struct Driver: Identifiable {
-//    var id: String
-//    var driverName: String
-//    var driverImage: String
-//    var driverExperience: Int
-//    var driverAge: Int
-//    var driverContactNo: String
-//    var driverLicenseNo: String
-//    var driverLicenseType: String
-//
-//
-//    enum DriverType {
-//        case HMV
-//        case LMV
-//    }
-//}
-//
-//
-//extension Color {
-//    init(hex: String) {
-//        let hex = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-//        let scanner = Scanner(string: hex)
-//        if hex.hasPrefix("#") { scanner.currentIndex = scanner.string.index(after: scanner.currentIndex) }
-//
-//        var rgb: UInt64 = 0
-//        scanner.scanHexInt64(&rgb)
-//
-//        let r = Double((rgb >> 16) & 0xFF) / 255.0
-//        let g = Double((rgb >> 8) & 0xFF) / 255.0
-//        let b = Double(rgb & 0xFF) / 255.0
-//
-//        self.init(red: r, green: g, blue: b)
-//    }
-//}
-//
-//struct InfoCardView: View {
-//    var card: InfoCard
-//
-//    var body: some View {
-//        VStack(alignment: .leading, spacing: 8) {
-//            HStack {
-//                Text(card.number)
-//                    .font(.title)
-//                    .bold()
-//                    .foregroundColor(Color(hex: "#396BAF"))
-//                Spacer()
-//                ZStack {
-//                    Circle()
-//                        .fill(Color.white)
-//                        .frame(width: 50, height: 50) // Increased size here
-//                    Image(systemName: card.icon)
-//                        .font(.system(size: 20))
-//                        .foregroundColor(Color(hex: "#396BAF"))
-//                }
-//            }
-//            Text(card.title)
-//                .font(.subheadline)
-//                .foregroundColor(Color(hex: "#396BAF"))
-//        }
-//        .padding()
-//        .background(Color(red: 237/255, green: 242/255, blue: 252/255))
-//        .cornerRadius(16)
-//    }
-//}
-//
+
 
 
 import SwiftUI
@@ -161,14 +30,6 @@ struct Trip: Identifiable {
     let driverImage: String
 }
 
-//struct PastTrip: Identifiable {
-//    let id = UUID()
-//    let driverName: String
-//    let vehicleNo: String
-//    let tripDetail: String
-//    let driverImage: String
-//    let date: String // <-- Add this back
-//}
 
 struct PastMaintenance: Identifiable {
     let id = UUID()
@@ -190,6 +51,7 @@ struct VehicleDetail: Identifiable{
     let distanceTravelled: Int
 }
 
+// MARK: – Ve Model
 struct Vehicle: Identifiable {
     var id: String
     var vehicleNo: String
@@ -210,6 +72,7 @@ struct Vehicle: Identifiable {
     }
 }
 
+// MARK: – Driver Model
 struct Driver: Identifiable {
     var id: String
     var driverName: String
@@ -225,6 +88,20 @@ struct Driver: Identifiable {
         case HMV
         case LMV
     }
+}
+
+// MARK: – PastTrip Model
+struct PastTrip: Identifiable {
+    let id: String
+    let driverId: String
+    let tripDetail: String
+    let date: Date
+    let cost: Double
+    let mileage: String
+    let distanceKm: Double
+    let durationMinutes: Int
+    var driverName: String? 
+    let vehicleNo: String
 }
 
 
@@ -384,4 +261,86 @@ extension Query {
     }
     .eraseToAnyPublisher()
   }
+}
+
+
+
+struct BookingRequest: Identifiable, Equatable {
+    var driverId: String
+    let id: String
+    let pickupName: String
+    let pickupAddress: String
+    let pickupLatitude: Double
+    let pickupLongitude: Double
+    let dropoffName: String
+    let dropoffAddress: String
+    let dropoffLatitude: Double
+    let dropoffLongitude: Double
+    let distanceKm: Double
+    let createdAt: Date
+    let vehicleNo: String
+
+    // Failable init pulling addresses and coordinates
+    init?(_ document: DocumentSnapshot) {
+        let data = document.data() ?? [:]
+        guard
+            let driverId      = data["driverId"]      as? String,
+            let pickupName    = data["pickupName"]    as? String,
+            let pickupAddress = data["pickupAddress"] as? String,
+            let pickupLat     = data["pickupLatitude"] as? Double,
+            let pickupLon     = data["pickupLongitude"]as? Double,
+            let dropoffName   = data["dropoffName"]   as? String,
+            let dropoffAddress = data["dropoffAddress"]as? String,
+            let dropoffLat    = data["dropoffLatitude"]as? Double,
+            let dropoffLon    = data["dropoffLongitude"]as? Double,
+            let km            = data["distanceKm"]    as? Double,
+            let ts            = data["createdAt"]     as? Timestamp,
+            let vehicleNo     = data["vehicleNo"]     as? String
+        else { return nil }
+
+        self.driverId         = driverId
+        self.id               = document.documentID
+        self.pickupName       = pickupName
+        self.pickupAddress    = pickupAddress
+        self.pickupLatitude   = pickupLat
+        self.pickupLongitude  = pickupLon
+        self.dropoffName      = dropoffName
+        self.dropoffAddress   = dropoffAddress
+        self.dropoffLatitude  = dropoffLat
+        self.dropoffLongitude = dropoffLon
+        self.distanceKm       = km
+        self.createdAt        = ts.dateValue()
+        self.vehicleNo        = vehicleNo
+    }
+
+    // Non-failable init for previews/mocks
+    init(
+        driverId: String,
+        id: String,
+        pickupName: String,
+        pickupAddress: String,
+        pickupLatitude: Double,
+        pickupLongitude: Double,
+        dropoffName: String,
+        dropoffAddress: String,
+        dropoffLatitude: Double,
+        dropoffLongitude: Double,
+        distanceKm: Double,
+        createdAt: Date,
+        vehicleNo: String
+    ) {
+        self.driverId         = driverId
+        self.id               = id
+        self.pickupName       = pickupName
+        self.pickupAddress    = pickupAddress
+        self.pickupLatitude   = pickupLatitude
+        self.pickupLongitude  = pickupLongitude
+        self.dropoffName      = dropoffName
+        self.dropoffAddress   = dropoffAddress
+        self.dropoffLatitude  = dropoffLatitude
+        self.dropoffLongitude = dropoffLongitude
+        self.distanceKm       = distanceKm
+        self.createdAt        = createdAt
+        self.vehicleNo        = vehicleNo
+    }
 }

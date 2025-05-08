@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseAuth
 
 
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -31,12 +32,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct fleetManagementSystemApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
+    @StateObject private var geofence = GeofenceManager.shared
+
     var body: some Scene {
         WindowGroup {
             AuthRootView()
-//            InspectionbeforeRide()
-//            MainTabView()
+              .sheet(isPresented: $geofence.didEnterRegion) {
+                // wrap in a NavigationStack if you want a nav‐bar hidden
+                NavigationStack {
+                  InspectionbeforeRide(
+                    bookingRequestID: geofence.bookingRequestID!,
+                    vehicleNumber:    geofence.vehicleNumber!,
+                    phase:             .post,
+                    driverId: Auth.auth().currentUser?.uid ?? ""
+                    // ← use .post here
+                    // vehicleOdometerKm: geofence.odometerKm  // if you still need to supply it
+                  )
+                  .navigationBarHidden(true)
+                }
+              }
         }
     }
 }
