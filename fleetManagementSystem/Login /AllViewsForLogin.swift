@@ -69,7 +69,7 @@ struct LogoView: View {
                 .frame(width: 100, height: 100)
                 .padding(.bottom, 8)
             
-            Text("Navora")
+            Text("Fleetums")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.black)
             
@@ -381,9 +381,9 @@ struct HomeScreenRouter: View {
               ProgressView("Loading your trip…")
             }
         case .fleetManager:
-            MainTabView()
+            MainTabView(viewModel: viewModel)
         case .maintenance:
-            MaintenanceTabView(viewModel: AuthViewModel())
+            MaintenanceTabView(viewModel: viewModel)
         case .unknown:
             UnknownRoleScreen(viewModel: viewModel)
         }
@@ -392,99 +392,11 @@ struct HomeScreenRouter: View {
 
 // MARK: - Driver Home Screen
 
-struct DriverHomeScreen: View {
-    @ObservedObject var viewModel: AuthViewModel
-    
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Driver Dashboard").font(.largeTitle).padding()
-                Text("Welcome to the Driver Portal").font(.title2)
-                
-                Text("User ID: \(viewModel.userId)")
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(8)
-                    .padding()
-                
-                Spacer()
-                Button("Sign Out") {
-                    viewModel.logout()
-                }
-                .padding()
-                .background(Color.red)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-            }
-            .padding()
-            .navigationTitle("Driver Portal")
-        }
-    }
-}
-
 // MARK: - Fleet Manager Home Screen
 
-struct FleetManagerHomeScreen: View {
-    @ObservedObject var viewModel: AuthViewModel
-    
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Fleet Manager Dashboard").font(.largeTitle).padding()
-                Text("Welcome to the Fleet Management Portal").font(.title2)
-                
-                Text("User ID: \(viewModel.userId)")
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(8)
-                    .padding()
-                
-                Spacer()
-                Button("Sign Out") {
-                    viewModel.logout()
-                }
-                .padding()
-                .background(Color.red)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-            }
-            .padding()
-            .navigationTitle("Fleet Manager Portal")
-        }
-    }
-}
 
 // MARK: - Maintenance Home Screen
 
-struct MaintenanceHomeScreen: View {
-    @ObservedObject var viewModel: AuthViewModel
-    
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Maintenance Dashboard").font(.largeTitle).padding()
-                Text("Welcome to the Maintenance Portal").font(.title2)
-                
-                Text("User ID: \(viewModel.userId)")
-                    .padding()
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(8)
-                    .padding()
-                
-                Spacer()
-                Button("Sign Out") {
-                    viewModel.logout()
-                }
-                .padding()
-                .background(Color.red)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-            }
-            .padding()
-            .navigationTitle("Maintenance Portal")
-        }
-    }
-}
 
 // MARK: - Unknown Role Screen
 
@@ -506,7 +418,10 @@ struct UnknownRoleScreen: View {
             
             Spacer()
             Button("Sign Out") {
-                viewModel.logout()
+                Task{
+                    
+                    await viewModel.logout()
+                }
             }
             .padding()
             .background(Color.red)

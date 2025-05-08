@@ -8,6 +8,7 @@ import MapKit
 struct DashboardView: View {
     @StateObject private var dashboard = DashboardService()
     @StateObject private var notifVM   = NotificationViewModel()
+    @ObservedObject var viewModel: AuthViewModel
     
     @State private var currentOffRoute: NotificationItem?
     @State private var selectedOffRoute: NotificationItem?
@@ -79,8 +80,24 @@ struct DashboardView: View {
                     NavigationLink(destination: NotificationScreen()) {
                         Image(systemName: "bell.fill")
                     }
-                    Image(systemName: "person.crop.circle")
-                        .font(.system(size: 26))
+                    Menu {
+                        Button(role: .destructive, action: {
+                            Task {
+                                await viewModel.logout()
+                            }
+                        }) {
+                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "person.crop.circle")
+                        }
+//                        .padding()
+//                        .frame(maxWidth: .infinity)
+//                        .background(Color.clear)
+//                        .cornerRadius(10)
+//                        .shadow(color: Color.black.opacity(0.1), radius: 1)
+                    }
                 }
             }
             .padding(.horizontal)
@@ -135,9 +152,9 @@ struct DashboardView: View {
         }
     }
 }
-
-struct DashboardView_Previews: PreviewProvider {
-    static var previews: some View {
-        DashboardView()
-    }
-}
+//
+//struct DashboardView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        DashboardView(viewModel: AuthViewModel)
+//    }
+//}

@@ -3,11 +3,12 @@ import SwiftUI
 struct MainTabView: View {
     @State private var selectedTab = 0
     
+    @ObservedObject var viewModel: AuthViewModel
     var body: some View {
         TabView(selection: $selectedTab) {
             // Tab 1: Home
             NavigationStack {
-                DashboardView()
+                DashboardView(viewModel: viewModel)
             }
             .tabItem {
                 Label("Home", systemImage: selectedTab == 0 ? "house.fill" : "house")
@@ -83,9 +84,9 @@ struct ScheduleView: View {
     }
 }
 
-// MARK: - Preview
-struct MainTabView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainTabView()
-    }
-}
+//// MARK: - Preview
+//struct MainTabView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        MainTabView(viewModel: )
+//    }
+//}

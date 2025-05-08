@@ -190,7 +190,18 @@ struct DriverProfile: View {
                         
                         Button(action: {
                             // Sign out using AuthViewModel
-                            viewModel.logout()
+                            Task {
+                                   await viewModel.logout()
+                                   // Force navigation reset
+                                   DispatchQueue.main.async {
+                                       if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                                          let window = windowScene.windows.first {
+                                           let rootView = ApplicationSwitcher().environmentObject(viewModel)
+                                           window.rootViewController = UIHostingController(rootView: rootView)
+                                       }
+                                   }
+                               }
+                       
                         }) {
                             Text("Sign Out")
                                 .foregroundColor(.red)

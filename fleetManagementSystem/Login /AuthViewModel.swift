@@ -167,22 +167,26 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    func logout() {
+    
+    func logout() async {
         isLoading = true
-        
-        Task {
-            do {
-                // Logout from Appwrite
-                try await appwrite.onLogout()
+        do {
+            // End Appwrite session
+            try await appwrite.onLogout()
+            
+            // Update UI state on main thread
+            await MainActor.run {
                 userId = ""
-                resetFields()
-                screen = .login
-            } catch {
-                errorMessage = error.localizedDescription
+                screen = .login // Critical line for navigation
             }
+        } catch {
+            print("Logout error: \(error)")
+        }
+        await MainActor.run {
             isLoading = false
         }
     }
+
     
     // MARK: - MFA Methods
     

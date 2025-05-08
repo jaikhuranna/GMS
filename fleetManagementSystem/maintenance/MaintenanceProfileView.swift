@@ -121,8 +121,19 @@ struct MaintenanceProfileView: View {
 
                     // Sign Out Button
                     Button(action: {
-                        viewModel.logout()
-                        dismiss()
+                  
+                        Task {
+                               await viewModel.logout()
+                               // Force navigation reset
+                               DispatchQueue.main.async {
+                                   if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                                      let window = windowScene.windows.first {
+                                       let rootView = ApplicationSwitcher().environmentObject(viewModel)
+                                       window.rootViewController = UIHostingController(rootView: rootView)
+                                   }
+                               }
+                           }
+                        
                     }) {
                         HStack {
                             Image(systemName: "rectangle.portrait.and.arrow.right")
