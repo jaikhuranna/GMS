@@ -63,7 +63,6 @@ struct TripAssignedView: View {
                 if let trip = bookingService.booking {
                     let displayKm = distanceKm(for: trip)
                     VStack(spacing: 0) {
-//                        TripHeader(trip: trip, distanceKm: displayKm)
                         TripDetails(
                             trip: trip,
                             distanceKm: displayKm,
@@ -71,8 +70,12 @@ struct TripAssignedView: View {
                             onReject: { reject(trip: trip) }
                         )
                     }
+                    .background(
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(Color.white)
+                            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: -5)
+                    )
                     .ignoresSafeArea(edges: .bottom)
-                    .background(Color.white)
 
                     // navigation to inspection
                     NavigationLink(
@@ -250,7 +253,7 @@ private struct TripDetails: View {
             .background(Color(red: 0.25, green: 0.44, blue: 0.7))
             .cornerRadius(24, corners: [.topLeft, .topRight])
 
-            // White Card
+            // White Card Content
             VStack(alignment: .leading, spacing: 24) {
                 // Distance row
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -261,7 +264,8 @@ private struct TripDetails: View {
                         .font(.system(size: 20, weight: .medium))
                         .foregroundColor(Color(red: 0.45, green: 0.56, blue: 0.81))
                 }
-                .padding(.top, 8)
+                .padding(.top, 24)
+                
                 // Pickup & Dropoff rows with vertical line
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(alignment: .center, spacing: 14) {
@@ -285,14 +289,16 @@ private struct TripDetails: View {
                         }
                     }
                     .padding(.bottom, 2)
-                    // Vertical line (color is white, dark mode issue? )
+                    
+                    // Vertical line
                     HStack(alignment: .top, spacing: 0) {
                         Spacer().frame(width: 18)
                         Rectangle()
-                            .fill(Color(red: 255, green: 255, blue: 255))
+                            .fill(Color.gray.opacity(0.3))
                             .frame(width: 2, height: 28)
                             .padding(.leading, 8)
                     }
+                    
                     // Dropoff
                     HStack(alignment: .center, spacing: 14) {
                         ZStack {
@@ -315,6 +321,7 @@ private struct TripDetails: View {
                         }
                     }
                 }
+                
                 // Accept / Reject buttons
                 HStack(spacing: 16) {
                     Button(action: onReject) {
@@ -335,15 +342,11 @@ private struct TripDetails: View {
                     }
                 }
                 .padding(.top, 8)
-                .padding(.bottom, 8)
+                .padding(.bottom, 24)
             }
             .padding(.horizontal, 24)
-            .padding(.top, 0)
             .background(Color.white)
-            .cornerRadius(24, corners: [.topLeft, .topRight])
         }
-        .background(Color.white)
-        .edgesIgnoringSafeArea(.bottom)
     }
 }
 

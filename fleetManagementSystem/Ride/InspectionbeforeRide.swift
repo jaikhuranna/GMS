@@ -168,7 +168,7 @@ struct InspectionbeforeRide: View {
           .padding(26)
           .frame(maxWidth: .infinity)
           .background(Color(red: 0.25, green: 0.44, blue: 0.7))
-          .cornerRadius(20, corners: [.topLeft, .topRight])
+          .cornerRadius(24, corners: [.topLeft, .topRight])
           .zIndex(1)
 
           ZStack(alignment: .topTrailing) {

@@ -252,12 +252,12 @@ struct VehicleChecklistView: View {
     
     private func iconName(for item: String) -> String {
         switch item {
-        case "Engine": return "car.fill"
-        case "Oil Levels": return "drop.fill"
-        case "Brake": return "circle.dashed"
-        case "Transmission": return "gearshape"
-        case "Exhaust System": return "arrow.up.forward"
-        case "Tires & Wheels": return "circle.grid.cross"
+        case "Engine": return "engine.combustion.badge.exclamationmark.fill"
+        case "Oil Levels": return "oilcan.fill"
+        case "Brake": return "abs.brakesignal"
+        case "Transmission": return "gearshift.layout.sixspeed"
+        case "Exhaust System": return "carbon.dioxide.cloud.fill"
+        case "Tires & Wheels": return "tire"
         default: return "checkmark"
         }
     }
