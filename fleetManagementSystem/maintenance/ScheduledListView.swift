@@ -6,42 +6,6 @@
 //
 
 
-//import SwiftUI
-//
-//struct ScheduledListView: View {
-//    @State private var tasks: [MaintenanceTask] = []
-//
-//    var body: some View {
-//        VStack(alignment: .leading) {
-//            ScrollView {
-//                ForEach(tasks) { task in
-//                    NavigationLink(destination: ScheduledDetailsView(billId: task.id)) {
-//
-//                        MaintenanceCardView(task: task, showDate: true)
-//                    }
-//                }
-//            }
-//            .onAppear {
-//                FirebaseModules.shared.fetchScheduledMaintenanceTasks { fetched in
-//                    self.tasks = fetched
-//                }
-//                
-//                
-//            }
-//        }
-//        .navigationTitle("Upcoming Tasks")
-//    }
-//}
-//
-//
-//struct UpcomingMaintenanceDetailView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            ScheduledListView()
-//        }
-//    }
-//}
-
 
 import SwiftUI
 

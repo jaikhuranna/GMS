@@ -50,7 +50,7 @@ struct OnGoingMaintenance: View {
         VStack(alignment: .leading) {
             ScrollView {
                 ForEach(tasks) { task in
-                    NavigationLink(destination: MaintenanceDetailsView()) {
+                    NavigationLink(destination: OngoingDetailsView(billId: task.id)) {
                         MaintenanceCardView(task: task, showDate: true)
                     }
                 }
@@ -75,3 +75,4 @@ struct OngoingMaintenanceDetailView_Previews: PreviewProvider {
         }
     }
 }
+

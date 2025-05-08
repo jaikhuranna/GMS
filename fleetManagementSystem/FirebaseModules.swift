@@ -729,6 +729,46 @@ class FirebaseModules {
                 completion(tasks)
             }
     }
+    
+    
+    func uploadPostMaintenanceImages(billId: String, images: [UIImage], completion: @escaping (Error?) -> Void) {
+        let storage = Storage.storage()
+        let dispatchGroup = DispatchGroup()
+        var urls: [String] = []
+
+        for (index, image) in images.prefix(4).enumerated() {
+            guard let imageData = image.jpegData(compressionQuality: 0.8) else { continue }
+            let ref = storage.reference().child("postMaintenanceImages/\(billId)_\(index).jpg")
+
+            dispatchGroup.enter()
+            ref.putData(imageData, metadata: nil) { _, error in
+                if let error = error {
+                    dispatchGroup.leave()
+                    print("Upload error: \(error)")
+                    return
+                }
+
+                ref.downloadURL { url, error in
+                    if let url = url {
+                        urls.append(url.absoluteString)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            Firestore.firestore().collection("pendingBills").document(billId).updateData([
+                "status": "in Review",
+                "postMaintenanceImages": urls
+            ]) { error in
+                if let error = error {
+                    print("❌ Failed to update bill:", error)
+                }
+                completion(error)
+            }
+        }
+    }
 
 
     
