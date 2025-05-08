@@ -37,13 +37,13 @@ struct AddDriverView: View {
         ZStack {
             NavigationStack {
                 ScrollView {
-                    VStack(spacing: 24) {
+                    VStack(spacing: 10) {
                         profileUploadSection
                         driverDetailsContainer
                         licenseUploadSection
                         addDriverButton
                     }
-                    .padding(.bottom, 24)
+                    .padding(.bottom, 4)
                     .padding(.horizontal, 16)
                 }
                 .sheet(isPresented: $showingImagePicker) {
@@ -106,8 +106,8 @@ struct AddDriverView: View {
                     .shadow(radius: 2)
             }
         }
-        .padding(.top, 32)
-        .padding(.bottom, 16)
+        .padding(.top, 0)
+        .padding(.bottom, 6)
     }
     
     private var driverDetailsContainer: some View {
@@ -287,7 +287,7 @@ struct AddDriverView: View {
         }
         .disabled(isSaving)
         .padding(.horizontal)
-        .padding(.top, 8)
+        .padding(.top, 0)
     }
     
     private func validateAndSave() {

@@ -70,7 +70,7 @@ struct FleetVehicleListView: View {
     
     var body: some View {
           NavigationView {
-              VStack(spacing: 16) {
+              VStack(spacing: 4) {
                   searchBar
                   CustomSegmentedControl(selectedSegment: $selectedSegment, segments: segments)
                   vehicleList
@@ -83,12 +83,12 @@ struct FleetVehicleListView: View {
               
               
               .background(Color.white.ignoresSafeArea())
-              .navigationBarTitle("Vehicles", displayMode: .inline)
               .navigationBarItems(trailing: Button(action: {
                   navigateToAddFleet = true
               }) {
                   Image(systemName: "plus.circle.fill")
                       .foregroundColor(.primary)
+                      .font(.system(size: 24))
               })
               .onAppear {
                   FirebaseModules.shared.fetchAllVehicles { vehicles in
@@ -102,7 +102,7 @@ struct FleetVehicleListView: View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
-            TextField("Search vehicle", text: $searchText)
+            TextField("Search Ideal Vehicle", text: $searchText)
                 .foregroundColor(.primary)
         }
         .padding(12)
@@ -114,7 +114,7 @@ struct FleetVehicleListView: View {
 
     private var vehicleList: some View {
         ScrollView {
-            VStack(spacing: 14) {
+            VStack(spacing: 6) {
                 if filteredVehicles.isEmpty {
                     Text("No vehicles found.")
                         .foregroundColor(.gray)
@@ -150,8 +150,8 @@ struct FleetVehicleListView: View {
         }
     }
     private func vehicleRow(_ vehicle: Vehicle) -> some View {
-        HStack(spacing: 16) {
-                Image(vehicle.carImage)
+        HStack(spacing: 8) {
+                Image("tt")
                     .resizable()
                     .scaledToFill()
                     .frame(width: 50, height: 50)

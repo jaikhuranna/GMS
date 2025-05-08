@@ -67,18 +67,22 @@ struct DashboardView: View {
     private var header: some View {
         ZStack(alignment: .top) {
             RoundedRectangle(cornerRadius: 30)
-                .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
-                .ignoresSafeArea(edges: .top)
+                .fill(Color(hex: "#396BAF"))
+                .ignoresSafeArea()
 
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Welcome,").font(.title3)
+                        .foregroundColor(.white)
                     Text("Manager").font(.title2).bold()
+                        .foregroundColor(.white)
                 }
                 Spacer()
                 HStack(spacing: 20) {
                     NavigationLink(destination: NotificationScreen()) {
                         Image(systemName: "bell.fill")
+                            .foregroundColor(.white)
+                            .font(.system(size: 24))
                     }
                     Menu {
                         Button(role: .destructive, action: {
@@ -91,12 +95,10 @@ struct DashboardView: View {
                     } label: {
                         HStack {
                             Image(systemName: "person.crop.circle")
+                                .foregroundColor(.white)
+                                .font(.system(size: 24))
                         }
-//                        .padding()
-//                        .frame(maxWidth: .infinity)
-//                        .background(Color.clear)
-//                        .cornerRadius(10)
-//                        .shadow(color: Color.black.opacity(0.1), radius: 1)
+
                     }
                 }
             }
@@ -139,7 +141,7 @@ struct DashboardView: View {
 
     // MARK: – Ongoing Trips Section
     private var ongoingSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("On Going Trips")
                 .font(.title3).bold()
                 .padding(.horizontal)
@@ -148,7 +150,7 @@ struct DashboardView: View {
                 TripRowView(trip: trip)
                     .padding(.horizontal)
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, 2)
         }
     }
 }
@@ -158,3 +160,11 @@ struct DashboardView: View {
 //        DashboardView(viewModel: AuthViewModel)
 //    }
 //}
+
+// MARK: – Preview
+struct DashboardView_Previews: PreviewProvider {
+    static var previews: some View {
+        // Initialize with a mock or default AuthViewModel for preview
+        DashboardView(viewModel: AuthViewModel())
+    }
+}

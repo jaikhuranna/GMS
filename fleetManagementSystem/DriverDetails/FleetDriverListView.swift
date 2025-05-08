@@ -30,12 +30,12 @@ struct FleetDriverListView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
+            VStack(spacing: 6) {
                 searchBar
                 CustomSegmentedControl(selectedSegment: $selectedSegment, segments: segments)
                 
                 ScrollView {
-                    VStack(spacing: 14) {
+                    VStack(spacing: 4) {
                         if filteredDrivers.isEmpty {
                             Text("No drivers found.").foregroundColor(.gray)
                         } else {
@@ -47,14 +47,13 @@ struct FleetDriverListView: View {
                     }
                 }
             }
-            .navigationBarTitle("Drivers", displayMode: .inline)
-            .toolbar {
+                .toolbar {
                 // ← Here is the Add button
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: AddDriverView()) {
                         Image(systemName: "plus.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(Color(hex: "#396BAF"))
+                            .font(.system(size: 24))
+                            .foregroundColor(Color.black)
                     }
                 }
             }
@@ -86,7 +85,7 @@ struct FleetDriverListView: View {
     
     private var driverList: some View {
         ScrollView {
-            VStack(spacing: 14) {
+            VStack(spacing: 4) {
                 if filteredDrivers.isEmpty {
                     Text("No drivers found.")
                         .foregroundColor(.gray)
@@ -108,7 +107,7 @@ struct FleetDriverListView: View {
                     case .success(let img):
                         img.resizable().scaledToFill()
                     default:
-                        Image(systemName: "person.crop.circle.fill")
+                        Image("driver")
                             .resizable().foregroundColor(.gray)
                     }
                 }

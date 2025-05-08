@@ -229,20 +229,7 @@ struct DriverProfile: View {
                         .edgesIgnoringSafeArea(.top)
                     
                     HStack {
-                       
-                        Button {
-                            // This will pop to root and show TripAssignedView
-                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                               let window = windowScene.windows.first {
-                                let tripView = TripAssignedView(
-                                    bookingService: BookingService(driverId: viewModel.userId),
-                                    viewModel: viewModel
-                                )
-                                window.rootViewController = UIHostingController(
-                                    rootView: NavigationStack { tripView }
-                                )
-                            }
-                        } label: {
+                        Button { dismiss() } label: {
                             Image(systemName: "arrow.left")
                                 .foregroundColor(.white)
                                 .padding()

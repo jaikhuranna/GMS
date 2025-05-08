@@ -60,7 +60,7 @@ struct fleetManagementSystemApp: App {
                             bookingRequestID: geofence.bookingRequestID!,
                             vehicleNumber:    geofence.vehicleNumber!,
                             phase:             .post,
-                            driverId: Auth.auth().currentUser?.uid ?? "", viewModel: authVM
+                            driverId: Auth.auth().currentUser?.uid ?? ""
                             // ← use .post here
                             // vehicleOdometerKm: geofence.odometerKm  // if you still need to supply it
                         )

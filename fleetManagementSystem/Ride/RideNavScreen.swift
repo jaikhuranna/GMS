@@ -52,10 +52,8 @@ class NavigationViewModel: NSObject, ObservableObject {
     @Published var errorMessage: String? = nil
     @Published var isNavigating = false
     @Published var hasArrived = false
-    
    
     let driverId: String
-    let authViewModel: AuthViewModel
 
    
 
@@ -101,11 +99,10 @@ class NavigationViewModel: NSObject, ObservableObject {
     let vehicleNumber: String
     
 
-    init( driverId: String,bookingRequestID: String, vehicleNumber: String, viewModel: AuthViewModel) {
+    init( driverId: String,bookingRequestID: String, vehicleNumber: String) {
         self.driverId         = driverId
         self.bookingRequestID = bookingRequestID
         self.vehicleNumber = vehicleNumber
-        self.authViewModel = viewModel
         
         super.init()
         setupLocationManager()
@@ -510,7 +507,6 @@ struct OffRouteSheet: View {
 
 struct NavigationMapView: View {
     
-    
     @StateObject private var vm: NavigationViewModel
     @State private var showArrived       = false
     @State private var showPostTrip      = false
@@ -519,19 +515,13 @@ struct NavigationMapView: View {
     @State private var navigateToSOS = false
     @Environment(\.presentationMode) private var presentationMode
 
-
-    @ObservedObject var viewModel: AuthViewModel
-
-    init(driverId: String, bookingRequestID: String, vehicleNumber: String, viewModel: AuthViewModel) {
+    init(driverId: String,bookingRequestID: String, vehicleNumber: String) {
         self.driverId = driverId
-        self.viewModel = viewModel // Initialize the viewModel property
-        
         _vm = StateObject(
             wrappedValue: NavigationViewModel(
-                driverId: driverId,
+                driverId:          driverId, 
                 bookingRequestID: bookingRequestID,
-                vehicleNumber: vehicleNumber,
-                viewModel: viewModel
+                vehicleNumber:   vehicleNumber
             )
         )
     }
@@ -585,7 +575,7 @@ struct NavigationMapView: View {
                     bookingRequestID: vm.bookingRequestID,
                     vehicleNumber:   vm.vehicleNumber,
                     phase:           .post,
-                    driverId: driverId, viewModel: viewModel
+                    driverId: driverId
                   
                
                 )
@@ -719,7 +709,7 @@ struct NavigationMapView: View {
 
             // C) Route selection before navigation
             } else if !vm.isNavigating {
-                RouteSelectionSheet(vm: vm, viewModel: viewModel, onGo: vm.startNavigation)
+                RouteSelectionSheet(vm: vm, onGo: vm.startNavigation)
                     .transition(.move(edge: .bottom))
                     .animation(.easeInOut, value: vm.isNavigating)
 
@@ -942,7 +932,6 @@ struct MapWithNavigation: UIViewRepresentable {
 
     struct RouteSelectionSheet: View {
         @ObservedObject var vm: NavigationViewModel
-        @ObservedObject var viewModel: AuthViewModel
         let onGo: () -> Void
         
         var body: some View {
@@ -983,7 +972,7 @@ struct MapWithNavigation: UIViewRepresentable {
                                 distance:       String(format: "%.0f km", route.distance/1000),
                                 isSelected:     route.isSelected,
                                 action:         { vm.selectRoute(at: offset) },
-                                navigateAction: onGo, viewModel: viewModel
+                                navigateAction: onGo
                             )
                             .padding(.horizontal)
                             
@@ -1145,8 +1134,6 @@ struct RouteOptionView: View {
     let action: () -> Void       // called when row tapped
     let navigateAction: () -> Void  // called when “GO” tapped
     
-    @ObservedObject var viewModel: AuthViewModel
-
     var body: some View {
         HStack(spacing: 0) {
             // Left info

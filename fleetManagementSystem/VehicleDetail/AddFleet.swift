@@ -29,14 +29,14 @@ struct AddFleetVehicleView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 4) {
                     profileUploadSection
                     vehicleDetailsContainer
                     insuranceUploadSection
                     addFleetButton
                 }
                 .padding(.horizontal)
-                .padding(.bottom, 24)
+                .padding(.bottom, 4)
             }
             .sheet(isPresented: $showingImagePickerForVehicle) {
                 ImagePicker(selectedImage: $vehicle.vehiclePhoto)
@@ -56,7 +56,7 @@ struct AddFleetVehicleView: View {
                         ZStack {
                             Color.black.opacity(0.4).ignoresSafeArea()
                             
-                            VStack(spacing: 16) {
+                            VStack(spacing: 6) {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                     .scaleEffect(1.5)
@@ -65,7 +65,7 @@ struct AddFleetVehicleView: View {
                                     .foregroundColor(.white)
                                     .font(.headline)
                             }
-                            .padding(20)
+                            .padding(0)
                             .background(Color.black.opacity(0.7))
                             .cornerRadius(12)
                         }
@@ -81,7 +81,7 @@ struct AddFleetVehicleView: View {
                 Image(uiImage: photo)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 120, height: 120)
+                    .frame(width: 100, height: 100)
                     .clipShape(Circle())
                     .clipped()
             } else {
@@ -100,7 +100,7 @@ struct AddFleetVehicleView: View {
             Button(action: { showingImagePickerForVehicle = true }) {
                 Circle()
                     .fill(Color.white)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 40, height: 40)
                     .overlay(
                         Image(systemName: "pencil")
                             .foregroundColor(Color(hex: "#396BAF"))
@@ -108,8 +108,8 @@ struct AddFleetVehicleView: View {
                     .shadow(radius: 2)
             }
         }
-        .padding(.top, 32)
-        .padding(.bottom, 16)
+        .padding(.top, 4)
+        .padding(.bottom, 6)
     }
     
     private var vehicleDetailsContainer: some View {
@@ -133,6 +133,7 @@ struct AddFleetVehicleView: View {
 //                    inputRow(title: "Chasis No.", text: $vehicle.engineNo, field: .engineNo)
                     Divider()
                     datePickerRow
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     Divider()
                     inputDoubleRow(title: "Distance Travelled", value: $vehicle.distanceTravelled, field: .distanceTravelled)
                     Divider()
@@ -140,8 +141,8 @@ struct AddFleetVehicleView: View {
                     Divider()
                     vehicleCategoryPicker
                 }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 10)
             }
         }
         .padding(.horizontal)
@@ -213,7 +214,7 @@ struct AddFleetVehicleView: View {
         HStack(alignment: .center, spacing: 16) {
             Text("License Date")
                 .foregroundColor(Color(hex: "#396BAF"))
-                .frame(width: 120, alignment: .leading)
+                .frame(width: 100, alignment: .leading)
             
             VStack(alignment: .leading, spacing: 4) {
                 DatePicker("", selection: $vehicle.licenseRenewalDate, displayedComponents: .date)
