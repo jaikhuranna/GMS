@@ -149,17 +149,23 @@ struct VehicleChecklistView: View {
                     .ignoresSafeArea()
                     .transition(.opacity)
                 
+                // In VehicleChecklistView.swift - Change the TripCompletedCard code:
                 TripCompletedCard(
                     bookingRequestID: bookingRequestID,
                     onHideOverlay: {
                         withAnimation { showCompleted = false }
-                        presentationMode.wrappedValue.dismiss()
-                        // Add root view controller change
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                               let window = windowScene.windows.first {
-                                let driverProfileView = DriverProfile(viewModel: viewModel)
-                                window.rootViewController = UIHostingController(rootView: driverProfileView)
+                        // Don't dismiss immediately, wait for animation to complete
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            // First dismiss current view
+                            presentationMode.wrappedValue.dismiss()
+                            
+                            // Then after dismissal is complete, reset root view controller
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                                   let window = windowScene.windows.first {
+                                    let driverProfileView = DriverProfile(viewModel: viewModel)
+                                    window.rootViewController = UIHostingController(rootView: driverProfileView)
+                                }
                             }
                         }
                     },

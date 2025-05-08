@@ -38,23 +38,50 @@ struct TripCompletedCard: View {
                     .padding()
             }
 
+          
             Button("Done") {
                 isUpdating = true
-                let ref = Firestore.firestore()
-                    .collection("bookingRequests")
+                let db = Firestore.firestore()
+                
+                // 1. First update booking status
+                let ref = db.collection("bookingRequests")
                     .document(bookingRequestID)
                 ref.updateData(["status": "completed"]) { error in
-                    DispatchQueue.main.async {
+                    if let error = error {
+                        errorMessage = "Failed to complete trip: \(error.localizedDescription)"
+                        showError = true
                         isUpdating = false
-                        if let error = error {
-                            errorMessage = "Failed to complete trip: \(error.localizedDescription)"
-                            showError = true
-                        } else {
-                            // First hide overlay, which will dismiss this sheet
-                            onHideOverlay()
-                            
-                            // Navigation happens in the parent view, not here
-                        }
+                    } else {
+                        // 2. Find and update driver's total trips count
+                        db.collection("fleetDrivers")
+                            .whereField("id", isEqualTo: viewModel.userId)
+                            .limit(to: 1)
+                            .getDocuments { (snapshot, error) in
+                                if let doc = snapshot?.documents.first {
+                                    // Get actual document ID
+                                    let driverDocId = doc.documentID
+                                    
+                                    // Update using document ID
+                                    db.collection("fleetDrivers")
+                                        .document(driverDocId)
+                                        .updateData([
+                                            "totalTrips": FieldValue.increment(Int64(1))
+                                        ]) { error in
+                                            isUpdating = false
+                                            if let error = error {
+                                                print("Error updating trip count: \(error)")
+                                            } else {
+                                                print("Successfully incremented totalTrips")
+                                            }
+                                            // 3. Hide overlay and navigate
+                                            onHideOverlay()
+                                        }
+                                } else {
+                                    isUpdating = false
+                                    print("No matching driver found")
+                                    onHideOverlay()
+                                }
+                            }
                     }
                 }
             }
