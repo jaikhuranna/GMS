@@ -380,21 +380,21 @@ private struct ChecklistButton: View {
             VStack(spacing: 16) {
                 Image(systemName: icon)
                     .font(.system(size: 26))
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
                 Text(title)
                     .font(.system(size: 16))
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
                     .multilineTextAlignment(.center)
             }
             .frame(width: 140, height: 140)
             .background(Color.white)
             .cornerRadius(20)
             .shadow(color: Color.gray.opacity(0.1), radius: 2, x: 0, y: 1)
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.blue, lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color(red: 57/255, green: 107/255, blue: 175/255), lineWidth: 1))
             .overlay {
                 if isSelected {
                     Circle()
-                        .fill(Color.blue)
+                        .fill(Color(red: 57/255, green: 107/255, blue: 175/255))
                         .frame(width: 24, height: 24)
                         .overlay(
                             Image(systemName: "checkmark")
