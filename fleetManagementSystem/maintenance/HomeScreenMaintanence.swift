@@ -72,7 +72,7 @@ struct HomeView: View {
                             }
                             .background(
                                 NavigationLink(
-                                    destination: OngoingMaintenanceDetailView(),
+                                    destination: OnGoingMaintenance(),
                                     isActive: $isNavigatingToOngoing,
                                     label: { EmptyView() }
                                 )
@@ -87,7 +87,7 @@ struct HomeView: View {
                             }
                             .background(
                                 NavigationLink(
-                                    destination: UpcomingMaintenanceDetailView(),
+                                    destination: ScheduledListView(),
                                     isActive: $isNavigatingToUpcoming,
                                     label: { EmptyView() }
                                 )
@@ -95,7 +95,7 @@ struct HomeView: View {
                             )
                         }
 
-                        SectionView(title: "Requests") {
+                        
 //                            RequestCard(billId: <#String#>, carNumber: "TN 22 BP 9987", serviceDetail: "Oil Change", totalBill: 3200.0)
                             if !pendingBills.isEmpty {
                                 SectionView(title: "Requests") {
@@ -110,7 +110,7 @@ struct HomeView: View {
                                 }
                             }
 
-                        }
+                        
 
                         SectionView(title: "Inventory") {
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
@@ -276,7 +276,7 @@ struct RequestCard: View {
     }
     
     func approveRequest() {
-        FirebaseModules.shared.updateBillToOngoing(billId: billId, date: selectedDate) { error in
+        FirebaseModules.shared.scheduleMaintenanceDate(billId: billId, date: selectedDate) { error in
             if error == nil {
                 withAnimation {
                     decision = .accepted
@@ -284,6 +284,7 @@ struct RequestCard: View {
             }
         }
     }
+
 
 }
 

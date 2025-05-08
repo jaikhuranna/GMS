@@ -8,11 +8,17 @@ struct GeneratedBillView: View {
     let taskName: String
     let description: String
     let bill: BillSummary
+    
+    @State private var showSuccessAlert = false
+    @Environment(\.dismiss) private var dismiss
+    
+    // Add this to communicate with parent
+    @Binding var shouldClearForm: Bool
+    @Binding var navigateToRoot: Bool
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-
                 // 🔹 Vehicle and Task Info
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -41,7 +47,7 @@ struct GeneratedBillView: View {
                         Text("Name").frame(width: 120, alignment: .leading)
                         Spacer()
                         Text("Qty").frame(width: 50)
-                        Text("Price").frame(width: 70, alignment: .trailing)
+                        Text("Price").frame(width: 76, alignment: .trailing)
                     }
                     .font(.headline)
                     .foregroundColor(Color(hex: "#396BAF"))
@@ -116,6 +122,7 @@ struct GeneratedBillView: View {
                             print("❌ Failed to send bill: \(error.localizedDescription)")
                         } else {
                             print("✅ Bill sent for approval.")
+                            showSuccessAlert = true
                         }
                     }
                 }
@@ -126,15 +133,21 @@ struct GeneratedBillView: View {
                 .cornerRadius(10)
             }
             .padding()
+            .alert("Success", isPresented: $showSuccessAlert) {
+                Button("OK") {
+                    showSuccessAlert = false
+                    shouldClearForm = true  // Signal the parent view to clear form
+                    navigateToRoot = true   // Signal to navigate back to root
+                    dismiss()
+                }
+            } message: {
+                Text("Your request has been sent.")
+            }
         }
         .navigationTitle("Generated Bill")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
-
-
-
-
 
 // MARK: - Preview
 struct GeneratedBillView_Previews: PreviewProvider {
@@ -152,7 +165,9 @@ struct GeneratedBillView_Previews: PreviewProvider {
                 vehicleNo: "KA01AB1234",
                 taskName: "Routine Service",
                 description: "Replaced brake pads and topped up engine oil.",
-                bill: bill
+                bill: bill,
+                shouldClearForm: .constant(false),
+                navigateToRoot: .constant(false)
             )
         }
     }

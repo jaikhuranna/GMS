@@ -532,23 +532,10 @@ class FirebaseModules {
                 }
         }
     
-    //MARK: - Firebase - Change the status to approved
-    func updateBillToOngoing(billId: String, date: Date, completion: ((Error?) -> Void)? = nil) {
-        db.collection("pendingBills").document(billId).updateData([
-            "status": "ongoing",
-            "scheduledDate": Timestamp(date: date)
-        ]) { error in
-            if let error = error {
-                print("❌ Failed to update bill to ongoing:", error.localizedDescription)
-            } else {
-                print("✅ Bill moved to ongoing.")
-            }
-            completion?(error)
-        }
-    }
 
 
 
+    //MARK: - Firebase - Fetch approved bills
     func fetchApprovedBills(completion: @escaping ([PendingBill]) -> Void) {
         db.collection("pendingBills")
             .whereField("status", isEqualTo: "approved")
@@ -574,6 +561,213 @@ class FirebaseModules {
 
                 completion(bills)
             }
+    }
+
+//    //MARK: - Firebase - Fetch ongoing bills
+//    func fetchOngoingMaintenanceTasks(completion: @escaping ([MaintenanceTask]) -> Void) {
+//        db.collection("pendingBills")
+//            .whereField("status", isEqualTo: "ongoing")
+//            .getDocuments { snapshot, error in
+//                guard let documents = snapshot?.documents else {
+//                    print("❌ Failed to fetch ongoing tasks:", error?.localizedDescription ?? "")
+//                    completion([])
+//                    return
+//                }
+//
+//                let tasks = documents.compactMap { doc -> MaintenanceTask? in
+//                    let data = doc.data()
+//                    guard
+//                        let task = data["taskName"] as? String,
+//                        let vehicle = data["vehicleNo"] as? String
+//                    else {
+//                        return nil
+//                    }
+//
+//                    let scheduledDate: Date? = (data["scheduledDate"] as? Timestamp)?.dateValue()
+//                    let dateString = scheduledDate.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) }
+//
+//                    return MaintenanceTask(
+//                        taskTitle: task,
+//                        vehicleNumber: vehicle,
+//                        dateRange: dateString
+//                    )
+//                }
+//
+//                completion(tasks)
+//            }
+//    }
+    
+    
+    //MARK: - Firebase - Fetch Scheduled task
+    func fetchScheduledMaintenanceTasks(completion: @escaping ([MaintenanceTask]) -> Void) {
+        db.collection("pendingBills")
+            .whereField("status", isEqualTo: "scheduled")
+            .getDocuments { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("❌ Failed to fetch scheduled tasks:", error?.localizedDescription ?? "")
+                    completion([])
+                    return
+                }
+
+                let tasks = documents.compactMap { doc -> MaintenanceTask? in
+                    let data = doc.data()
+                    guard
+                        let taskName = data["taskName"] as? String,
+                        let vehicleNo = data["vehicleNo"] as? String
+                    else {
+                        return nil
+                    }
+
+                    let date = (data["scheduledDate"] as? Timestamp)?.dateValue()
+                    let formattedDate = date.map {
+                        DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none)
+                    }
+
+                    return MaintenanceTask(
+                        id: doc.documentID,
+                        taskTitle: taskName,
+                        vehicleNumber: vehicleNo,
+                        dateRange: formattedDate
+                    )
+
+                }
+
+                completion(tasks)
+            }
+    }
+
+
+    
+    //MARK: - Firebase - Change the status to Scheduled
+    func scheduleMaintenanceDate(billId: String, date: Date, completion: ((Error?) -> Void)? = nil) {
+        db.collection("pendingBills").document(billId).updateData([
+            "status": "scheduled",
+            "scheduledDate": Timestamp(date: date)
+        ]) { error in
+            if let error = error {
+                print("❌ Failed to schedule maintenance:", error.localizedDescription)
+            } else {
+                print("✅ Maintenance task scheduled.")
+            }
+            completion?(error)
+        }
+    }
+
+    
+    func uploadScheduledMaintenanceImages(billId: String, images: [UIImage], completion: @escaping (Error?) -> Void) {
+        let storage = Storage.storage()
+        let dispatchGroup = DispatchGroup()
+        var urls: [String] = []
+
+        for (index, image) in images.prefix(4).enumerated() {
+            guard let imageData = image.jpegData(compressionQuality: 0.8) else { continue }
+            let ref = storage.reference().child("scheduledMaintenance/\(billId)_\(index).jpg")
+
+            dispatchGroup.enter()
+            ref.putData(imageData, metadata: nil) { _, error in
+                if let error = error {
+                    dispatchGroup.leave()
+                    print("Upload error: \(error)")
+                    return
+                }
+
+                ref.downloadURL { url, error in
+                    if let url = url {
+                        urls.append(url.absoluteString)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            Firestore.firestore().collection("pendingBills").document(billId).updateData([
+                "status": "ongoing",
+                "maintenanceImages": urls
+            ]) { error in
+                if let error = error {
+                    print("❌ Failed to update bill:", error)
+                }
+                completion(error)
+            }
+        }
+    }
+    
+
+    
+    // MARK: - Firebase - Fetch ongoing bills
+    func fetchOngoingMaintenanceTasks(completion: @escaping ([MaintenanceTask]) -> Void) {
+        db.collection("pendingBills")
+            .whereField("status", isEqualTo: "ongoing")
+            .getDocuments { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("❌ Failed to fetch ongoing tasks:", error?.localizedDescription ?? "")
+                    completion([])
+                    return
+                }
+
+                let tasks = documents.compactMap { doc -> MaintenanceTask? in
+                    let data = doc.data()
+                    guard
+                        let task = data["taskName"] as? String,
+                        let vehicle = data["vehicleNo"] as? String
+                    else {
+                        return nil
+                    }
+
+                    let scheduledDate: Date? = (data["scheduledDate"] as? Timestamp)?.dateValue()
+                    let dateString = scheduledDate.map { DateFormatter.localizedString(from: $0, dateStyle: .medium, timeStyle: .none) }
+
+                    return MaintenanceTask(
+                        id: doc.documentID,
+                        taskTitle: task,
+                        vehicleNumber: vehicle,
+                        dateRange: dateString
+                    )
+                }
+
+                completion(tasks)
+            }
+    }
+    
+    
+    func uploadPostMaintenanceImages(billId: String, images: [UIImage], completion: @escaping (Error?) -> Void) {
+        let storage = Storage.storage()
+        let dispatchGroup = DispatchGroup()
+        var urls: [String] = []
+
+        for (index, image) in images.prefix(4).enumerated() {
+            guard let imageData = image.jpegData(compressionQuality: 0.8) else { continue }
+            let ref = storage.reference().child("postMaintenanceImages/\(billId)_\(index).jpg")
+
+            dispatchGroup.enter()
+            ref.putData(imageData, metadata: nil) { _, error in
+                if let error = error {
+                    dispatchGroup.leave()
+                    print("Upload error: \(error)")
+                    return
+                }
+
+                ref.downloadURL { url, error in
+                    if let url = url {
+                        urls.append(url.absoluteString)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            Firestore.firestore().collection("pendingBills").document(billId).updateData([
+                "status": "in Review",
+                "postMaintenanceImages": urls
+            ]) { error in
+                if let error = error {
+                    print("❌ Failed to update bill:", error)
+                }
+                completion(error)
+            }
+        }
     }
 
 
