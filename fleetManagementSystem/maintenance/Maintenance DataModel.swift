@@ -306,29 +306,29 @@ struct BillRequest: Identifiable {
     let description: String
     let summary: BillSummary
 
-    static func from(_ doc: QueryDocumentSnapshot) -> BillRequest? {
-        let data = doc.data()
+    static func from(_ doc: DocumentSnapshot) -> BillRequest? {
+        let data = doc.data() ?? [:]
+
         guard
             let vehicleNo = data["vehicleNo"] as? String,
             let taskName = data["taskName"] as? String,
             let description = data["description"] as? String,
             let items = data["parts"] as? [[String: Any]]
         else {
-            print("⚠️ Error parsing BillRequest from Firestore.")
             return nil
         }
+
 
         let billItems: [BillItem] = items.enumerated().compactMap { (i, dict) in
             guard
                 let name = dict["name"] as? String,
                 let qty = dict["quantity"] as? Int,
                 let price = dict["price"] as? Int
-            else {
-                return nil
-            }
+            else { return nil }
 
             return BillItem(id: i + 1, name: name, quantity: qty, price: price)
         }
+
 
         let subtotal = data["subtotal"] as? Int ?? 0
         let serviceCharge = data["serviceCharge"] as? Int ?? 500
@@ -345,4 +345,14 @@ struct BillRequest: Identifiable {
             summary: summary
         )
     }
+
 }
+
+struct PendingBill: Identifiable {
+    let id: String
+    let task: String
+    let vehicle: String
+    let amount: Double
+}
+
+

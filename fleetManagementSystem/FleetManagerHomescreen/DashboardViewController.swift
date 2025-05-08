@@ -1,209 +1,142 @@
-//
-//  DashboardViewController.swift
-//  Fleet_Management
-//
-//  Created by admin81 on 22/04/25.
-//
-//import SwiftUI
-//import SwiftUI
-//import Firebase
-//import FirebaseFirestore
-//import Combine
-//
-//
-//
-//struct DashboardView: View {
-//    @StateObject private var dashboard = DashboardService()
-//    
-//    var body: some View {
-//        
-//        VStack(spacing: 22) {
-//            // MARK: – Header
-//            ZStack(alignment: .top) {
-//                RoundedRectangle(cornerRadius: 30, style: .circular)
-//                    .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
-//                    .edgesIgnoringSafeArea(.top)
-//                
-//                HStack {
-//                    VStack(alignment: .leading, spacing: 4) {
-//                        Text("Welcome,")
-//                            .font(.title3)
-//                            .foregroundColor(.black)
-//                        Text("Manager")
-//                            .font(.title2)
-//                            .bold()
-//                            .foregroundColor(.black)
-//                    }
-//                    Spacer()
-//                    HStack(spacing: 20) {
-//                        NavigationLink(destination: PendingBillsView()) {
-//                            Image(systemName: "bell.fill")
-//                        }
-//
-//                        Image(systemName: "person.crop.circle").font(.system(size: 26))
-//                    }
-//                    .foregroundColor(.black)
-//                }
-//                .padding(.horizontal)
-//                .padding(.top, 20)
-//            }
-//            .frame(height: 100)
-//            .zIndex(1)
-//            
-//            // MARK: – Cards + Trips List
-//            ScrollView {
-//                // 1) Info cards grid
-//                VStack(alignment: .leading , spacing: 10){
-//                    LazyVGrid(columns: [ GridItem(.flexible()), GridItem(.flexible()) ], spacing: 10) {
-//                        InfoCardView(card: InfoCard(
-//                            number: "\(dashboard.runningTripsCount)",
-//                            title: "Running Trips",
-//                            icon: "person.line.dotted.person"
-//                        ))
-//                        InfoCardView(card: InfoCard(
-//                            number: "\(dashboard.carsInMaintenanceCount)",
-//                            title: "Cars In Maintenance",
-//                            icon: "car.side.front.open"
-//                        ))
-//                        InfoCardView(card: InfoCard(
-//                            number: "\(dashboard.idleVehiclesCount)",
-//                            title: "Idle Vehicles",
-//                            icon: "car.2"
-//                        ))
-//                        InfoCardView(card: InfoCard(
-//                            number: "\(dashboard.idleDriversCount)",
-//                            title: "Idle Drivers",
-//                            icon: "person.3"
-//                        ))
-//                    }
-//                    .padding(.horizontal)
-//                    
-//                    // 2) Ongoing trips header
-//                    Text("On Going Trips")
-//                        .font(.title3).bold()
-//                        .padding(.horizontal)
-//                    
-//                    // 3) Ongoing trips rows
-//                    VStack(spacing: 12) {
-//                        ForEach(dashboard.ongoingTrips) { trip in
-//                            TripRowView(trip: trip)
-//                                .padding(.horizontal)
-//                        }
-//                    }
-//                    .padding(.bottom, 20)
-//                }
-//            }
-//            .onAppear {
-//                dashboard.fetchAll()
-//            }
-//        }
-//    }
-//}
-//// MARK: - Preview
-//struct DashBoardView: PreviewProvider {
-//    static var previews: some View {
-//        DashboardView()
-//    }
-//}
-
-
 import SwiftUI
 import Firebase
 import FirebaseFirestore
 import Combine
+import CoreLocation
+import MapKit
 
 struct DashboardView: View {
     @StateObject private var dashboard = DashboardService()
+    @StateObject private var notifVM   = NotificationViewModel()
     
+    @State private var currentOffRoute: NotificationItem?
+    @State private var selectedOffRoute: NotificationItem?
+    @State private var showingOffRouteMap = false
+
     var body: some View {
-        VStack(spacing: 22) {
-            // MARK: – Header
-            ZStack(alignment: .top) {
-                RoundedRectangle(cornerRadius: 30, style: .circular)
-                    .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
-                    .edgesIgnoringSafeArea(.top)
-                
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Welcome,")
-                            .font(.title3)
-                            .foregroundColor(.black)
-                        Text("Manager")
-                            .font(.title2)
-                            .bold()
-                            .foregroundColor(.black)
-                    }
-                    Spacer()
-                    HStack(spacing: 20) {
-//                        NavigationLink(destination: PendingBillsView()) {
-//                            Image(systemName: "bell.fill")
-//                        }
-                        
-                        NavigationLink(destination: ManagerProfileView(viewModel: AuthViewModel())) {
-                            Image(systemName: "person.crop.circle")
-                                .font(.system(size: 26))
-                        }
-                    }
-                    .foregroundColor(.black)
+        NavigationStack {
+            VStack(spacing: 22) {
+                header
+
+                ScrollView {
+                    statsGrid
+                    ongoingSection
                 }
-                .padding(.horizontal)
-                .padding(.top, 20)
+                .onAppear {
+                    dashboard.fetchAll()
+                    notifVM.fetchAllNotifications()
+                }
+                .onReceive(notifVM.$offRouteAlerts) { alerts in
+                    currentOffRoute = alerts.first
+                }
             }
-            .frame(height: 100)
-            .zIndex(1)
             
-            // MARK: – Cards + Trips List
-            ScrollView {
-                // 1) Info cards grid
-                VStack(alignment: .leading, spacing: 10) {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                        InfoCardView(card: InfoCard(
-                            number: "\(dashboard.runningTripsCount)",
-                            title: "Running Trips",
-                            icon: "person.line.dotted.person"
-                        ))
-                        InfoCardView(card: InfoCard(
-                            number: "\(dashboard.carsInMaintenanceCount)",
-                            title: "Cars In Maintenance",
-                            icon: "car.side.front.open"
-                        ))
-                        InfoCardView(card: InfoCard(
-                            number: "\(dashboard.idleVehiclesCount)",
-                            title: "Idle Vehicles",
-                            icon: "car.2"
-                        ))
-                        InfoCardView(card: InfoCard(
-                            number: "\(dashboard.idleDriversCount)",
-                            title: "Idle Drivers",
-                            icon: "person.3"
-                        ))
-                    }
-                    .padding(.horizontal)
-                    
-                    // 2) Ongoing trips header
-                    Text("On Going Trips")
-                        .font(.title3).bold()
-                        .padding(.horizontal)
-                    
-                    // 3) Ongoing trips rows
-                    VStack(spacing: 12) {
-                        ForEach(dashboard.ongoingTrips) { trip in
-                            TripRowView(trip: trip)
-                                .padding(.horizontal)
+                    .alert(item: $currentOffRoute) { alert in
+                        // now binding all six slots (use underscores for the ones you don’t care about)
+                        guard case let .offRoute(vehicle, driverId, _, _, _, _) = alert else {
+                            return Alert(title: Text("Alert"),
+                                         message: Text("Unknown alert type"),
+                                         dismissButton: .default(Text("OK")))
                         }
+                        return Alert(
+                            title: Text("Vehicle Off-Route"),
+                            message: Text("Vehicle \(vehicle) driven by \(driverId) has left the assigned route."),
+                            primaryButton: .default(Text("View on Map")) {
+                                selectedOffRoute = alert
+                                showingOffRouteMap = true
+                            },
+                            secondaryButton: .cancel()
+                        )
                     }
-                    .padding(.bottom, 20)
+            
+            .fullScreenCover(isPresented: $showingOffRouteMap) {
+                // full-screen modal map
+                if let off = selectedOffRoute {
+                    OffRouteMapView(alert: off)
+                } else {
+                    Text("No location available")
+                        .font(.headline)
+                        .padding()
                 }
             }
-            .onAppear {
-                dashboard.fetchAll()
+        }
+    }
+
+    // MARK: – Header
+    private var header: some View {
+        ZStack(alignment: .top) {
+            RoundedRectangle(cornerRadius: 30)
+                .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
+                .ignoresSafeArea(edges: .top)
+
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Welcome,").font(.title3)
+                    Text("Manager").font(.title2).bold()
+                }
+                Spacer()
+                HStack(spacing: 20) {
+                    NavigationLink(destination: NotificationScreen()) {
+                        Image(systemName: "bell.fill")
+                    }
+                    Image(systemName: "person.crop.circle")
+                        .font(.system(size: 26))
+                }
             }
+            .padding(.horizontal)
+            .padding(.top, 20)
+        }
+        .frame(height: 100)
+        .zIndex(1)
+    }
+
+    // MARK: – Stats Grid
+    private var statsGrid: some View {
+        LazyVGrid(
+            columns: [ GridItem(.flexible()), GridItem(.flexible()) ],
+            spacing: 10
+        ) {
+            InfoCardView(card: .init(
+                number: "\(dashboard.runningTripsCount)",
+                title: "Running Trips",
+                icon: "person.line.dotted.person"
+            ))
+            InfoCardView(card: .init(
+                number: "\(dashboard.carsInMaintenanceCount)",
+                title: "Cars In Maintenance",
+                icon: "car.side.front.open"
+            ))
+            InfoCardView(card: .init(
+                number: "\(dashboard.idleVehiclesCount)",
+                title: "Idle Vehicles",
+                icon: "car.2"
+            ))
+            InfoCardView(card: .init(
+                number: "\(dashboard.idleDriversCount)",
+                title: "Idle Drivers",
+                icon: "person.3"
+            ))
+        }
+        .padding(.horizontal)
+    }
+
+    // MARK: – Ongoing Trips Section
+    private var ongoingSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("On Going Trips")
+                .font(.title3).bold()
+                .padding(.horizontal)
+
+            ForEach(dashboard.ongoingTrips) { trip in
+                TripRowView(trip: trip)
+                    .padding(.horizontal)
+            }
+            .padding(.bottom, 20)
         }
     }
 }
 
-// MARK: - Preview
-struct DashBoardView: PreviewProvider {
+struct DashboardView_Previews: PreviewProvider {
     static var previews: some View {
         DashboardView()
     }

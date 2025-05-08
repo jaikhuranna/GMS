@@ -5,6 +5,9 @@ import SwiftUI
 struct HomeView: View {
     // Use the shared viewModel passed from MaintenanceTabView
     @ObservedObject var viewModel: AuthViewModel
+    @State private var pendingBills: [PendingBill] = []
+
+    
     
     let inventoryItems: [InventoryItem] = [
         InventoryItem(name: "Brake Pad", quantity: 2, price: 150.0, partID: "BR123"),
@@ -37,8 +40,11 @@ struct HomeView: View {
                         }
                         Spacer()
                         HStack(spacing: 16) {
-                            Image(systemName: "bell.fill").font(.system(size: 25))
+                          
                             // Settings button
+                            NavigationLink(destination: MaintenanceNotificationScreen()) {
+                                Image(systemName: "bell.fill").font(.system(size: 25))
+                            }
                             Button(action: {
                                 showProfile = true
                             }) {
@@ -90,7 +96,20 @@ struct HomeView: View {
                         }
 
                         SectionView(title: "Requests") {
-                            RequestCard(carNumber: "TN 22 BP 9987", serviceDetail: "Oil Change", totalBill: 3200.0)
+//                            RequestCard(billId: <#String#>, carNumber: "TN 22 BP 9987", serviceDetail: "Oil Change", totalBill: 3200.0)
+                            if !pendingBills.isEmpty {
+                                SectionView(title: "Requests") {
+                                    ForEach(pendingBills) { bill in
+                                        RequestCard(
+                                            billId: bill.id,
+                                            carNumber: bill.vehicle,
+                                            serviceDetail: bill.task,
+                                            totalBill: bill.amount
+                                        )
+                                    }
+                                }
+                            }
+
                         }
 
                         SectionView(title: "Inventory") {
@@ -108,6 +127,11 @@ struct HomeView: View {
             }
             .background(Color.white)
             .navigationBarHidden(true)
+            .onAppear {
+                           FirebaseModules.shared.fetchApprovedBills { bills in
+                               self.pendingBills = bills
+                           }
+                       }
             .fullScreenCover(isPresented: $showProfile) {
                 MaintenanceProfileView(viewModel: viewModel)
             }
@@ -165,6 +189,7 @@ struct SectionView<Content: View>: View {
 }
 
 struct RequestCard: View {
+    let billId: String
     let carNumber: String
     let serviceDetail: String
     let totalBill: Double
@@ -212,7 +237,17 @@ struct RequestCard: View {
                             DatePicker("", selection: $selectedDate, in: Date()..., displayedComponents: .date)
                                 .labelsHidden()
                                 .datePickerStyle(.compact)
-                        } else {
+
+                            Button("Confirm Date & Approve") {
+                                approveRequest()
+                            }
+                            .font(.subheadline)
+                            .padding(6)
+                            .background(Color.green.opacity(0.2))
+                            .cornerRadius(8)
+                        }
+
+                        else {
                             HStack {
                                 Spacer()
                                 Button(action: {
@@ -239,6 +274,17 @@ struct RequestCard: View {
         .cornerRadius(20)
         .shadow(color: .gray.opacity(0.05), radius: 2, x: 0, y: 1)
     }
+    
+    func approveRequest() {
+        FirebaseModules.shared.updateBillToOngoing(billId: billId, date: selectedDate) { error in
+            if error == nil {
+                withAnimation {
+                    decision = .accepted
+                }
+            }
+        }
+    }
+
 }
 
 struct InventoryCard2: View {
@@ -272,6 +318,3 @@ struct InventoryCard2: View {
         .cornerRadius(20)
     }
 }
-
-
-
