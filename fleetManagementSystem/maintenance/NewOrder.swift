@@ -7,14 +7,14 @@ struct OrderFormView: View {
     let itemType: String
     @Binding var inventoryItems: [InventoryItem]
     @Binding var showSheet: Bool
-    
+
     init(itemType: String, inventoryItems: Binding<[InventoryItem]>, showSheet: Binding<Bool>) {
         _newItem = State(initialValue: OrderItem(name: "", quantity: 1, partID: "", price: ""))
         self.itemType = itemType
         self._inventoryItems = inventoryItems
         self._showSheet = showSheet
     }
-    
+
     var body: some View {
         ZStack {
             Color.black.opacity(0.4)
@@ -22,42 +22,45 @@ struct OrderFormView: View {
                 .onTapGesture {
                     showSheet = false
                 }
-            
+
             VStack(spacing: 20) {
                 Text("Order New \(itemType)")
                     .font(.title2)
                     .foregroundColor(Color(hex: "396BAF"))
                     .padding(.top)
-                
+
                 VStack(spacing: 16) {
-                    HStack {
-                        Text("Name").foregroundColor(Color(hex: "396BAF"))
-                        Spacer()
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Name")
+                            .foregroundColor(Color(hex: "396BAF"))
                         TextField("Enter Name", text: $newItem.name)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding(.horizontal)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
                     }
-                    
-                    HStack {
-                        Text("Quantity").foregroundColor(Color(hex: "396BAF"))
-                        Spacer()
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Quantity")
+                            .foregroundColor(Color(hex: "396BAF"))
                         TextField("Enter Quantity", value: $newItem.quantity, formatter: NumberFormatter())
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
                             .keyboardType(.numberPad)
-                            .padding(.horizontal)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
                     }
-                    
-                    HStack {
-                        Text("Price").foregroundColor(Color(hex: "396BAF"))
-                        Spacer()
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Price")
+                            .foregroundColor(Color(hex: "396BAF"))
                         TextField("Enter Price", text: $newItem.price)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
                             .keyboardType(.decimalPad)
-                            .padding(.horizontal)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
                     }
                 }
-                .padding()
-                
+                .padding(.horizontal)
+
                 Button(action: placeOrder) {
                     Text("Place Order")
                         .foregroundColor(.white)
@@ -80,28 +83,26 @@ struct OrderFormView: View {
                 title: Text("Error"),
                 message: Text(alertMessage),
                 dismissButton: .default(Text("OK"))
-                )
+            )
         }
     }
-    
+
     private func placeOrder() {
-        // Validate inputs
         guard !newItem.name.isEmpty else {
             showAlert(message: "Please enter a name for the item")
             return
         }
-        
+
         guard let price = Double(newItem.price), price > 0 else {
             showAlert(message: "Please enter a valid price")
             return
         }
-        
+
         guard newItem.quantity > 0 else {
             showAlert(message: "Please enter a valid quantity")
             return
         }
-        
-        // Create and add the new item
+
         withAnimation {
             let item = InventoryItem(
                 name: newItem.name,
@@ -109,16 +110,15 @@ struct OrderFormView: View {
                 price: price,
                 partID: itemType == "Parts" ? newItem.partID : ""
             )
-            
+
             inventoryItems.append(item)
             FirebaseModules.shared.addInventoryItem(item)
-            
-            // Reset form and close sheet
+
             newItem = OrderItem(name: "", quantity: 1, partID: "", price: "")
             showSheet = false
         }
     }
-    
+
     private func showAlert(message: String) {
         alertMessage = message
         showAlert = true

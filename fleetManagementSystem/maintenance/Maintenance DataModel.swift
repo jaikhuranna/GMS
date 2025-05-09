@@ -70,14 +70,14 @@ struct InventoryCard: View {
             
             Spacer()
             
-            Button(action: {}) {
-                Text("Restock")
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
+//            Button(action: {}) {
+//                Text("Restock")
+//                    .padding(.horizontal)
+//                    .padding(.vertical, 8)
+//                    .background(Color.green)
+//                    .foregroundColor(.white)
+//                    .cornerRadius(10)
+//            }
         }
         .padding()
         .background(Color(.systemGray6))
@@ -273,6 +273,8 @@ struct MaintenanceCardView: View {
     }
 }
 
+
+//MARK: Creating Bill
 struct BillSummary {
     let billItems: [BillItem]
     let subtotal: Int

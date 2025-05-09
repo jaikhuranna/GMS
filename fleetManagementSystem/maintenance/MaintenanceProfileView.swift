@@ -70,14 +70,14 @@ struct MaintenanceProfileView: View {
                 VStack(spacing: 24) {
                     // Name and Contact Info
                     VStack(spacing: 1) {
-                        Text("Alex Johnson")
+                        Text("Ramesh")
                             .font(.title)
                             .bold()
                             .foregroundColor(.primary)
 
 
                         HStack(spacing: 0) {
-                            ContactInfoView(icon: "envelope.fill", text: "manager@fleet.com")
+                            ContactInfoView(icon: "envelope.fill", text: "rameshmaintainer@gmail.com")
                         }
                         .padding(.top, 8)
                     }
@@ -160,10 +160,7 @@ struct MaintenanceProfileView: View {
         }
        // This ensures the header can extend to top edge
 }
-        
 
-
-// Rest of your structs remain the same...
 struct MaintenanceProfileStatCard: View {
     let title: String
     let value: String
@@ -207,8 +204,6 @@ struct ContactInfoView: View {
         }
     }
 }
-
-
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {

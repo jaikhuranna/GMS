@@ -17,12 +17,23 @@ struct MaintenanceReport: Identifiable {
 
 final class MaintenanceNotificationViewModel: ObservableObject {
     @Published var reports: [MaintenanceReport] = []
+    @Published var approvedTasks: [NotificationData] = []
+
+    func fetchApprovedTasks() {
+        FirebaseModules.shared.fetchApprovedBills { items in
+            print("✅ Approved tasks fetched: \(items.count)")
+            DispatchQueue.main.async {
+                self.approvedTasks = items
+            }
+        }
+    }
 
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
 
     init() {
         fetchReports()
+        fetchApprovedTasks()
     }
 
     deinit {
@@ -88,9 +99,7 @@ struct MaintenanceNotificationScreen: View {
                     )
                 }
 
-                // ————————————————————————————
-                //  Static “Requests” Section
-                // ————————————————————————————
+                //  Requests Section
                 SectionView2(title: "Requests", items: [
                     NotificationData(
                         statusMessage: "Fleet Manager has raised a request",
@@ -105,24 +114,12 @@ struct MaintenanceNotificationScreen: View {
                         vehicle: "KN23CB4563"
                     )
                 ])
-
                 // ————————————————————————————
                 //  Static “Post Maintenance Reviews” Section
                 // ————————————————————————————
-                SectionView2(title: "Post Maintenance Reviews", items: [
-                    NotificationData(
-                        statusMessage: "Your work has been approved.",
-                        statusColor: .green,
-                        task: "Tire Replace Task",
-                        vehicle: "KN23CB4563"
-                    ),
-                    NotificationData(
-                        statusMessage: "Need to do the work again.",
-                        statusColor: .red,
-                        task: "Tire Replace Task",
-                        vehicle: "KN23CB4563"
-                    )
-                ])
+                if !viewModel.approvedTasks.isEmpty {
+                       SectionView2(title: "Post Maintenance Reviews", items: viewModel.approvedTasks)
+                   }
             }
             .padding()
         }
@@ -156,8 +153,8 @@ struct NotificationData: Identifiable {
     let statusColor: Color
     let task: String
     let vehicle: String
-    var date: Date? = nil       // optional: only used for real reports
-    var notes: String? = nil    // optional: only used for real reports
+    var date: Date? = nil
+    var notes: String? = nil
 }
 
 struct NotificationCard: View {
@@ -212,9 +209,6 @@ struct NotificationCard: View {
         .cornerRadius(12)
     }
 }
-
-// MARK: - Hex Color Helper
-
 
 // MARK: - Preview
 

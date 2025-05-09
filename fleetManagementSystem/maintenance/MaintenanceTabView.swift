@@ -36,8 +36,13 @@ struct MaintenanceTabView: View {
                 .tabItem {
                     Label("Inventory", systemImage: "shippingbox.fill")
                 }
-            
-            
+        }
+        .accentColor(Color(hex: "396BAF"))
+        .onAppear {
+            // Set translucent tab bar appearance
+            let appearance = UITabBarAppearance()
+            appearance.configureWithDefaultBackground()
+            UITabBar.appearance().scrollEdgeAppearance = appearance
         }
     }
 }
