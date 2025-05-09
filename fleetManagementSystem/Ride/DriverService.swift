@@ -53,7 +53,21 @@ class DriverService: ObservableObject {
                 }
                 
                 // Use default values if stats aren't available yet
-                let totalTripsInt = (data["totalTrips"] as? String).flatMap(Int.init) ?? 0
+//                let totalTripsInt = (data["totalTrips"] as? String).flatMap(Int.init) ?? 0
+                
+                
+                var totalTripsInt = 0
+                if let trips = data["totalTrips"] as? Int {
+                    totalTripsInt = trips
+                } else if let trips = data["totalTrips"] as? Int64 {
+                    totalTripsInt = Int(trips)
+                } else if let trips = data["totalTrips"] as? Double {
+                    totalTripsInt = Int(trips)
+                } else if let trips = data["totalTrips"] as? String, let parsed = Int(trips) {
+                    totalTripsInt = parsed
+                }
+
+                
                 let totalTimeDouble = (data["totalTime"] as? String).flatMap(Double.init) ?? 0
                 let totalDistanceDouble = (data["totalDistance"] as? String).flatMap(Double.init) ?? 0
                 

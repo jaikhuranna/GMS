@@ -13,11 +13,11 @@ struct EmergencyHelpView: View {
   
 
     // Hard‑coded numbers for demo
-    private let fleetManagerNumber = "18001234567"
-    private let policeNumber       = "18007654321"
-    private let ambulanceNumber    = "18005551234"
-    private let hospitalNumber     = "18009876543"
-    private let maintenanceNumber  = "18002223344"
+    private let fleetManagerNumber = "‭8310541255‬"
+    private let policeNumber       = "100"
+    private let ambulanceNumber    = "102"
+    private let hospitalNumber     = "102"
+    private let maintenanceNumber  = "9354883198"
 
     var body: some View {
         VStack(spacing: 32) {
