@@ -131,15 +131,6 @@ struct LoginView: View {
                         }
                     }
                     
-                    HStack {
-                        Spacer()
-                        Button("Forgot password?") {
-                            // Action for forgot password
-                        }
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(Color(red: 51/255, green: 102/255, blue: 204/255))
-                        .padding(.trailing, 4)
-                    }
                 }
                 .padding(.bottom, 12)
                 
@@ -158,13 +149,6 @@ struct LoginView: View {
                     .cornerRadius(6)
                 }
                 .padding(.top, 8)
-                
-                Button(action: viewModel.register) {
-                    Text("Don't have an account? Sign Up")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(Color(red: 51/255, green: 102/255, blue: 204/255))
-                }
-                .padding(.top, 12)
                 
                 Spacer()
                 
