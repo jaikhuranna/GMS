@@ -70,14 +70,14 @@ struct MaintenanceProfileView: View {
                 VStack(spacing: 24) {
                     // Name and Contact Info
                     VStack(spacing: 1) {
-                        Text("Alex Johnson")
+                        Text("Ramesh")
                             .font(.title)
                             .bold()
                             .foregroundColor(.primary)
 
 
                         HStack(spacing: 0) {
-                            ContactInfoView(icon: "envelope.fill", text: "manager@fleet.com")
+                            ContactInfoView(icon: "envelope.fill", text: "rameshmaintainer@gmail.com")
                         }
                         .padding(.top, 8)
                     }

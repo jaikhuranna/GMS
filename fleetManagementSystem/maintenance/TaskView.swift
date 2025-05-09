@@ -363,16 +363,22 @@ struct TaskView: View {
                 .scaledToFill()
                 .frame(width: 80, height: 80)
                 .clipShape(RoundedRectangle(cornerRadius: 5))
+                .clipped()
 
             Button(action: {
                 selectedImages.remove(at: index)
             }) {
                 Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 20))
                     .foregroundColor(.red)
-                    .background(Color.white.clipShape(Circle()))
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .shadow(radius: 1)
             }
-            .offset(x: 5, y: -5)
+            .padding(6) // gives spacing from top and trailing edge
         }
+        .frame(width: 80, height: 80)
+        .clipShape(RoundedRectangle(cornerRadius: 5))
     }
 
     private func sectionDivider() -> some View {
@@ -415,17 +421,15 @@ struct TaskView: View {
             FirebaseModules.shared.addMaintenanceTask(taskData, taskId: taskId) { error in
                 isSaving = false
                 if let error = error {
-                    print("❌ Failed to save task: \(error.localizedDescription)")
+                    print("Failed to save task: \(error.localizedDescription)")
                 } else {
-                    print("✅ Maintenance task saved.")
+                    print("Maintenance task saved.")
                     showGeneratedBill = true
                 }
             }
         }
     }
 }
-
-
 
 // MARK: - Models
 

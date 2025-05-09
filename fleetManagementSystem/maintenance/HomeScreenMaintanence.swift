@@ -69,7 +69,7 @@ struct HomeView: View {
                             Button(action: {
                                 isNavigatingToOngoing = true
                             }) {
-                                TaskSummaryCard(title: "On Going Tasks", count: 5, icon: "hammer")
+                                TaskSummaryCard(title: "On Going Tasks", count: 1, icon: "hammer")
                             }
                             .background(
                                 NavigationLink(
@@ -84,7 +84,7 @@ struct HomeView: View {
                             Button(action: {
                                 isNavigatingToUpcoming = true
                             }) {
-                                TaskSummaryCard(title: "Scheduled Tasks", count: 4, icon: "calendar")
+                                TaskSummaryCard(title: "Scheduled Tasks", count: 2, icon: "calendar")
                             }
                             .background(
                                 NavigationLink(
