@@ -36,6 +36,24 @@ struct FuelLogScreen: View {
         .background(Color(red: 57/255, green: 107/255, blue: 175/255))
         .cornerRadius(24, corners: [.topLeft, .topRight])
 
+        // Large, nice truck image
+        HStack {
+          Spacer()
+          Rectangle()
+            .fill(Color.blue)
+            .frame(width: 700, height: 357)
+            .overlay(
+              Image("truck")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+            )
+            .border(Color.blue, width: 2)
+          Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(Color.yellow.opacity(0.3)) // Debug background
+
         // — White card with fuel controls —
         VStack(spacing: 16) {
           Text("Log Fuel Level")
@@ -79,8 +97,10 @@ struct FuelLogScreen: View {
         .background(Color.white)
         .cornerRadius(24, corners: [.topLeft, .topRight])
       }
+      .frame(maxWidth: .infinity)
       .padding(.bottom)
     }
+    .frame(maxWidth: .infinity)
     .alert("Fuel Level Logged",
            isPresented: $showConfirm,
            actions: { Button("OK", role: .cancel) { dismiss() } },

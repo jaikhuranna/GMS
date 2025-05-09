@@ -71,9 +71,9 @@ class NavigationViewModel: NSObject, ObservableObject {
     var distanceToNextStepText: String {
         if distanceToNextStep >= 1000 {
             let km = distanceToNextStep / 1000
-            return String(format: "%.1f km", km)
+            return String(format: "%.1f km Covered", km)
         } else {
-            return String(format: "%dm", Int(distanceToNextStep))
+            return String(format: "%dm Remaining", Int(distanceToNextStep))
         }
     }
     var timeToNextStepText: String {
@@ -452,32 +452,27 @@ struct OffRouteSheet: View {
                 .onTapGesture { /* block taps */ }
 
             VStack(spacing: 0) {
-                Spacer(minLength: 0)
-                VStack(spacing: 28) {
-                    Capsule()
-                        .frame(width: 48, height: 6)
-                        .foregroundColor(Color.gray.opacity(0.18))
-                        .padding(.top, 18)
-                        .padding(.bottom, 8)
-
+                Spacer(minLength: 32)
+                VStack(spacing: 32) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 54))
                         .foregroundColor(.yellow)
+                        .padding(.top,10)
                         .padding(.bottom, 2)
 
                     Text("You're off the route")
-                        .font(.system(size: 26, weight: .bold))
+                        .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.black)
                         .multilineTextAlignment(.center)
                         .padding(.bottom, 2)
 
                     Text("Your current location is outside the defined geofence boundary. Please return to the assigned route to avoid delays or violations.")
-                        .font(.system(size: 16))
+                        .font(.system(size: 17))
                         .foregroundColor(Color.gray)
                         .multilineTextAlignment(.center)
-                        .lineSpacing(2)
-                        .padding(.horizontal, 8)
-                        .padding(.bottom, 8)
+                        .lineSpacing(4)
+                        .padding(.horizontal, 30)
+                        .padding(.bottom, 18)
 
                     VStack(spacing: 14) {
                         Button(action: {
@@ -487,7 +482,7 @@ struct OffRouteSheet: View {
                             Text("View Route")
                                 .font(.system(size: 18, weight: .semibold))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, 18)
                                 .background(Color(red: 57/255, green: 107/255, blue: 175/255))
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
@@ -498,7 +493,7 @@ struct OffRouteSheet: View {
                             Text("Contact Manager (\(countdown)s)")
                                 .font(.system(size: 18, weight: .semibold))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
+                                .padding(.vertical, 18)
                                 .background(Color.red)
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
@@ -507,12 +502,13 @@ struct OffRouteSheet: View {
                     .padding(.horizontal, 8)
                     .padding(.bottom, 8)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 32)
                 .padding(.bottom, 24)
                 .background(Color.white)
                 .cornerRadius(28)
                 .shadow(color: Color.black.opacity(0.10), radius: 18, x: 0, y: 8)
                 .frame(maxWidth: 420)
+                .padding(.horizontal, 16)
                 Spacer(minLength: 0)
             }
             .onReceive(timer) { _ in
@@ -631,16 +627,11 @@ struct NavigationMapView: View {
             Button { navigateToSOS = true } label: {
                 Text("SOS")
                     .font(.subheadline).bold()
-                    .padding(8)
+                    .padding(15)
                     .background(Color.red)
                     .clipShape(Circle())
                     .foregroundColor(.white)
             }
-            Image(systemName: "person.circle.fill")
-                .resizable()
-                .frame(width: 32, height: 32)
-                .foregroundColor(.white)
-                .padding(.leading, 8)
         }
         .padding()
         .background(Color(red: 57/255, green: 107/255, blue: 175/255))
@@ -652,14 +643,11 @@ struct NavigationMapView: View {
          let rem   = max(0, total - vm.distanceCovered)
 
          return HStack {
-             Button { /* share action */ } label: {
-                 Image(systemName: "square.and.arrow.up")
-             }
              Spacer()
 
-             Text(String(format: "%.1f km", vm.distanceCovered / 1000))
+             Text(String(format: "%.1f km Covered", vm.distanceCovered / 1000))
              Text("•")
-             Text(String(format: "%.1f km", rem / 1000))
+             Text(String(format: "%.1f km Remaining", rem / 1000))
          }
          .padding()
          .background(Color.black.opacity(0.8))
@@ -688,9 +676,9 @@ struct NavigationMapView: View {
          if t.contains("left")  { return "arrow.turn.up.left"  }
          if t.contains("right") { return "arrow.turn.up.right" }
          if t.contains("straight") || t.contains("continue") {
-             return "arrow.up"
+             return "truck.box.fill"
          }
-         return "arrow.up"
+         return "truck.box.fill"
      }
  
 
@@ -750,9 +738,7 @@ struct NavigationMapView: View {
                 .background(Color.white)
                 .cornerRadius(24, corners: [.topLeft, .topRight])
                 .padding(.horizontal)
-                .padding(.bottom,
-                    UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
-                )
+                .ignoresSafeArea(.container, edges: .bottom)
             }
             }
             .zIndex(1)
@@ -1022,53 +1008,35 @@ struct ArrivalSheet: View {
     let onEnd: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Capsule()
-                .frame(width: 40, height: 6)
-                .foregroundColor(.gray.opacity(0.4))
-                .padding(.top, 8)
-
+        VStack(spacing: 32) {
             Text("Arrived")
-                .font(.title2).bold()
+                .font(.system(size: 28, weight: .bold))
+                .padding(.top, 24)
 
             Text("On your left: \(name)")
-                .font(.subheadline)
+                .font(.system(size: 18))
                 .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
 
-            HStack {
-                Text("Rate your route")
-                    .font(.subheadline)
-                Spacer()
-                Button(action: {}) {
-                    Image(systemName: "hand.thumbsup.fill")
-                        .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
-                }
-                Button(action: {}) {
-                    Image(systemName: "hand.thumbsdown.fill")
-                        .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
-                }
-            }
-            .padding()
-            .background(Color.white)
-            .cornerRadius(12)
-
-            Button(action: onEnd
-                // handle end navigation
-            ) {
+            Button(action: onEnd) {
                 Text("End Navigation")
-                    .font(.headline)
+                    .font(.system(size: 20, weight: .semibold))
                     .frame(maxWidth: .infinity)
-                    .padding()
+                    .padding(.vertical, 18)
                     .background(Color.red)
                     .foregroundColor(.white)
-                    .cornerRadius(12)
+                    .cornerRadius(14)
             }
         }
-        .padding()
+        .padding(.horizontal, 32)
+        .padding(.vertical, 32)
         .background(Color(UIColor.systemBackground))
-        .cornerRadius(24)
-        .shadow(radius: 6)
-        .padding(.horizontal)
+        .cornerRadius(28)
+        .shadow(color: Color.black.opacity(0.10), radius: 18, x: 0, y: 8)
+        .frame(maxWidth: 420)
+        .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 }
 

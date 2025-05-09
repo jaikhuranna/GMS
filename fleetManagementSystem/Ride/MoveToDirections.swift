@@ -149,7 +149,7 @@ struct MoveToDirections: View {
                     .background(Color(red: 57/255, green: 107/255, blue: 175/255).opacity(0.9))
                     .cornerRadius(12)
                     .padding(.horizontal)
-                    .padding(.bottom, 30)
+                    .ignoresSafeArea(.container, edges: .bottom)
                 }
             }
             .alert("SOS Activated", isPresented: $viewModel.showSOSAlert) {

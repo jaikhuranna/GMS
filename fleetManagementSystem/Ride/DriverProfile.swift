@@ -77,7 +77,7 @@ struct DriverProfile: View {
                             }
                             
                             TripLocationView(
-                                icon: "arrow.up.circle.fill",
+                                icon: "location.circle.fill",
                                 iconColor: .green,
                                 title: trip.pickupName,
                                 subtitle: trip.pickupAddress
@@ -89,7 +89,7 @@ struct DriverProfile: View {
                                 .padding(.leading, 10)
                             
                             TripLocationView(
-                                icon: "arrow.down.circle.fill",
+                                icon: "mappin.and.ellipse.circle.fill",
                                 iconColor: .red,
                                 title: trip.dropoffName,
                                 subtitle: trip.dropoffAddress
