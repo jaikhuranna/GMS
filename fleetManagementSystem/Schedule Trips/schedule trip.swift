@@ -453,8 +453,8 @@ private struct DoneButton: View {
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(isDisabled
-                                ? Color.gray.opacity(0.5)
-                                : Color(hex: "396BAF"))
+                                ? Color(.systemGray).opacity(0.5)
+                                : Color.accentColor)
                 .foregroundColor(.white)
                 .cornerRadius(16)
         }

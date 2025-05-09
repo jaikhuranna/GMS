@@ -131,23 +131,23 @@ struct InfoCardView: View {
                 Text(card.number)
                     .font(.title)
                     .bold()
-                    .foregroundColor(Color(hex: "#396BAF"))
+                    .foregroundColor(Color.accentColor)
                 Spacer()
                 ZStack {
                     Circle()
-                        .fill(Color.white)
+                        .fill(Color(.systemBackground))
                         .frame(width: 50, height: 50) // Increased size here
                     Image(systemName: card.icon)
                         .font(.system(size: 20))
-                        .foregroundColor(Color(hex: "#396BAF"))
+                        .foregroundColor(Color.accentColor)
                 }
             }
             Text(card.title)
                 .font(.subheadline)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(Color.accentColor)
         }
         .padding()
-        .background(Color(red: 237/255, green: 242/255, blue: 252/255))
+        .background(Color(.systemGray6))
         .cornerRadius(16)
     }
 }

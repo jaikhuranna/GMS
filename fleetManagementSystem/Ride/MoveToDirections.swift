@@ -5,6 +5,7 @@ struct MoveToDirections: View {
     @StateObject private var viewModel = NavigationViewModelDirections()
     @Environment(\.presentationMode) private var presentationMode // Add this line to get the presentation mode
     @State private var navigateToSOS = false
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         NavigationView {  // Wrap the view inside NavigationView
@@ -81,7 +82,7 @@ struct MoveToDirections: View {
                     .padding(.top, 40)
                     .padding(.horizontal)
                     .frame(maxWidth: .infinity)
-                    .background(Color(red: 57/255, green: 107/255, blue: 175/255))
+                    .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(red: 57/255, green: 107/255, blue: 175/255))
 
                     // Current Instruction
                     HStack {
@@ -146,7 +147,7 @@ struct MoveToDirections: View {
                     }
                     .foregroundColor(.white)
                     .padding()
-                    .background(Color(red: 57/255, green: 107/255, blue: 175/255).opacity(0.9))
+                    .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(red: 57/255, green: 107/255, blue: 175/255).opacity(0.9))
                     .cornerRadius(12)
                     .padding(.horizontal)
                     .ignoresSafeArea(.container, edges: .bottom)

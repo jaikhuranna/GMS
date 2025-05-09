@@ -20,6 +20,7 @@ struct PostTripInspectionView: View {
     @State private var selectedItems = Set<String>()
     @Environment(\.presentationMode) var presentation
     private let db = Firestore.firestore()
+    @Environment(\.colorScheme) var colorScheme
     
     private func toggle(_ item: String) {
        if selectedItems.contains(item) {
@@ -56,7 +57,7 @@ struct PostTripInspectionView: View {
                 // balance space
                 Color.clear.frame(width: 44, height: 44)
             }
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color.white)
             
             // — Checklist Grid —
             ScrollView {
@@ -133,6 +134,7 @@ struct PostripInspectionViewcard: View {
     let isSelected: Bool
     var multiline: Bool = false
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         Button(action: action) {
@@ -146,7 +148,7 @@ struct PostripInspectionViewcard: View {
                     .multilineTextAlignment(.center)
             }
             .frame(width: 140, height: 140)
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color.white)
             .cornerRadius(20)
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color(red: 57/255, green: 107/255, blue: 175/255), lineWidth: 1))
             .overlay(
@@ -177,6 +179,7 @@ struct RouteCompleteView: View {
 
     @State private var showFuelLog  = false
     @State private var showPostTrip = false
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -219,7 +222,7 @@ struct RouteCompleteView: View {
                 }
             }
             .padding()
-            .background(Color(red: 57/255, green: 107/255, blue: 175/255))
+            .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(red: 57/255, green: 107/255, blue: 175/255))
             .cornerRadius(24, corners: [.topLeft, .topRight])
         }
         // FuelLogScreen sheet

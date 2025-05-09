@@ -78,6 +78,8 @@ struct InspectionbeforeRide: View {
    @StateObject private var locationManager = LocationManager()
     @State private var navigateToSOS = false
 
+  @Environment(\.colorScheme) var colorScheme
+
   private let db = Firestore.firestore()
     private var distanceToVehicleKm: Double {
       guard let userLoc = locationManager.location else { return 0 }
@@ -214,7 +216,7 @@ struct InspectionbeforeRide: View {
               }
             }
             .frame(maxWidth: .infinity)
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
             .cornerRadius(24, corners: [.topLeft, .topRight])
             .offset(y: -24)
             .zIndex(0)
@@ -228,7 +230,7 @@ struct InspectionbeforeRide: View {
           }
           .zIndex(1)
         }
-        .background(Color.white)
+        .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
         .edgesIgnoringSafeArea(.bottom)
       }
 
@@ -263,7 +265,7 @@ struct InspectionbeforeRide: View {
           .foregroundColor(.secondary)
       }
       .padding()
-      .background(Color(.systemGray6))
+      .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemGray6))
       .cornerRadius(16)
       if fuelLogged {
         Image(systemName: "checkmark.circle.fill")
@@ -288,7 +290,7 @@ struct InspectionbeforeRide: View {
         .foregroundColor(.secondary)
     }
     .padding()
-    .background(Color(.systemGray6))
+    .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemGray6))
     .cornerRadius(16)
   }
 

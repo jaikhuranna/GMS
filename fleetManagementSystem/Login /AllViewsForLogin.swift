@@ -71,7 +71,7 @@ struct LogoView: View {
             
             Text("Navora")
                 .font(.system(size: 32, weight: .bold))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Text("Manage your fleets")
                 .font(.system(size: 16, weight: .semibold))
@@ -107,9 +107,9 @@ struct LoginView: View {
                         .autocapitalization(.none)
                         .keyboardType(.emailAddress)
                         .padding()
-                        .background(Color.white)
+                        .background(Color(.systemBackground))
                         .cornerRadius(6)
-                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.black.opacity(0.5)))
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.5)))
                     
                     ZStack(alignment: .trailing) {
                         Group {
@@ -120,13 +120,13 @@ struct LoginView: View {
                             }
                         }
                         .padding()
-                        .background(Color.white)
+                        .background(Color(.systemBackground))
                         .cornerRadius(6)
-                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.black.opacity(0.5)))
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.5)))
                         
                         Button(action: { viewModel.isPasswordVisible.toggle() }) {
                             Image(systemName: viewModel.isPasswordVisible ? "eye.slash" : "eye")
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                                 .padding(.trailing, 12)
                         }
                     }
@@ -172,7 +172,7 @@ struct LoginView: View {
                 if !viewModel.userId.isEmpty {
                     Text("User ID: \(viewModel.userId)")
                         .font(.caption2)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                         .padding(.bottom, 8)
                 }
             }
@@ -221,7 +221,7 @@ struct MFASetupView: View {
                     }
                 }
                 .padding()
-                .background(Color.gray.opacity(0.1))
+                .background(Color(.systemBackground))
                 .cornerRadius(8)
                 
                 Button(action: viewModel.setupEmailMFA) {
@@ -244,7 +244,7 @@ struct MFASetupView: View {
                 if !viewModel.userId.isEmpty {
                     Text("User ID: \(viewModel.userId)")
                         .font(.caption2)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                         .padding(.top, 24)
                 }
             }
@@ -331,7 +331,7 @@ struct EmailOTPVerificationView: View {
             if !viewModel.userId.isEmpty {
                 Text("User ID: \(viewModel.userId)")
                     .font(.caption2)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
                     .padding(.bottom, 8)
             }
         }
@@ -353,11 +353,11 @@ struct OTPDigitTextField: View {
             .keyboardType(.numberPad)
             .multilineTextAlignment(.center)
             .frame(width: 44, height: 44)
-            .background(Color.white)
+            .background(Color(.systemBackground))
             .cornerRadius(6)
             .overlay(
                 RoundedRectangle(cornerRadius: 6)
-                    .stroke(isFocused ? Color.blue : Color.black.opacity(0.5), lineWidth: 2)
+                    .stroke(isFocused ? Color.accentColor : Color.secondary.opacity(0.5), lineWidth: 2)
             )
             .font(.system(size: 20, weight: .bold))
     }
@@ -412,7 +412,7 @@ struct UnknownRoleScreen: View {
             
             Text("User ID: \(viewModel.userId)")
                 .padding()
-                .background(Color.gray.opacity(0.1))
+                .background(Color(.systemBackground))
                 .cornerRadius(8)
                 .padding()
             

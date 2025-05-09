@@ -20,6 +20,7 @@ struct TripAssignedView: View {
     @State private var showCompletedCard = false
     @State private var navigateToInspection = false
     @State private var navigateToProfile = false
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         NavigationStack {
@@ -71,11 +72,8 @@ struct TripAssignedView: View {
                             onReject: { reject(trip: trip) }
                         )
                     }
-                    .background(
-                        RoundedRectangle(cornerRadius: 24)
-                            .fill(Color.white)
-                            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: -5)
-                    )
+                    .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
+                    .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: -5)
                     .ignoresSafeArea(edges: .bottom)
 
                     // navigation to inspection
@@ -93,6 +91,8 @@ struct TripAssignedView: View {
                 } else {
                     ProgressView("Waiting for trip assignment…")
                         .padding()
+                        .tint(Color.accentColors)
+                        .foregroundColor(Color.accentColors)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(12)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -230,6 +230,7 @@ private struct TripDetails: View {
     let distanceKm: Double
     let onAccept: () -> Void
     let onReject: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         VStack(spacing: 0) {
@@ -260,7 +261,7 @@ private struct TripDetails: View {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text("\(Int(distanceKm))")
                         .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     Text("kms")
                         .font(.system(size: 20, weight: .medium))
                         .foregroundColor(Color(red: 0.45, green: 0.56, blue: 0.81))
@@ -283,7 +284,7 @@ private struct TripDetails: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(trip.pickupName)
                                 .font(.system(size: 22, weight: .bold))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             Text(trip.pickupAddress)
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(Color(red: 0.45, green: 0.56, blue: 0.81))
@@ -313,7 +314,7 @@ private struct TripDetails: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(trip.dropoffName)
                                 .font(.system(size: 22, weight: .bold))
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             Text(trip.dropoffAddress)
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(Color(red: 0.45, green: 0.56, blue: 0.81))
@@ -328,7 +329,7 @@ private struct TripDetails: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color.gray.opacity(0.15))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                             .cornerRadius(12)
                     }
                     Button(action: onAccept) {
@@ -344,7 +345,7 @@ private struct TripDetails: View {
                 .padding(.bottom, 24)
             }
             .padding(.horizontal, 24)
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
         }
     }
 }

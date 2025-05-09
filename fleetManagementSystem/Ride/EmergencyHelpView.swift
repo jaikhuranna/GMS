@@ -44,7 +44,7 @@ struct EmergencyHelpView: View {
                 }
             }
 
-            // “Not sure what to do?” line
+            // "Not sure what to do?" line
             Text("Not sure what to do?")
                 .font(.headline)
             Text("Pick a subject below")
@@ -105,13 +105,13 @@ struct SOSCard: View {
             VStack(spacing: 8) {
                 Image(systemName: systemImage)
                                    .font(.system(size: 32))
-                                   .foregroundColor(Color(hex: "396BAF"))
+                                   .foregroundColor(Color.accentColor)
                 Text(title)
                                    .font(.headline)
-                                   .foregroundColor(Color(hex: "396BAF"))
+                                   .foregroundColor(.primary)
                            }
             .frame(width: 140, height: 100)
-            .background(Color(UIColor.secondarySystemBackground))
+            .background(Color(.secondarySystemBackground))
             .cornerRadius(12)
             .shadow(radius: 2)
         }

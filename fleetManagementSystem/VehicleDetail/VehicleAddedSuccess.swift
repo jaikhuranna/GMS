@@ -29,18 +29,18 @@ struct VehicleAddedSuccessView: View {
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-                .foregroundStyle(Color(hex: "396BAF"))
+                .foregroundColor(Color.accentColor)
 
             ZStack {
                 Circle()
-                    .fill(Color.blue.opacity(0.1))
+                    .fill(Color.accentColor.opacity(0.1))
                     .frame(width: 120, height: 120)
 
                 Image(systemName: "car.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 60, height: 60)
-                    .foregroundColor(Color(hex: "396BAF"))
+                    .foregroundColor(Color.accentColor)
             }
 
             VStack(spacing: 0) {
@@ -48,7 +48,7 @@ struct VehicleAddedSuccessView: View {
                 Divider()
                 infoRow(title: "Distance Travelled", value: distanceTravelled)
             }
-            .background(Color.white)
+            .background(Color(.systemGray6))
             .cornerRadius(12)
             .padding(.horizontal, 32)
             .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
@@ -61,7 +61,7 @@ struct VehicleAddedSuccessView: View {
                 Text("Done")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(hex: "396BAF"))
+                    .background(Color.accentColor)
                     .foregroundColor(.white)
                     .font(.headline)
                     .cornerRadius(12)
@@ -69,18 +69,18 @@ struct VehicleAddedSuccessView: View {
             .padding(.horizontal, 32)
             .padding(.bottom, 32)
         }
-        .background(Color(red: 237/255, green: 242/255, blue: 252/255))
+        .background(Color(.systemGray6))
         .navigationBarBackButtonHidden(true)
     }
 
     private func infoRow(title: String, value: String) -> some View {
         HStack {
             Text(title)
-                .foregroundColor(Color(hex: "396BAF"))
+                .foregroundColor(.primary)
                 .font(.body.bold())
             Spacer()
             Text(value)
-                .foregroundColor(.gray)
+                .foregroundColor(.secondary)
                 .font(.body)
         }
         .padding()

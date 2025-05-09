@@ -133,11 +133,11 @@ struct FleetDriverListView: View {
                         .font(.system(size: 24))
                         .foregroundColor(Color(hex: "#396BAF"))
                 }
-                // make sure tapping the pencil doesn’t trigger the row link:
+                // make sure tapping the pencil doesn't trigger the row link:
                 .buttonStyle(BorderlessButtonStyle())
             }
             .padding()
-            .background(Color(red: 237/255, green: 242/255, blue: 252/255))
+            .background(Color(.systemGray6))
             .cornerRadius(12)
             .padding(.horizontal)
         }
@@ -145,7 +145,7 @@ struct FleetDriverListView: View {
     }
 }
     
-    /// Turn that bad “.firebasestorage.app” into “.appspot.com”, and drop the “:443” port
+    /// Turn that bad ".firebasestorage.app" into ".appspot.com", and drop the ":443" port
     private func sanitizeStorageURL(_ raw: String) -> URL? {
         guard var comps = URLComponents(string: raw) else { return nil }
         // remove explicit port
@@ -174,14 +174,14 @@ struct FleetDriverListView: View {
                         Text(segment)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 6)
-                            .background(selectedSegment == segment ? Color.white : Color(hex: "396BAF"))
-                            .foregroundColor(selectedSegment == segment ? Color(hex: "396BAF") : .white)
+                            .background(selectedSegment == segment ? Color(.systemBackground) : Color.accentColor)
+                            .foregroundColor(selectedSegment == segment ? Color.accentColor : .white)
                             .cornerRadius(8)
                     }
                 }
             }
             .padding(4)
-            .background(Color(hex: "396BAF"))
+            .background(Color.accentColor)
             .cornerRadius(10)
             .padding(.horizontal)
         }

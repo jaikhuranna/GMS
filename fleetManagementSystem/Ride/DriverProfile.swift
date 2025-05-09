@@ -10,6 +10,8 @@ struct DriverProfile: View {
     @StateObject private var driverService: DriverService
     @StateObject private var recentService: RecentBookingService
     
+    @Environment(\.colorScheme) var colorScheme
+    
     // Initialize with AuthViewModel
     init(viewModel: AuthViewModel) {
         self.viewModel = viewModel
@@ -106,7 +108,7 @@ struct DriverProfile: View {
                             }
                         }
                         .padding()
-                        .background(Color.white)
+                        .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
                         .cornerRadius(16)
                         .shadow(color: Color.black.opacity(0.05),
                                 radius: 8, x: 0, y: 2)
@@ -143,7 +145,7 @@ struct DriverProfile: View {
                                 
                                 Text("KA01HE6655")
                                     .font(.system(size: 14))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                             }
                         }
                         
@@ -170,7 +172,7 @@ struct DriverProfile: View {
                         }
                     }
                     .padding()
-                    .background(Color.white)
+                    .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
                     .cornerRadius(16)
                     .shadow(color: Color.black.opacity(0.05),
                             radius: 8, x: 0, y: 2)
@@ -210,7 +212,7 @@ struct DriverProfile: View {
                         }
                     }
                     .padding()
-                    .background(Color.white)
+                    .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
                     .cornerRadius(16)
                     .shadow(color: Color.black.opacity(0.05),
                             radius: 8, x: 0, y: 2)
@@ -353,22 +355,22 @@ struct StatCardWithIcon: View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 32))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Text(value)
                 .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
             
             Text(label)
                 .font(.system(size: 14))
-                .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
+                .foregroundColor(.accentColor)
         }
         .frame(maxWidth: .infinity, minHeight: 100)
         .padding()
-        .background(Color(red: 0.95, green: 0.97, blue: 1.0))
+        .background(Color(.systemGray6))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(Color(red: 57/255, green: 107/255, blue: 175/255), lineWidth: 1)
+                .stroke(Color.accentColor, lineWidth: 1)
         )
         .cornerRadius(12)
     }
@@ -392,7 +394,7 @@ struct TripLocationView: View {
                 
                 Text(subtitle)
                     .font(.system(size: 14))
-                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
+                    .foregroundColor(.accentColor)
             }
         }
     }

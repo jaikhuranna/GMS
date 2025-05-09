@@ -16,7 +16,7 @@ class BookingService: ObservableObject {
   private let db = Firestore.firestore()
 
     init(driverId: String) {
-        // Listen for exactly one “pending” booking assigned to this driver
+        // Listen for exactly one "pending" booking assigned to this driver
         listener = db.collection("bookingRequests")
             .whereField("driverId", isEqualTo: driverId)
             .whereField("status", isEqualTo: "pending")

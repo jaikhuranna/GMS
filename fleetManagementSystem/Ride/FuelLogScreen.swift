@@ -10,6 +10,7 @@ struct FuelLogScreen: View {
   @State private var showPicker        = false
   @State private var showConfirm       = false
   private let db = Firestore.firestore()
+  @Environment(\.colorScheme) var colorScheme
 
   var body: some View {
     ZStack(alignment: .bottom) {
@@ -28,33 +29,28 @@ struct FuelLogScreen: View {
         // — Blue header with vehicle info —
         HStack {
           Text(vehicleNumber)
-            .font(.title2).bold().foregroundColor(.white)
+            .font(.title2).bold().foregroundColor(.primary)
           Spacer()
           // optionally show mileage
         }
         .padding()
-        .background(Color(red: 57/255, green: 107/255, blue: 175/255))
+        .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color.accentColor)
         .cornerRadius(24, corners: [.topLeft, .topRight])
 
         // Large, nice truck image
         HStack {
           Spacer()
-          Rectangle()
-            .fill(Color.blue)
-            .frame(width: 700, height: 357)
-            .overlay(
-              Image("truck")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-            )
-            .border(Color.blue, width: 2)
+          Image("truck")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 400, height: 204)
+            .shadow(color: Color.black.opacity(0.18), radius: 8, x: 0, y: 4)
           Spacer()
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
-        .background(Color.yellow.opacity(0.3)) // Debug background
 
-        // — White card with fuel controls —
+        // — Card with fuel controls —
         VStack(spacing: 16) {
           Text("Log Fuel Level")
             .font(.headline)
@@ -63,12 +59,12 @@ struct FuelLogScreen: View {
           HStack(spacing: 16) {
             Image(systemName: "fuelpump.fill")
               .font(.system(size: 24))
-              .foregroundColor(.black)
+              .foregroundColor(.primary)
 
             Text("\(selectedFuelLevel)%")
               .padding(.vertical, 8)
               .padding(.horizontal, 12)
-              .background(Color(.systemGray6))
+              .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
               .cornerRadius(8)
               .onTapGesture { showPicker.toggle() }
 
@@ -81,7 +77,7 @@ struct FuelLogScreen: View {
             .foregroundColor(.white)
             .padding(.horizontal, 24)
             .padding(.vertical, 10)
-            .background(Color.green)
+            .background(Color.accentColor)
             .cornerRadius(8)
           }
 
@@ -94,7 +90,7 @@ struct FuelLogScreen: View {
           }
         }
         .padding()
-        .background(Color.white)
+        .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
         .cornerRadius(24, corners: [.topLeft, .topRight])
       }
       .frame(maxWidth: .infinity)

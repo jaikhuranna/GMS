@@ -46,14 +46,14 @@ struct FleetVehicleListView: View {
                         Text(segment)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 6)
-                            .background(selectedSegment == segment ? Color.white : Color(hex: "396BAF"))
-                            .foregroundColor(selectedSegment == segment ? Color(hex: "396BAF") : .white)
+                            .background(selectedSegment == segment ? Color(.systemBackground) : Color.accentColor)
+                            .foregroundColor(selectedSegment == segment ? Color.accentColor : .white)
                             .cornerRadius(8)
                     }
                 }
             }
             .padding(4)
-            .background(Color(hex: "396BAF"))
+            .background(Color.accentColor)
             .cornerRadius(10)
             .padding(.horizontal)
         }

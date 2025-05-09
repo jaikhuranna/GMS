@@ -1,3 +1,4 @@
+// This file contains only logic and does not require dark mode UI changes.
 import Foundation
 import MapKit
 import CoreLocation

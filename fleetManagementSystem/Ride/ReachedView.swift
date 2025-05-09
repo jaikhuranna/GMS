@@ -8,6 +8,7 @@ struct ArrivalScreen: View {
         center: CLLocationCoordinate2D(latitude: 12.3072, longitude: 76.6497),
         span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
     )
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -34,7 +35,7 @@ struct ArrivalScreen: View {
                     Text("Arrived")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     Text("On your left: Mysuru Airport")
                         .font(.subheadline)
@@ -47,7 +48,7 @@ struct ArrivalScreen: View {
                 VStack(spacing: 12) {
                     Text("Rate your route")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     HStack(spacing: 4) {
                         ForEach(1..<6) { index in
@@ -79,10 +80,7 @@ struct ArrivalScreen: View {
                 }
             }
             .padding()
-            .background(
-                Color(hex: "#F2F2F2")
-                    .ignoresSafeArea(.container, edges: .bottom)
-            )
+            .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(hex: "#F2F2F2")).ignoresSafeArea(.container, edges: .bottom)
         }
         .navigationBarHidden(true)
         .statusBar(hidden: true)

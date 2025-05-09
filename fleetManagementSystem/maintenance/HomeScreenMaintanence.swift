@@ -25,18 +25,18 @@ struct HomeView: View {
                 // Header
                 ZStack(alignment: .top) {
                     RoundedRectangle(cornerRadius: 30)
-                        .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
+                        .fill(Color(.systemBackground))
                         .edgesIgnoringSafeArea(.top)
 
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Welcome,")
                                 .font(.title3)
-                                .foregroundColor(.black)
+                                .foregroundColor(Color.primary)
                             Text("Maintenance Manager")
                                 .font(.title2)
                                 .bold()
-                                .foregroundColor(.black)
+                                .foregroundColor(Color.primary)
                         }
                         Spacer()
                         HStack(spacing: 16) {
@@ -50,7 +50,7 @@ struct HomeView: View {
                             }) {
                                 Image(systemName: "person.circle.fill")
                                     .font(.system(size: 20))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(Color.primary)
                             }
                         }
                     }
@@ -125,7 +125,7 @@ struct HomeView: View {
                     .padding(.bottom, 40)
                 }
             }
-            .background(Color.white)
+            .background(Color(.systemGray6))
             .navigationBarHidden(true)
             .onAppear {
                            FirebaseModules.shared.fetchApprovedBills { bills in
@@ -152,7 +152,7 @@ struct TaskSummaryCard: View {
                 Text("\(count)")
                     .font(.title2)
                     .bold()
-                    .foregroundColor(Color(hex: "#396BAF"))
+                    .foregroundColor(Color.accentColor)
                 Spacer()
                 ZStack {
                     Circle()
@@ -160,16 +160,16 @@ struct TaskSummaryCard: View {
                         .frame(width: 50, height: 50)
                     Image(systemName: icon)
                         .font(.system(size: 22))
-                        .foregroundColor(Color(hex: "#396BAF"))
+                        .foregroundColor(Color.accentColor)
                 }
             }
             Text(title)
                 .font(.headline)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(Color.primary)
         }
         .padding(20)
         .frame(minHeight: 120)
-        .background(Color(red: 231/255, green: 237/255, blue: 248/255))
+        .background(Color(.systemGray6))
         .cornerRadius(20)
     }
 }
@@ -182,7 +182,7 @@ struct SectionView<Content: View>: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
                 .font(.title2)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(Color.primary)
             content()
         }
     }
@@ -208,13 +208,13 @@ struct RequestCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Car Number: \(carNumber)")
                     .font(.headline)
-                    .foregroundColor(Color(hex: "#396BAF"))
+                    .foregroundColor(Color.primary)
                 Text("Service Detail: \(serviceDetail)")
                     .font(.subheadline)
-                    .foregroundColor(Color(hex: "#396BAF"))
+                    .foregroundColor(Color.primary)
                 Text("Total Bill: ₹\(Int(totalBill))")
                     .font(.subheadline)
-                    .foregroundColor(Color(hex: "#396BAF"))
+                    .foregroundColor(Color.primary)
             }
             
             Divider()
@@ -270,7 +270,7 @@ struct RequestCard: View {
             .frame(minHeight: 24)
         }
         .padding(16)
-        .background(Color(red: 231/255, green: 237/255, blue: 248/255))
+        .background(Color(.systemGray6))
         .cornerRadius(20)
         .shadow(color: .gray.opacity(0.05), radius: 2, x: 0, y: 1)
     }
@@ -297,7 +297,7 @@ struct InventoryCard2: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.name)
                         .font(.headline)
-                        .foregroundColor(Color(hex: "#396BAF"))
+                        .foregroundColor(Color.primary)
                     Text("Only \(item.quantity) left in stock")
                         .font(.subheadline)
                         .foregroundColor(.red)
@@ -309,13 +309,13 @@ struct InventoryCard2: View {
                         .frame(width: 50, height: 50)
                     Image(systemName: item.type == .part ? "wrench.and.screwdriver" : "drop.fill")
                         .font(.system(size: 22))
-                        .foregroundColor(Color(hex: "#396BAF"))
+                        .foregroundColor(Color.accentColor)
                 }
             }
         }
         .padding(20)
         .frame(minHeight: 100)
-        .background(Color(red: 231/255, green: 237/255, blue: 248/255))
+        .background(Color(.systemGray6))
         .cornerRadius(20)
     }
 }

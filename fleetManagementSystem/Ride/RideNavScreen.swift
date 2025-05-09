@@ -529,6 +529,7 @@ struct NavigationMapView: View {
     let driverId: String
     @State private var navigateToSOS = false
     @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.colorScheme) var colorScheme
 
 
     @ObservedObject var viewModel: AuthViewModel
@@ -735,7 +736,7 @@ struct NavigationMapView: View {
                          },
                     viewModel: AuthViewModel()
                 )
-                .background(Color.white)
+                .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color.white)
                 .cornerRadius(24, corners: [.topLeft, .topRight])
                 .padding(.horizontal)
                 .ignoresSafeArea(.container, edges: .bottom)
@@ -751,6 +752,7 @@ struct NavigationSummaryView: View {
     let duration: String
     let distance: String
     let onExpand: () -> Void
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         HStack {
@@ -800,7 +802,7 @@ struct NavigationSummaryView: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Color(UIColor.systemBackground))
+        .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(UIColor.systemBackground))
         .cornerRadius(16, corners: [.topLeft, .topRight])
         .shadow(radius: 5)
     }
@@ -945,6 +947,7 @@ struct MapWithNavigation: UIViewRepresentable {
         @ObservedObject var vm: NavigationViewModel
         @ObservedObject var viewModel: AuthViewModel
         let onGo: () -> Void
+        @Environment(\.colorScheme) var colorScheme
         
         var body: some View {
             VStack(spacing: 0) {
@@ -993,7 +996,7 @@ struct MapWithNavigation: UIViewRepresentable {
                             }
                         }
                     }
-                    .background(Color.white)
+                    .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color.white)
                 }
             }
             .edgesIgnoringSafeArea(.bottom)
@@ -1006,6 +1009,7 @@ struct MapWithNavigation: UIViewRepresentable {
 struct ArrivalSheet: View {
     let name: String
     let onEnd: () -> Void
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         VStack(spacing: 32) {
@@ -1031,7 +1035,7 @@ struct ArrivalSheet: View {
         }
         .padding(.horizontal, 32)
         .padding(.vertical, 32)
-        .background(Color(UIColor.systemBackground))
+        .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(UIColor.systemBackground))
         .cornerRadius(28)
         .shadow(color: Color.black.opacity(0.10), radius: 18, x: 0, y: 8)
         .frame(maxWidth: 420)

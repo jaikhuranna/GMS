@@ -85,7 +85,7 @@ struct AddFleetVehicleView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 40, height: 40)
-                            .foregroundColor(Color(hex: "#396BAF"))
+                            .foregroundColor(Color.accentColor)
                     )
             }
 
@@ -95,7 +95,7 @@ struct AddFleetVehicleView: View {
                     .frame(width: 40, height: 40)
                     .overlay(
                         Image(systemName: "pencil")
-                            .foregroundColor(Color(hex: "#396BAF"))
+                            .foregroundColor(.primary)
                     )
                     .shadow(radius: 2)
             }
@@ -108,12 +108,12 @@ struct AddFleetVehicleView: View {
         VStack(spacing: 6) {
             Text("Vehicle Details")
                 .font(.headline)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(Color.accentColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white)
+                    .fill(Color(.systemGray6))
                     .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
 
                 VStack(spacing: 16) {
@@ -138,7 +138,7 @@ struct AddFleetVehicleView: View {
     private func inputRow(title: String, text: Binding<String>) -> some View {
         HStack(spacing: 16) {
             Text(title)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(.primary)
                 .frame(width: 120, alignment: .leading)
             TextField("Enter \(title)", text: text)
                 .frame(minHeight: 30)
@@ -148,7 +148,7 @@ struct AddFleetVehicleView: View {
     private func inputDoubleRow(title: String, value: Binding<Double>) -> some View {
         HStack(spacing: 16) {
             Text(title)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(.primary)
                 .frame(width: 120, alignment: .leading)
             TextField("Enter \(title)", value: value, format: .number)
                 .keyboardType(.decimalPad)
@@ -159,7 +159,7 @@ struct AddFleetVehicleView: View {
     private var datePickerRow: some View {
         HStack(spacing: 16) {
             Text("License Date")
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(.primary)
                 .frame(width: 120, alignment: .leading)
             DatePicker("", selection: $vehicle.licenseRenewalDate, displayedComponents: .date)
                 .labelsHidden()
@@ -169,19 +169,19 @@ struct AddFleetVehicleView: View {
     private var vehicleCategoryPicker: some View {
         HStack(spacing: 16) {
             Text("Vehicle Category")
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(.primary)
                 .frame(width: 120, alignment: .leading)
             Button(action: { showingVehicleTypePicker = true }) {
                 HStack {
                     Text(vehicle.vehicleCategory == .HMV ? "HMV" : "LMV")
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     Spacer()
                     Image(systemName: "chevron.down")
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)
-                .background(Color.gray.opacity(0.1))
+                .background(Color(.systemGray6))
                 .cornerRadius(8)
             }
             .actionSheet(isPresented: $showingVehicleTypePicker) {
@@ -202,12 +202,12 @@ struct AddFleetVehicleView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Insurance Proof")
                 .font(.headline)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(Color.accentColor)
 
             Button(action: { showingImagePickerForInsurance = true }) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white)
+                        .fill(Color(.systemGray6))
                         .shadow(color: .black.opacity(0.1), radius: 5)
                         .frame(height: 150)
 
@@ -220,9 +220,9 @@ struct AddFleetVehicleView: View {
                         } else {
                             Image(systemName: "arrow.up.doc")
                                 .font(.system(size: 32))
-                                .foregroundColor(Color(hex: "#396BAF"))
+                                .foregroundColor(Color.accentColor)
                             Text("Upload Insurance Image")
-                                .foregroundColor(Color(hex: "#396BAF"))
+                                .foregroundColor(Color.primary)
                         }
                     }
                 }
@@ -236,7 +236,7 @@ struct AddFleetVehicleView: View {
             Text(isSaving ? "Saving..." : "Add To Fleet")
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(isSaving ? Color.gray : Color(hex: "#396BAF"))
+                .background(isSaving ? Color.gray : Color.accentColor)
                 .foregroundColor(.white)
                 .font(.headline)
                 .cornerRadius(12)

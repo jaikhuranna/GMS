@@ -504,7 +504,7 @@ extension NotificationItem {
                 Image(systemName: iconName)
                     .resizable()
                     .frame(width: 24, height: 24)
-                    .foregroundColor(iconColor)
+                    .foregroundColor(Color.accentColor)
 
                 VStack(alignment: .leading, spacing: 4) {
                     switch self {
@@ -518,14 +518,14 @@ extension NotificationItem {
                     case let .billRaised(_, task, vehicle):
                         Text("Maintenance Manager raised a request")
                             .bold()
-                            .foregroundColor(Color(hex: "#F18701"))
+                            .foregroundColor(Color.accentColor)
                         Text(task)
                         Text(vehicle)
 
                     case let .maintenanceReview(task, vehicle):
                         Text("Maintenance Manager raised a review")
                             .bold()
-                            .foregroundColor(Color(hex: "#F18701"))
+                            .foregroundColor(Color.accentColor)
                         Text(task)
                         Text(vehicle)
 
@@ -539,14 +539,14 @@ extension NotificationItem {
                     case let .inventoryRestock(item, qty):
                         Text("Requested restocking")
                             .bold()
-                            .foregroundColor(Color(hex: "#F18701"))
+                            .foregroundColor(Color.accentColor)
                         Text(item)
                         Text("Qty: \(qty)")
 
                     case let .inventoryNewPart(item, qty):
                         Text("Requested new part")
                             .bold()
-                            .foregroundColor(Color(hex: "#F18701"))
+                            .foregroundColor(Color.accentColor)
                         Text(item)
                         Text("Qty: \(qty)")
 
@@ -566,13 +566,13 @@ extension NotificationItem {
                     }
                 }
                 .font(.subheadline)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(.primary)
 
                 Spacer()
             }
             .padding()
-            .background(Color(red: 231/255, green: 237/255, blue: 248/255))
-            .cornerRadius(12) // ✅ This now works
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
         }
     }
 
@@ -598,7 +598,7 @@ extension NotificationItem {
              .maintenanceReview,
              .inventoryRestock,
              .inventoryNewPart:
-            return Color(hex: "#F18701")
+            return Color.orange
         case .tripCompleted:      return .green
         case .maintenanceReport:  return .orange
         case .offRoute:           return .orange

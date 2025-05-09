@@ -25,6 +25,8 @@ struct VehicleChecklistView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     
+    @Environment(\.colorScheme) var colorScheme
+    
     private let items = [
         "Engine",
         "Tires & Wheels",
@@ -45,7 +47,7 @@ struct VehicleChecklistView: View {
                     } label: {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                             .padding(.trailing, 16)
                     }
                     Spacer()
@@ -55,7 +57,7 @@ struct VehicleChecklistView: View {
                     Color.clear.frame(width: 44, height: 44)
                 }
                 .padding()
-                .background(Color.white)
+                .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
                 
                 // Truck image & number
                 VStack(spacing: 8) {
@@ -96,7 +98,7 @@ struct VehicleChecklistView: View {
                         Text(selectedItems.count == items.count
                              ? (phase == .pre ? "Vehicle Ready!" : "All Good!")
                              : "Report Maintenance Issue!")
-                        .foregroundColor(.white)
+                        .foregroundColor(.primary)
                         .font(.system(size: 17, weight: .semibold))
                         Spacer()
                         Image(systemName: "arrow.right")
@@ -168,7 +170,7 @@ struct VehicleChecklistView: View {
                 .padding(.horizontal)
                 .background(
                     RoundedRectangle(cornerRadius: 24)
-                        .fill(Color(UIColor.systemBackground))
+                        .fill(Color(.systemBackground))
                         .shadow(radius: 8)
                 )
                 .transition(.move(edge: .bottom))
@@ -214,7 +216,7 @@ struct VehicleChecklistView: View {
                                 HStack(alignment: .center, spacing: 10) {
                                     Image(systemName: iconName(for: issue))
                                         .font(.system(size: 20))
-                                        .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
+                                        .foregroundColor(.accentColor)
                                     Text(issue)
                                         .font(.system(size: 16))
                                         .foregroundColor(.primary)
@@ -270,7 +272,7 @@ struct VehicleChecklistView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.vertical, 16)
-                .background(Color.white)
+                .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
                 .cornerRadius(24)
                 .shadow(color: Color.black.opacity(0.10), radius: 18, x: 0, y: 8)
                 .frame(maxWidth: 420)
@@ -413,27 +415,27 @@ private struct ChecklistButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: action) {
             VStack(spacing: 16) {
                 Image(systemName: icon)
                     .font(.system(size: 26))
-                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
+                    .foregroundColor(.accentColor)
                 Text(title)
                     .font(.system(size: 16))
-                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
-                    .multilineTextAlignment(.center)
+                    .foregroundColor(.primary)
             }
             .frame(width: 140, height: 140)
-            .background(Color.white)
+            .background(colorScheme == .dark ? Color(.secondarySystemBackground) : Color(.systemBackground))
             .cornerRadius(20)
             .shadow(color: Color.gray.opacity(0.1), radius: 2, x: 0, y: 1)
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color(red: 57/255, green: 107/255, blue: 175/255), lineWidth: 1))
+            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color(.systemGray6), lineWidth: 1))
             .overlay {
                 if isSelected {
                     Circle()
-                        .fill(Color(red: 57/255, green: 107/255, blue: 175/255))
+                        .fill(Color(.accentColors))
                         .frame(width: 24, height: 24)
                         .overlay(
                             Image(systemName: "checkmark")

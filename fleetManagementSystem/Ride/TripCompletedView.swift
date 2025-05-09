@@ -22,8 +22,8 @@ struct TripCompletedCard: View {
 
     var body: some View {
         ZStack {
-            // Fullscreen white background
-            Color.white.ignoresSafeArea()
+            // Fullscreen adaptive background
+            Color(.systemBackground).ignoresSafeArea()
             
             // Confetti animation (simple circles for now)
             if showConfetti {
@@ -40,7 +40,8 @@ struct TripCompletedCard: View {
                         .frame(width: 120, height: 120)
                     Image(systemName: "checkmark.circle.fill")
                         .resizable()
-                        .foregroundColor(.green)
+                        .foregroundColor(Color.green)
+                        .background(Color(.systemBackground))
                         .frame(width: 100, height: 100)
                         .scaleEffect(animateCheck ? 1.0 : 0.5)
                         .opacity(animateCheck ? 1.0 : 0.0)
@@ -50,11 +51,11 @@ struct TripCompletedCard: View {
                 
                 Text("Trip Completed!")
                     .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.black)
+                    .foregroundColor(Color.primary)
                     .padding(.bottom, 4)
                 Text("Thanks for driving safely.")
                     .font(.system(size: 18))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color.secondary)
                 
                 if isUpdating {
                     ProgressView()
@@ -108,8 +109,8 @@ struct TripCompletedCard: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(isUpdating ? Color.gray : Color(red: 57/255, green: 107/255, blue: 175/255))
-                .foregroundColor(.white)
+                .background(isUpdating ? Color(.systemGray) : Color.accentColor)
+                .foregroundColor(Color(.systemBackground))
                 .cornerRadius(16)
                 .disabled(isUpdating)
                 .padding(.horizontal, 32)
@@ -137,7 +138,10 @@ struct TripCompletedCard: View {
 // Simple confetti animation view
 struct ConfettiView: View {
     @State private var animate = false
-    let colors: [Color] = [.green, .blue, .yellow, .red, .purple, .orange]
+    let colors: [Color] = [
+        .green, .blue, .yellow, .red, .purple, .orange,
+        Color(.systemTeal), Color(.systemPink), Color(.systemIndigo), Color(.systemOrange)
+    ]
     var body: some View {
         GeometryReader { geo in
             ForEach(0..<18) { i in

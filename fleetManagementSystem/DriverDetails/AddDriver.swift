@@ -86,7 +86,7 @@ struct AddDriverView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 40, height: 40)
-                                .foregroundColor(Color(hex: "#396BAF"))
+                                .foregroundColor(Color.accentColor)
                         }
                     }
                 )
@@ -100,7 +100,7 @@ struct AddDriverView: View {
                     .frame(width: 32, height: 32)
                     .overlay(
                         Image(systemName: "pencil")
-                            .foregroundColor(Color(hex: "#396BAF"))
+                            .foregroundColor(.primary)
                             .font(.system(size: 16, weight: .medium))
                     )
                     .shadow(radius: 2)
@@ -114,14 +114,14 @@ struct AddDriverView: View {
         VStack(spacing: 6) {
             Text("Driver Details")
                 .font(.headline)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(Color.accentColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 2)
                 .fontWeight(.bold)
             
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white)
+                    .fill(Color(.systemGray6))
                     .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                 
                 VStack(spacing: 16) {
@@ -158,7 +158,7 @@ struct AddDriverView: View {
     private func inputRow(title: String, text: Binding<String>, field: Field, keyboard: UIKeyboardType = .default) -> some View {
         HStack(alignment: .top, spacing: 16) {
             Text(title)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(.primary)
                 .font(.subheadline)
                 .frame(width: 100, alignment: .leading)
             
@@ -182,7 +182,7 @@ struct AddDriverView: View {
     private var licenseTypeRow: some View {
         HStack(alignment: .center, spacing: 16) {
             Text("Licence Type")
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(.primary)
                 .font(.subheadline)
                 .frame(width: 100, alignment: .leading)
             
@@ -191,17 +191,17 @@ struct AddDriverView: View {
             }) {
                 HStack {
                     Text(driver.driverLicenseType)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .font(.body)
                     
                     Spacer()
                     
                     Image(systemName: "chevron.down")
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)
-                .background(Color.gray.opacity(0.1))
+                .background(Color(.systemGray6))
                 .cornerRadius(8)
             }
             .actionSheet(isPresented: $showingLicenseTypePicker) {
@@ -222,7 +222,7 @@ struct AddDriverView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Licence Proof")
                 .font(.headline)
-                .foregroundColor(Color(hex: "#396BAF"))
+                .foregroundColor(Color.accentColor)
                 .padding(.leading, 4)
             
             Button(action: {
@@ -231,7 +231,7 @@ struct AddDriverView: View {
             }) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.white)
+                        .fill(Color(.systemGray6))
                         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                         .frame(height: 150)
                     
@@ -245,9 +245,9 @@ struct AddDriverView: View {
                         VStack(spacing: 12) {
                             Image(systemName: "arrow.up.doc")
                                 .font(.system(size: 32))
-                                .foregroundColor(Color(hex: "#396BAF"))
+                                .foregroundColor(Color.accentColor)
                             Text("Upload Licence Image")
-                                .foregroundColor(Color(hex: "#396BAF"))
+                                .foregroundColor(Color.accentColor)
                                 .font(.subheadline)
                         }
                     }
@@ -273,13 +273,13 @@ struct AddDriverView: View {
                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(hex: "#396BAF"))
+                    .background(Color.accentColor)
                     .cornerRadius(12)
             } else {
                 Text("Add Driver")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(hex: "#396BAF"))
+                    .background(Color.accentColor)
                     .foregroundColor(.white)
                     .font(.headline)
                     .cornerRadius(12)
