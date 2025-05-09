@@ -160,10 +160,7 @@ struct MaintenanceProfileView: View {
         }
        // This ensures the header can extend to top edge
 }
-        
 
-
-// Rest of your structs remain the same...
 struct MaintenanceProfileStatCard: View {
     let title: String
     let value: String
@@ -207,8 +204,6 @@ struct ContactInfoView: View {
         }
     }
 }
-
-
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {

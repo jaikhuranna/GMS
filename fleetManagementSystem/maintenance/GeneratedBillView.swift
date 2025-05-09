@@ -19,7 +19,6 @@ struct GeneratedBillView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                // 🔹 Vehicle and Task Info
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Vehicle Number : \(vehicleNo)")
@@ -119,9 +118,9 @@ struct GeneratedBillView: View {
 
                     db.collection("pendingBills").document(docId).setData(billData) { error in
                         if let error = error {
-                            print("❌ Failed to send bill: \(error.localizedDescription)")
+                            print("Failed to send bill: \(error.localizedDescription)")
                         } else {
-                            print("✅ Bill sent for approval.")
+                            print("Bill sent for approval.")
                             showSuccessAlert = true
                         }
                     }
