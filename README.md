@@ -1,6 +1,6 @@
-# 🚛 Fleet Maintenance Manager
+# 🚛 Fleet Management System
 
-Fleet Maintenance Manager is an iOS application built with SwiftUI and Firebase to manage and streamline vehicle maintenance tasks. It allows fleet managers to log repairs, track inventory parts and fluids, upload maintenance images, and auto-generate GST-compliant maintenance bills.
+Fleet Management System is an iOS application built with SwiftUI and Firebase to manage and streamline vehicle maintenance tasks. It allows fleet managers to log repairs, track inventory parts and fluids, upload maintenance images, and auto-generate GST-compliant maintenance bills.
 
 ---
 
