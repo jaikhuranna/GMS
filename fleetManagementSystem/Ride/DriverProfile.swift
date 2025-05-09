@@ -67,13 +67,6 @@ struct DriverProfile: View {
                                 Text("Recent")
                                     .font(.system(size: 20, weight: .bold))
                                 Spacer()
-                                Text("Navigation")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(Color(red: 57/255, green: 107/255, blue: 175/255))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 4)
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(12)
                             }
                             
                             TripLocationView(
@@ -95,15 +88,6 @@ struct DriverProfile: View {
                                 subtitle: trip.dropoffAddress
                             )
                             
-                            Divider()
-                            
-                            HStack {
-                                Text("All Trips (\(driverService.driver?.totalTrips ?? 0))")
-                                    .font(.system(size: 14, weight: .medium))
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.gray)
-                            }
                         }
                         .padding()
                         .background(Color.white)

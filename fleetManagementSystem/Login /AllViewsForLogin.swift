@@ -158,10 +158,7 @@ struct LoginView: View {
                     .cornerRadius(6)
                 }
                 .padding(.top, 8)
-                
-                Button(action: viewModel.register) {
-                    Text("Don't have an account? Sign Up")
-                        .font(.system(size: 14, weight: .medium))
+                Button(action: viewModel.register) { Text("Don't have an account? Sign Up") .font(.system(size: 14, weight: .medium))
                         .foregroundColor(Color(red: 51/255, green: 102/255, blue: 204/255))
                 }
                 .padding(.top, 12)
