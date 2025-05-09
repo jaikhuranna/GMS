@@ -15,6 +15,7 @@ struct FleetDriverListView: View {
     @State private var editingDriver: Driver?
     @State private var navigateToEdit = false
     @State private var selectedDriver: Driver?
+    @Environment(\.colorScheme) var colorScheme
     
     
     let segments = ["HMV", "LMV"]

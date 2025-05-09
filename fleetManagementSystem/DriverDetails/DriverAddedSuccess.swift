@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DriverAddedSuccessView: View {
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.colorScheme) var colorScheme
 
     var driverName: String = "Raghu Ram" // Example Vehicle No
     var driverExperience: String = "5 years"   // Example Distance Travelled

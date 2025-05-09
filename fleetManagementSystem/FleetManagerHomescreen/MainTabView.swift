@@ -4,6 +4,8 @@ struct MainTabView: View {
     @State private var selectedTab = 0
     
     @ObservedObject var viewModel: AuthViewModel
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             // Tab 1: Home

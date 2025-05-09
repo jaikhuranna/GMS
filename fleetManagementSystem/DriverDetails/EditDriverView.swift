@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EditDriverView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) var colorScheme
     
     let original: Driver
     @State private var driver: Driver

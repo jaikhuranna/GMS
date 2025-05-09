@@ -222,6 +222,7 @@ import MapKit
 
 struct NotificationScreen: View {
     @StateObject private var viewModel = NotificationViewModel()
+    @Environment(\.colorScheme) var colorScheme
     
 
     var body: some View {

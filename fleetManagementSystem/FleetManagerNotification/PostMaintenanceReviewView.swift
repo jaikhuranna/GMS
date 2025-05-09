@@ -13,6 +13,7 @@ struct PostMaintenanceReviewView: View {
     @State private var postMaintenanceImage: UIImage?
     @State private var preImageItem: PhotosPickerItem?
     @State private var postImageItem: PhotosPickerItem?
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ScrollView {

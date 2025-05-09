@@ -14,7 +14,6 @@ import Firebase
 import FirebaseFirestore
 import Combine
 
-
 struct InfoCard: Identifiable {
     let id = UUID()
     let number: String

@@ -23,6 +23,7 @@ struct AddDriverView: View {
     @State private var showSuccessView = false
     @State private var firestoreError: String?
     @State private var isSaving = false
+    @Environment(\.colorScheme) var colorScheme
     
     enum ImagePickerType {
         case profile
