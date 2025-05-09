@@ -105,16 +105,20 @@ struct DashboardView: View {
 
     // MARK: – Ongoing Trips Section
     private var ongoingSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("On Going Trips")
-                .font(.title3).bold()
-                .padding(.horizontal)
+        Group {
+            if !dashboard.ongoingTrips.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("On Going Trips")
+                        .font(.title3).bold()
+                        .padding(.horizontal)
 
-            ForEach(dashboard.ongoingTrips) { trip in
-                TripRowView(trip: trip)
-                    .padding(.horizontal)
+                    ForEach(dashboard.ongoingTrips) { trip in
+                        TripRowView(trip: trip)
+                            .padding(.horizontal)
+                    }
+                    .padding(.bottom, 2)
+                }
             }
-            .padding(.bottom, 2)
         }
     }
 }

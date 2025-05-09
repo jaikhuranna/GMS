@@ -98,7 +98,7 @@ struct VehicleChecklistView: View {
                         Text(selectedItems.count == items.count
                              ? (phase == .pre ? "Vehicle Ready!" : "All Good!")
                              : "Report Maintenance Issue!")
-                        .foregroundColor(.primary)
+                        .foregroundColor(.white)
                         .font(.system(size: 17, weight: .semibold))
                         Spacer()
                         Image(systemName: "arrow.right")
@@ -422,7 +422,7 @@ private struct ChecklistButton: View {
             VStack(spacing: 16) {
                 Image(systemName: icon)
                     .font(.system(size: 26))
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(Color(hex: "#396BAF"))
                 Text(title)
                     .font(.system(size: 16))
                     .foregroundColor(.primary)
@@ -435,7 +435,7 @@ private struct ChecklistButton: View {
             .overlay {
                 if isSelected {
                     Circle()
-                        .fill(Color(.accentColors))
+                        .fill(Color(hex: "#396BAF"))
                         .frame(width: 24, height: 24)
                         .overlay(
                             Image(systemName: "checkmark")

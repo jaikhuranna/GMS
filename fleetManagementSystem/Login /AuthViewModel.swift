@@ -6,6 +6,7 @@
 
 import SwiftUI
 import Appwrite
+import Security
 
 enum AuthScreen {
     case loading // Add loading state
@@ -41,9 +42,19 @@ class AuthViewModel: ObservableObject {
     // MARK: - Private Properties
     private let appwrite = Appwrite()
     private var challengeId: String = ""
+    private let keychainService = "com.fleetManagementSystem.login"
     
     // MARK: - Initialization
     init() {
+        // Prefill credentials from Keychain if available
+        if let emailData = KeychainHelper.shared.read(service: keychainService, account: "email"),
+           let passwordData = KeychainHelper.shared.read(service: keychainService, account: "password"),
+           let savedEmail = String(data: emailData, encoding: .utf8),
+           let savedPassword = String(data: passwordData, encoding: .utf8) {
+            self.email = savedEmail
+            self.password = savedPassword
+        }
+        
         if let savedUserId = appwrite.getUserId() {
             self.userId = savedUserId
             DispatchQueue.main.async {
@@ -123,6 +134,12 @@ class AuthViewModel: ObservableObject {
                     self.userId = savedId
                 }
                 
+                // Save credentials to Keychain
+                if let emailData = email.data(using: .utf8), let passwordData = password.data(using: .utf8) {
+                    KeychainHelper.shared.save(service: keychainService, account: "email", data: emailData)
+                    KeychainHelper.shared.save(service: keychainService, account: "password", data: passwordData)
+                }
+                
                 // Fetch role and go to home
                 try await fetchUserRole()
             } catch let error as AppwriteError {
@@ -173,6 +190,10 @@ class AuthViewModel: ObservableObject {
         do {
             // End Appwrite session
             try await appwrite.onLogout()
+            
+            // Delete credentials from Keychain
+            KeychainHelper.shared.delete(service: keychainService, account: "email")
+            KeychainHelper.shared.delete(service: keychainService, account: "password")
             
             // Update UI state on main thread
             await MainActor.run {
