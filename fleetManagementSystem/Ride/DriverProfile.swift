@@ -162,13 +162,13 @@ struct DriverProfile: View {
                     
                     // MARK: - Support & Sign Out
                     VStack(spacing: 16) {
-                        HStack {
-                            Image(systemName: "questionmark.circle")
-                            Text("Support")
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.gray)
-                        }
+//                        HStack {
+//                            Image(systemName: "questionmark.circle")
+//                            Text("Support")
+//                            Spacer()
+//                            Image(systemName: "chevron.right")
+//                                .foregroundColor(.gray)
+//                        }
                         
                         Divider()
                         
