@@ -99,9 +99,7 @@ struct MaintenanceNotificationScreen: View {
                     )
                 }
 
-                // ————————————————————————————
-                //  Static “Requests” Section
-                // ————————————————————————————
+                //  Requests Section
                 SectionView2(title: "Requests", items: [
                     NotificationData(
                         statusMessage: "Fleet Manager has raised a request",
@@ -116,7 +114,6 @@ struct MaintenanceNotificationScreen: View {
                         vehicle: "KN23CB4563"
                     )
                 ])
-
                 // ————————————————————————————
                 //  Static “Post Maintenance Reviews” Section
                 // ————————————————————————————
@@ -156,8 +153,8 @@ struct NotificationData: Identifiable {
     let statusColor: Color
     let task: String
     let vehicle: String
-    var date: Date? = nil       // optional: only used for real reports
-    var notes: String? = nil    // optional: only used for real reports
+    var date: Date? = nil
+    var notes: String? = nil
 }
 
 struct NotificationCard: View {
@@ -212,9 +209,6 @@ struct NotificationCard: View {
         .cornerRadius(12)
     }
 }
-
-// MARK: - Hex Color Helper
-
 
 // MARK: - Preview
 

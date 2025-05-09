@@ -70,14 +70,14 @@ struct InventoryCard: View {
             
             Spacer()
             
-            Button(action: {}) {
-                Text("Restock")
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-            }
+//            Button(action: {}) {
+//                Text("Restock")
+//                    .padding(.horizontal)
+//                    .padding(.vertical, 8)
+//                    .background(Color.green)
+//                    .foregroundColor(.white)
+//                    .cornerRadius(10)
+//            }
         }
         .padding()
         .background(Color(.systemGray6))

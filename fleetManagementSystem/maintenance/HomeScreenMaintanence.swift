@@ -25,18 +25,18 @@ struct HomeView: View {
                 // Header
                 ZStack(alignment: .top) {
                     RoundedRectangle(cornerRadius: 30)
-                        .fill(Color(red: 231/255, green: 237/255, blue: 248/255))
+                        .fill(Color(hex: "#396BAF"))
                         .edgesIgnoringSafeArea(.top)
 
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Welcome,")
-                                .font(.title3)
-                                .foregroundColor(.black)
+                                .font(.title3).bold()
+                                .foregroundColor(.white)
                             Text("Maintenance Manager")
                                 .font(.title2)
                                 .bold()
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                         }
                         Spacer()
                         HStack(spacing: 16) {
@@ -44,13 +44,14 @@ struct HomeView: View {
                             // Settings button
                             NavigationLink(destination: MaintenanceNotificationScreen()) {
                                 Image(systemName: "bell.fill").font(.system(size: 25))
+                                    .foregroundColor(.white)
                             }
                             Button(action: {
                                 showProfile = true
                             }) {
                                 Image(systemName: "person.circle.fill")
                                     .font(.system(size: 20))
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.white)
                             }
                         }
                     }
@@ -284,8 +285,6 @@ struct RequestCard: View {
             }
         }
     }
-
-
 }
 
 struct InventoryCard2: View {
@@ -317,5 +316,15 @@ struct InventoryCard2: View {
         .frame(minHeight: 100)
         .background(Color(red: 231/255, green: 237/255, blue: 248/255))
         .cornerRadius(20)
+    }
+}
+
+// MARK: - Preview
+
+struct HomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        // Create a mock AuthViewModel instance
+        let mockViewModel = AuthViewModel()
+        HomeView(viewModel: mockViewModel)
     }
 }
